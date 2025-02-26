@@ -23,7 +23,5 @@ export default new DataSource({
   },
   entities,
   logging: true,
-  migrations: [
-
-  ],
+  migrations: ['./migrations/*.ts'],
 });
