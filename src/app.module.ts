@@ -13,6 +13,7 @@ import { CountryModule } from './country/country.module';
 import { EmailVerificationTokenModule } from './email-verification-token/email-verification-token.module';
 import { ResetPasswordTokenModule } from './reset-password-token/reset-password-token.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { SeedersModule } from './seeders/seeders.module';
 
 
 
@@ -55,6 +56,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     EmailVerificationTokenModule,
     ResetPasswordTokenModule,
     CloudinaryModule,
+    SeedersModule,
 
   ],
   controllers: [AppController],

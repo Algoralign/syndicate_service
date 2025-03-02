@@ -1,24 +1,40 @@
 
 
+import {
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
-@Entity({ name: "countries" })
+@Entity({ name: 'countries' })
 class Country {
-    @PrimaryGeneratedColumn("uuid")
-    public id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({ nullable: true })
-    public name: string;
+    name: string;
 
     @Column({ nullable: true })
-    public code: string;
+    continent: string;
+
+    @Column({ nullable: true })
+    dial_code: string;
+
+    @Column({ nullable: true })
+    value: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
-    public created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
-    public updated_at: Date;
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)',
+    })
+    updated_at: Date;
 }
+
 
 export default Country;
