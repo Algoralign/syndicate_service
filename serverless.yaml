@@ -1,0 +1,65 @@
+service: algoralign-backend
+
+useDotenv: true
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  environment:
+    DATABASE_NAME: ${env.DATABASE_NAME}
+    DATABASE_TYPE: ${env.DATABASE_TYPE}
+    DATABASE_HOST: ${env.DATABASE_HOST}
+    DATABASE_PORT: ${env.DATABASE_PORT}
+    DATABASE_USER: ${env.DATABASE_USER}
+    DATABASE_PASSWORD: ${env.DATABASE_PASSWORD}
+    DATABASE_URL: ${env.DATABASE_URL}
+    PORT: ${env.PORT}
+    CLIENT_URL: ${env.CLIENT_URL}
+    JWT_SECRET: ${env.JWT_SECRET}
+    JWT_EXPIRY: ${env.JWT_EXPIRY}
+    AWS_ACCESS_KEY_ID: ${env.AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${env.AWS_SECRET_ACCESS_KEY}
+    AWS_REGION: ${env.AWS_REGION}
+    AWS_BUCKET_NAME: ${env.AWS_BUCKET_NAME}
+    SEND_GRID_API_KEY: ${env.SEND_GRID_API_KEY}
+    SEND_GRID_USER: ${env.SEND_GRID_USER}
+    SEND_GRID_PORT: ${env.SEND_GRID_PORT}
+    SEND_GRID_HOST: ${env.SEND_GRID_HOST}
+    MAIL_FROM: ${env.MAIL_FROM}
+    SENDCHAMPSMSSENDER: ${env.SENDCHAMPSMSSENDER}
+    SENDCHAMPPUBKEY: ${env.SENDCHAMPPUBKEY}
+    SENDCHAMPMODE: ${env.SENDCHAMPMODE}
+    SENDCHAMPROUTE: ${env.SENDCHAMPROUTE}
+    SMS_QUEUE: ${env.SMS_QUEUE}
+    REDIS_NAME: ${env.REDIS_NAME}
+    REDIS_URI: ${env.REDIS_URI}
+    REDIS_HOST: ${env.REDIS_HOST}
+    REDIS_TIMEOUT: ${env.REDIS_TIMEOUT}
+    REDIS_PORT: ${env.REDIS_PORT}
+    REDIS_PASSWORD: ${env.REDIS_PASSWORD}
+    MAIL_HOST: ${env.MAIL_HOST}
+    MAIL_USER: ${env.MAIL_USER}
+    MAIL_PASSWORD: ${env.MAIL_PASSWORD}
+    MAIL_PORT: ${env.MAIL_PORT}
+    MAIL_QUEUE: ${env.MAIL_QUEUE}
+    NODE_ENV: ${env.NODE_ENV}
+    NODE_OPTIONS: ${env.NODE_OPTIONS}
+    NPM_CONFIG_PRODUCTION: ${env.NPM_CONFIG_PRODUCTION}
+    STAGE: ${env.STAGE}
+    HTTP_TIMEOUT: ${env.HTTP_TIMEOUT}
+    HTTP_MAX_REDIRECTS: ${env.HTTP_MAX_REDIRECTS}
+    PROVIDUS_X_Auth_Signature: ${env.PROVIDUS_X_Auth_Signature}
+    PROVIDUS_CLIENT_ID: ${env.PROVIDUS_CLIENT_ID}
+    PROVIDUS_CLIENT_SECRET: ${env.PROVIDUS_CLIENT_SECRET}
+    PROVIDUS_BASE_URL: ${env.PROVIDUS_BASE_URL}
+
+functions:
+  main:
+    handler: dist/serverless.handler
+    events:
+      - http:
+          method: ANY
+          path: /
