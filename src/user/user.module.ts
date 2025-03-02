@@ -10,7 +10,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 
-
+// module
 @Module({
   imports: [TypeOrmModule.forFeature([
     User,
