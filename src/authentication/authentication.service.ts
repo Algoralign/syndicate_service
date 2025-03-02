@@ -30,6 +30,8 @@ export class AuthenticationService {
   public async getJwtToken(_user: LoginUserDto) {
     const user = await this.userService.getByEmail(_user.email, _user.password);
 
+    console.log(user);
+
     if (!user.data.verified) {
       return {
         error: true,

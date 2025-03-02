@@ -63,17 +63,17 @@ export class EmailVerificationTokenService {
             }
 
             // check if token created at is above 1 hour
-            if (tokenEntity?.created_at) {
-                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+            // if (tokenEntity?.created_at) {
+            //     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
 
-                if (new Date(tokenEntity.created_at) < oneHourAgo) {
-                    return {
-                        message: `email verification token expired`,
-                        error: true,
-                        status_code: 400,
-                    };
-                }
-            }
+            //     if (new Date(tokenEntity.created_at) < oneHourAgo) {
+            //         return {
+            //             message: `email verification token expired`,
+            //             error: true,
+            //             status_code: 400,
+            //         };
+            //     }
+            // }
 
             if (tokenEntity?.expired) {
                 return {

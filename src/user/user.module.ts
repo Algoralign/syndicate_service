@@ -9,6 +9,7 @@ import { ResetPasswordTokenService } from '../reset-password-token/reset-passwor
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
+import Address from '../address/address.entity';
 
 // module
 @Module({
@@ -16,7 +17,8 @@ import ResetPasswordToken from '../reset-password-token/reset-password-token.ent
     User,
     Country,
     EmailVerificationToken,
-    ResetPasswordToken
+    ResetPasswordToken,
+    Address
 
   ])],
   controllers: [UserController],

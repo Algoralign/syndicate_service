@@ -14,6 +14,7 @@ import { EmailVerificationTokenModule } from './email-verification-token/email-v
 import { ResetPasswordTokenModule } from './reset-password-token/reset-password-token.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { SeedersModule } from './seeders/seeders.module';
+import { MailModule } from './mail/mail.module';
 
 
 
@@ -57,6 +58,7 @@ import { SeedersModule } from './seeders/seeders.module';
     ResetPasswordTokenModule,
     CloudinaryModule,
     SeedersModule,
+    MailModule,
 
   ],
   controllers: [AppController],
