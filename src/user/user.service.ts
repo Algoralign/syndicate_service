@@ -23,6 +23,8 @@ import Country from '../country/country.entity';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import ChangePasswordDto from '../_dtos/change-password.dto';
 import RequestPasswordVerificationEmailDto from '../_dtos/request-password-verification-email.dto';
+import Address from '../address/address.entity';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -35,9 +37,13 @@ export class UserService {
     @InjectRepository(Country)
     private countryRepository: Repository<Country>,
 
+    @InjectRepository(Address)
+    private addressRepository: Repository<Address>,
+
     private emailVerificationTokenService: EmailVerificationTokenService,
 
     private resetPasswordTokenService: ResetPasswordTokenService,
+    private mailService: MailService,
   ) { }
 
   public async getByEmail(email: string, password: string) {
@@ -90,57 +96,65 @@ export class UserService {
 
   public async create(userData: CreateUserDto) {
     try {
+      // Check if country exists
+      const country = await this.countryRepository.findOne({ where: { id: userData.country_id } });
+
+      if (!country) {
+        return {
+          error: true, // Fix: This should be `true` for an error
+          status_code: HttpStatus.BAD_REQUEST,
+          message: 'Country selected does not exist',
+        };
+      }
+
+      // Create and save User first
       const newUser = this.userRepository.create({
-        first_name: userData.first_name,
-        last_name: userData.last_name,
         email: userData.email,
-        phone: userData.phone,
         password: await this.createPasswordHash(userData.password),
       });
+
       const user = await this.userRepository.save(newUser);
 
-      const token =
-        await this.emailVerificationTokenService.createEmailverificationToken(
-          userData.email,
-        );
+      // Create and save Address
+      const address = this.addressRepository.create({ user, country });
+      await this.addressRepository.save(address);
 
+      // Generate email verification token
+      const token = await this.emailVerificationTokenService.createEmailverificationToken(userData.email);
+
+      // Prepare response data
       const data = {
         email: user.email,
-        phone: user.phone,
         email_verification_token: token.token,
-        first_name: user.first_name,
-        last_name: user.last_name,
         verified: user.verified,
-        verification_link:
-          `${process.env.ROOT_URL}` + '?token=' + `${token.token}`,
+        verification_link: `${process.env.ROOT_URL}?token=${token.token}`,
       };
 
-      //send email verification mail - rabbitmq
-      // this.rabbitClient.emit('log.INFO', { name: 'auth', data: data });
-
-
-
+      // Send email verification mail (if needed)
+      await this.mailService.sendUserConfirmation(data);
 
       return {
         error: false,
-        status_code: HttpStatus.ACCEPTED,
-        message: 'user account created',
+        status_code: HttpStatus.OK,
+        message: 'User account created',
       };
     } catch (error) {
+      console.log(error)
       if (error?.code == PostgresErrorCode.UniqueViolation) {
         throw new CustomHttpException(
-          'user email already exist',
+          'User email already exists',
           HttpStatus.BAD_REQUEST,
           { status_code: HttpStatus.BAD_REQUEST, error: true },
         );
       }
       throw new CustomHttpException(
-        'error creating user',
+        'Error creating user',
         HttpStatus.INTERNAL_SERVER_ERROR,
         { status_code: HttpStatus.INTERNAL_SERVER_ERROR, error: true },
       );
     }
   }
+
 
   public async requestVerificationEmail(userData: RequestPasswordVerificationEmailDto) {
     try {

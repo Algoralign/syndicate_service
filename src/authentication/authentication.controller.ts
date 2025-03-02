@@ -63,6 +63,7 @@ export class AuthenticationController {
   @HttpCode(200)
   @Post('login')
   async logIn(@Body() userData: LoginUserDto, @Res() response: Response) {
+    console.log(userData, "USER")
     const token = await this.authenticationService.getJwtToken(
       userData,
     );

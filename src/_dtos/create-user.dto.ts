@@ -1,13 +1,17 @@
-import { UserType } from "../_enums/user-type.enum";
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateUserDto {
-    first_name: string;
-    last_name: string;
-    phone: string;
+class CreateUserDto {
+    @IsNotEmpty()
+    @IsString()
+    country_id: string;
+
+    @IsEmail()
+    @IsNotEmpty()
     email: string;
-    name: string;
+
+    @IsNotEmpty()
+    @IsString()
     password: string;
-    role: string;
 }
 
 

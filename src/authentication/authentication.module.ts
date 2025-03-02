@@ -20,6 +20,7 @@ import Country from '../country/country.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
+import Address from '../address/address.entity';
 @Global()
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import ResetPasswordToken from '../reset-password-token/reset-password-token.ent
       User,
       EmailVerificationToken,
       Country,
-
+      Address,
       ResetPasswordToken
     ])
   ],

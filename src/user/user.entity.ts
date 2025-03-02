@@ -38,6 +38,7 @@ class User {
     @Column({ default: false })
     public verified: boolean;
 
+
     @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true })
     @JoinColumn({ name: 'address_id' }) // Ensures foreign key in the User table
     public address: Address;
