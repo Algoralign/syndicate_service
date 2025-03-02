@@ -8,7 +8,7 @@ ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 WORKDIR /usr/src/app
 
 # Copy package.json and yarn.lock to the container
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Install app dependencies using yarn
 RUN yarn install --frozen-lockfile
