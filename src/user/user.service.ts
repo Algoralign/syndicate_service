@@ -131,8 +131,6 @@ export class UserService {
       };
 
       // Send email verification mail (if needed)
-      // this.rabbitClient.emit('log.INFO', { name: 'auth', data: data });
-      //send email verification link to user
       await this.mailService.sendUserConfirmation(data);
 
       return {

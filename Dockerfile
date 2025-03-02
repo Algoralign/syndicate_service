@@ -20,7 +20,7 @@ COPY . .
 COPY ./dist /usr/src/app/dist
 
 # Expose the port on which the app will run
-EXPOSE 5001
+EXPOSE 5002
 
 # Start the server using the production build
 CMD ["yarn", "start:prod"]
