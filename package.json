@@ -1,4 +1,9 @@
 {
   "name": "working-syndicate",
-  "packageManager": "yarn@3.6.4"
+  "packageManager": "yarn@3.6.4",
+  "dependencies": {
+    "@nestjs/event-emitter": "^3.0.1",
+    "@nestjs/typeorm": "^11.0.0",
+    "typeorm": "^0.3.20"
+  }
 }
