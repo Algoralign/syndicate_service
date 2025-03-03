@@ -11,9 +11,11 @@ class Address {
     @JoinColumn({ name: 'user_id' })
     public user: User;
 
-    @ManyToOne(() => Country, { nullable: true })
+
+    @ManyToOne(() => Country, { nullable: true, eager: true })
     @JoinColumn({ name: 'country_id' })
     public country: Country;
+
 
     @Column({ nullable: true })
     public residential_address: string;
