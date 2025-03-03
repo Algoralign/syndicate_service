@@ -173,4 +173,65 @@ export class AuthenticationController {
       data: result.data
     });
   }
+
+
+  @HttpCode(200)
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('retrieve-identification-types')
+  async retriveIdentificationTypes(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const result =
+      await this.authenticationService.retriveIdentificationTypes();
+    return response.status(HttpStatus.OK).json({
+      error: false,
+      status_code: 200,
+      message: 'Identification types retrived sucessfully',
+      data: {
+        data: result,
+      },
+    });
+  }
+
+
+  @HttpCode(200)
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('bank-country')
+  async retriveBankCountries(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const result =
+      await this.authenticationService.retriveBankCountries();
+    return response.status(HttpStatus.OK).json({
+      error: false,
+      status_code: 200,
+      message: 'data  retrived sucessfully',
+      data: {
+        data: result,
+      },
+    });
+  }
+
+
+
+  @Get('country-bank')
+  async retriveBank(
+    @Query('code') code: string,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+
+    const data = await this.authenticationService.retriveBank(code);
+    return response.status(HttpStatus.OK).json({
+      error: false,
+      status_code: 200,
+      message: 'data  retrived sucessfully',
+      data: {
+        data: data,
+      },
+    });
+  }
+
 }

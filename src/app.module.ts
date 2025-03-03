@@ -15,6 +15,8 @@ import { ResetPasswordTokenModule } from './reset-password-token/reset-password-
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { SeedersModule } from './seeders/seeders.module';
 import { MailModule } from './mail/mail.module';
+import { BankModule } from './bank/bank.module';
+import { IdentityTypesModule } from './identity-types/identity-types.module';
 
 
 
@@ -59,6 +61,8 @@ import { MailModule } from './mail/mail.module';
     CloudinaryModule,
     SeedersModule,
     MailModule,
+    BankModule,
+    IdentityTypesModule,
 
   ],
   controllers: [AppController],

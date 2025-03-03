@@ -21,6 +21,10 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import Address from '../address/address.entity';
+import { IdentityTypesService } from '../identity-types/identity-types.service';
+import IdentityType from '../identity-types/identity-types.entity';
+import { Bank } from '../bank/bank.entity';
+import { BankService } from '../bank/bank.service';
 @Global()
 @Module({
   imports: [
@@ -43,7 +47,9 @@ import Address from '../address/address.entity';
       EmailVerificationToken,
       Country,
       Address,
-      ResetPasswordToken
+      ResetPasswordToken,
+      IdentityType,
+      Bank
     ])
   ],
   providers: [
@@ -53,7 +59,9 @@ import Address from '../address/address.entity';
     EmailVerificationTokenService,
     JwtStrategy,
     CloudinaryService,
-    ResetPasswordTokenService
+    ResetPasswordTokenService,
+    IdentityTypesService,
+    BankService
   ],
   controllers: [AuthenticationController],
   exports: [JwtStrategy, PassportModule],
