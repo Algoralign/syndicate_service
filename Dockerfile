@@ -1,5 +1,5 @@
 # Base image
-FROM --platform=linux/amd64 node:18
+FROM --platform=linux/amd64 node:20
 
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
