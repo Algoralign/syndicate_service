@@ -39,8 +39,7 @@ class User {
     public verified: boolean;
 
 
-    @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true })
-    @JoinColumn({ name: 'address_id' }) // Ensures foreign key in the User table
+    @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true, eager: true })
     public address: Address;
 
 

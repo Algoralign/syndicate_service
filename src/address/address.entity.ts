@@ -7,8 +7,8 @@ class Address {
     @PrimaryGeneratedColumn('uuid')
     public id: string;
 
-    @OneToOne(() => User, (user) => user.address, { nullable: false })
-    @JoinColumn({ name: 'user_id' }) // Foreign key in the Address table
+    @OneToOne(() => User, (user) => user.address)
+    @JoinColumn({ name: 'user_id' })
     public user: User;
 
     @ManyToOne(() => Country, { nullable: true })
