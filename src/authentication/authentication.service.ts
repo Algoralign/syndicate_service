@@ -16,6 +16,8 @@ import { UserTypeArray } from '../_enums/user-type.enum';
 import ResetPasswordEmailDto from '../_dtos/reset-password-email.dto';
 import ChangePasswordDto from '../_dtos/change-password.dto';
 import RequestPasswordVerificationEmailDto from '../_dtos/request-password-verification-email.dto';
+import { IdentityTypesService } from '../identity-types/identity-types.service';
+import { BankService } from '../bank/bank.service';
 
 @Injectable()
 export class AuthenticationService {
@@ -24,6 +26,8 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private cloudinaryService: CloudinaryService,
+    private identityTypesService: IdentityTypesService,
+    private bankService: BankService,
 
   ) { }
 
@@ -89,5 +93,16 @@ export class AuthenticationService {
 
   public async changePassword(userdata: ChangePasswordDto) {
     return await this.userService.changePassword(userdata);
+  }
+
+  public async retriveIdentificationTypes() {
+    return await this.identityTypesService.getAll();
+  }
+  public async retriveBankCountries() {
+    return await this.bankService.retriveBankCountries();
+  }
+
+  public async retriveBank(code: string) {
+    return await this.bankService.retriveBank(code);
   }
 }
