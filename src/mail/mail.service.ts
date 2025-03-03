@@ -26,15 +26,12 @@ export class MailService {
   ): Promise<void> {
     try {
 
-      console.log("welcome email sending")
-      console.log(data)
-      console.log(data.verification_link)
       const templatePath = 'src/mail/templates/confirmation.hbs';
       const template = fs.readFileSync(templatePath, 'utf8');
       const compiledTemplate = handlebars.compile(template);
       const htmlBody = compiledTemplate({
         name: data.email,
-        login_url: `${this.config.get('LOGIN_URL')}`,
+        login_url: `${this.config.get('ROOT_URL')}`,
         url: data.verification_link,
       });
 
