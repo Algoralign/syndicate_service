@@ -49,6 +49,9 @@ class Kyc {
     public bank: Bank;
 
     @Column({ nullable: true })
+    public bvn: string;
+
+    @Column({ nullable: true })
     public account_number: string;
 
     @Column({ nullable: true })
