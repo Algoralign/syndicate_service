@@ -61,7 +61,11 @@ export class AuthenticationService {
         throw new BadRequestException('user unauthorized');
       }
 
-      const kycExist = await this.kycRepository.findOne({ where: { user: { id: user.id } } })
+      const kycExist = await this.kycRepository
+        .createQueryBuilder('kyc')
+        .where('kyc.user_id = :userId', { userId: userExist.id })
+        .getOne();
+
 
       if (kycExist && kycExist.uploaded) {
         return {
