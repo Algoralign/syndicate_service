@@ -7,6 +7,7 @@ import User from '../../user/user.entity';
 import { JsonResponse, JwtPayload } from '../interfaces/jwt-payload.interface';
 import { UserService } from '../../user/user.service';
 import { ConfigService } from '@nestjs/config';
+import Kyc from '../../kyc/kyc.entity';
 
 
 
@@ -16,6 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
 
 
   ) {
@@ -39,6 +41,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
 
+    let kyc = await this.kycRepository.findOne({
+      where: { user: { id: user.id } },
+    });
+
+    if (kyc) {
+      kyc.user = undefined
+    }
+
     user.password = undefined;
 
     // Construct the response
@@ -48,8 +58,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       status_code: HttpStatus.OK,
       data: {
         user,         // Include the original user object      // Include the extracted roles array
-        kyc_detail: {
-        }
+        kyc_detail: kyc || {}
       }
     };
 
