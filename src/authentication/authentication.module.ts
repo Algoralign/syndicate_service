@@ -12,6 +12,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
 import { Utility } from '../utilities/utility';
+import Kyc from '../kyc/kyc.entity';
 
 
 
@@ -49,7 +50,8 @@ import { BankService } from '../bank/bank.service';
       Address,
       ResetPasswordToken,
       IdentityType,
-      Bank
+      Bank,
+      Kyc,
     ])
   ],
   providers: [

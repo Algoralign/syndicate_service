@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import CreateUserDto from 'src/_dtos/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +18,9 @@ import ChangePasswordDto from '../_dtos/change-password.dto';
 import RequestPasswordVerificationEmailDto from '../_dtos/request-password-verification-email.dto';
 import { IdentityTypesService } from '../identity-types/identity-types.service';
 import { BankService } from '../bank/bank.service';
+import Kyc from '../kyc/kyc.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthenticationService {
@@ -29,7 +32,93 @@ export class AuthenticationService {
     private identityTypesService: IdentityTypesService,
     private bankService: BankService,
 
+    @InjectRepository(Kyc)
+    private kycRepository: Repository<Kyc>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
   ) { }
+
+
+  async verifyIdentity(files: any, user: any, details: any): Promise<any> {
+    try {
+      if (!files || !files.passport || !files.id_image || !files.address_evidence) {
+        throw new BadRequestException('All three images (passport, ID, address evidence) are required');
+      }
+
+      const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
+
+
+
+      // Upload files with error handling
+      const uploadResults = await Promise.allSettled([
+        this.uploadWithRetry(files.passport[0], userExist.email),
+        this.uploadWithRetry(files.id_image[0], userExist.email),
+        this.uploadWithRetry(files.address_evidence[0], userExist.email)
+      ]);
+
+      // Extract results
+      const passportUrl = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
+      const idImageUrl = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+      const addressEvidenceUrl = uploadResults[2].status === 'fulfilled' ? uploadResults[2].value : null;
+
+      // Check if any upload failed
+      if (!passportUrl || !idImageUrl || !addressEvidenceUrl) {
+        throw new Error('One or more document uploads failed. Please try again.');
+      }
+
+
+
+      // Save KYC details if all uploads are successful
+      const kyc = this.kycRepository.create({
+        user: userExist,
+        first_name: details.first_name,
+        last_name: details.last_name,
+        identityType: { id: details.id_type },
+        passport: passportUrl,
+        id_image: idImageUrl,
+        address: details.address,
+        address_evidence: addressEvidenceUrl,
+        bank: { id: details.bank_id },
+        account_number: details.account_number,
+        account_name: details.account_name,
+        uploaded: true
+      });
+
+      await this.kycRepository.save(kyc);
+
+
+      // update the user
+      userExist.first_name = details.first_name
+      userExist.last_name = details.last_name
+      await this.userRepository.save(userExist)
+
+      return {
+        statusCode: 201,
+        status: true,
+        message: 'Verification document submitted successfully. Please wait for verification.',
+        data: kyc,
+      };
+    } catch (error) {
+      console.error('KYC Submission Error:', error);
+      throw new BadRequestException({ message: error.message });
+    }
+  }
+
+  async uploadWithRetry(file, email, attempts = 3): Promise<string> {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const url = await this.cloudinaryService.uploadUserDocument(file, email);
+        if (url) return url;
+      } catch (error) {
+        console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
+      }
+    }
+    throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
+  }
+
+
 
   public async getJwtToken(_user: LoginUserDto) {
     const user = await this.userService.getByEmail(_user.email, _user.password);

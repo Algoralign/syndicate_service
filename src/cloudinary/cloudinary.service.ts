@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
-
+import path, { join } from 'path';
 import { promises as fs } from 'fs';
-import * as path from 'path';
+
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '../user/user.entity';
@@ -28,55 +28,68 @@ export class CloudinaryService {
         });
     }
 
+    // async uploadUserDocument(data) {
+    //     try {
+    //         cloudinary.config({
+    //             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    //             api_key: process.env.CLOUDINARY_API_KEY,
+    //             api_secret: process.env.CLOUDINARY_API_SECRET,
+    //         });
+    //         //read file to be uploaded  to cloudinary from diskstorage
+    //         const storagePath = join(
+    //             path.resolve('./'),
+    //             `/uploads/identification-document/${data.filename}`,
+    //         );
 
-    async uploadRenterKyc(detail: any): Promise<UploadApiResponse | UploadApiErrorResponse | { error: boolean, status_code: number, message: string, data: any }> {
+    //         console.log(storagePath)
+    //         //construct db path for image to be searched
+    //         const imageInDBPath = `uploads/identification-document/${data.filename}`;
+
+    //         // Upload the image
+    //         const result = await cloudinary.uploader.upload(storagePath);
+
+    //         console.log(result)
+
+    //         return result.secure_url;
+
+    //     } catch (error) { }
+    // }
+
+    async uploadUserDocument(data, email: string): Promise<string> {
         try {
+            cloudinary.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
+            });
+
+            const storagePath = join(path.resolve('./'), `/uploads/identification-document/${data.filename}`);
 
 
-            // check  country 
-            const country = await this.countryRepository.findOne({ where: { id: detail.addressCountry } })
-            if (!country) {
-                return {
-                    error: true,
-                    status_code: HttpStatus.BAD_REQUEST,
-                    message: 'country selected do not exist',
-                    data: {}
-                };
 
+            // Determine resource_type based on file extension
+            const ext = path.extname(storagePath).toLowerCase();
+            let resourceType: 'image' | 'raw' = 'raw'; // Default to raw
+
+            if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'].includes(ext)) {
+                resourceType = 'image'; // Set resource type for images
+            } else if (['.pdf'].includes(ext)) {
+                resourceType = 'raw'; // Set resource type for PDF
             }
 
+            const result = await cloudinary.uploader.upload(storagePath,
+                { folder: 'syndicatekycs/' + email, access_mode: 'public', resource_type: resourceType },);
 
-            return new Promise((resolve, reject) => {
-                const storagePath = detail.targetPath // Ensure the correct path
+            if (!result || !result.secure_url) {
+                throw new Error(`Cloudinary upload failed for ${data.filename}`);
+            }
 
-
-                // Determine resource_type based on file extension
-                const ext = path.extname(storagePath).toLowerCase();
-                let resourceType: 'image' | 'raw' = 'raw'; // Default to raw
-
-                if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'].includes(ext)) {
-                    resourceType = 'image'; // Set resource type for images
-                } else if (['.pdf'].includes(ext)) {
-                    resourceType = 'raw'; // Set resource type for PDF
-                }
-
-                cloudinary.uploader.upload(
-                    storagePath,
-                    { folder: 'rentalsolution/renterkyc', access_mode: 'public', resource_type: resourceType },
-                    async (error, result) => {
-                        if (error) {
-                            console.error('Cloudinary upload error:', error);
-                            return reject(error);
-                        }
-
-
-
-                    },
-                );
-            });
+            console.log('Cloudinary Upload Response:', result.secure_url);
+            return result.secure_url;
         } catch (error) {
-            console.error('Error in uploadRenterKyc:', error);
-            throw error; // Rethrow to handle this in the calling function
+            console.error('Cloudinary Upload Error:', error);
+            throw new Error(`Upload failed for ${data.filename}`);
         }
     }
+
 }

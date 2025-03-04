@@ -11,6 +11,7 @@ import {
   Req,
   Res,
   UploadedFile,
+  UploadedFiles,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -30,6 +31,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique filenames
 
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage, memoryStorage } from 'multer';
 
 
 
@@ -38,11 +41,54 @@ import { ResetPasswordEmailDto } from '../_dtos/reset-password-email.dto';
 import { ChangePasswordDto } from '../_dtos/change-password.dto';
 import { RequestPasswordVerificationEmailDto } from '../_dtos/request-password-verification-email.dto';
 
+
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/identification-document',
+    filename: (req, file, cb) => {
+      const splitFileName = file.originalname.split('.');
+      const extension = splitFileName.length - 1;
+      cb(null, uuidv4() + '.' + splitFileName[extension]);
+    },
+  }),
+};
+
 //
 @Controller('authentication')
 @Injectable()
 export class AuthenticationController {
   constructor(private authenticationService: AuthenticationService) { }
+
+
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'passport', maxCount: 1 },
+        { name: 'id_image', maxCount: 1 },
+        { name: 'address_evidence', maxCount: 1 },
+      ],
+      storage,
+    ),
+  )
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('/submit-kyc')
+  async verifyIdentity(
+    @Body() details: any,
+    @Req() request: RequestWithUser,
+    @UploadedFiles()
+    files: {
+      passport?: Express.Multer.File[];
+      id_image?: Express.Multer.File[];
+      address_evidence?: Express.Multer.File[];
+    },
+  ): Promise<any> {
+
+    return await this.authenticationService.verifyIdentity(files, request.user, details);
+  }
+
+
+ 
 
   @Post('/signup')
   async createUser(@Body() userData: CreateUserDto, @Res() response: Response) {
@@ -233,5 +279,9 @@ export class AuthenticationController {
       },
     });
   }
+
+
+
+
 
 }
