@@ -127,7 +127,7 @@ export class UserService {
         email: user.email,
         email_verification_token: token.token,
         verified: user.verified,
-        verification_link: `${process.env.ROOT_URL}?token=${token.token}`,
+        verification_link: `${process.env.ROOT_URL}/verify-email?token=${token.token}`,
       };
 
       // Send email verification mail (if needed)
