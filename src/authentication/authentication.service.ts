@@ -49,8 +49,19 @@ export class AuthenticationService {
 
       const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
 
+      if (!user) {
+        throw new BadRequestException('user unauthorized');
+      }
 
+      const kycExist = await this.kycRepository.findOne({ where: { user: { id: user.id } } })
 
+      if (kycExist && kycExist.uploaded) {
+        return {
+          status_code: 400,
+          error: true,
+          message: 'you have previously uploaded your kyc details, you can no longer upload new documents',
+        };
+      }
       // Upload files with error handling
       const uploadResults = await Promise.allSettled([
         this.uploadWithRetry(files.passport[0], userExist.email),
@@ -82,6 +93,7 @@ export class AuthenticationService {
         address_evidence: addressEvidenceUrl,
         bank: { id: details.bank_id },
         account_number: details.account_number,
+        bvn: details.bvn,
         account_name: details.account_name,
         uploaded: true
       });
@@ -95,8 +107,8 @@ export class AuthenticationService {
       await this.userRepository.save(userExist)
 
       return {
-        statusCode: 201,
-        status: true,
+        status_code: 200,
+        error: false,
         message: 'Verification document submitted successfully. Please wait for verification.',
         data: kyc,
       };

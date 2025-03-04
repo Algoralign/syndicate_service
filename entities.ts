@@ -13,8 +13,6 @@ export const entities = [
   User,
   Country,
   Address,
-  User,
-  Country,
   EmailVerificationToken,
   ResetPasswordToken,
   IdentityType,
