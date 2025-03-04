@@ -120,6 +120,7 @@ export class AuthenticationService {
         bank: { id: details.bank_id },
         account_number: details.account_number,
         bvn: details.bvn,
+        swift_bic_code: details.swift_bic_code,
         account_name: details.account_name,
         phone: details.phone,
         uploaded: true
