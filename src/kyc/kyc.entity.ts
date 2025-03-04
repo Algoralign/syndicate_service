@@ -51,6 +51,10 @@ class Kyc {
     @Column({ nullable: true })
     public bvn: string;
 
+
+    @Column({ nullable: true })
+    public swift_bic_code: string;
+
     @Column({ nullable: true })
     public account_number: string;
 
