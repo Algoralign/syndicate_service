@@ -21,6 +21,8 @@ import { BankService } from '../bank/bank.service';
 import Kyc from '../kyc/kyc.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import IdentityType from '../identity-types/identity-types.entity';
+import { Bank } from '../bank/bank.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -37,6 +39,12 @@ export class AuthenticationService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(IdentityType)
+    private identityTypeRepository: Repository<IdentityType>,
+
+    @InjectRepository(Bank)
+    private bankRepository: Repository<Bank>,
 
   ) { }
 
@@ -62,6 +70,25 @@ export class AuthenticationService {
           message: 'you have previously uploaded your kyc details, you can no longer upload new documents',
         };
       }
+
+      // check id type
+      const idTypeExist = await this.identityTypeRepository.findOne({ where: { id: details.id_type } })
+      if (!idTypeExist) {
+        return {
+          status_code: 400,
+          error: true,
+          message: 'id type selected do not exist',
+        };
+      }
+
+      const bankExist = await this.bankRepository.findOne({ where: { id: details.bank_id } })
+      if (!bankExist) {
+        return {
+          status_code: 400,
+          error: true,
+          message: 'bank  selected do not exist',
+        };
+      }
       // Upload files with error handling
       const uploadResults = await Promise.allSettled([
         this.uploadWithRetry(files.passport[0], userExist.email),
@@ -78,7 +105,6 @@ export class AuthenticationService {
       if (!passportUrl || !idImageUrl || !addressEvidenceUrl) {
         throw new Error('One or more document uploads failed. Please try again.');
       }
-
 
 
       // Save KYC details if all uploads are successful
