@@ -63,6 +63,9 @@ class Kyc {
     @Column({ default: false })
     public verified: boolean;
 
+    @Column({ nullable: true })
+    public phone: string;
+
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;
 

@@ -11,7 +11,7 @@ import LoginUserDto from '../_dtos/login-user.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 
-import { UserTypeArray } from '../_enums/user-type.enum';
+
 
 import ResetPasswordEmailDto from '../_dtos/reset-password-email.dto';
 import ChangePasswordDto from '../_dtos/change-password.dto';
@@ -121,6 +121,7 @@ export class AuthenticationService {
         account_number: details.account_number,
         bvn: details.bvn,
         account_name: details.account_name,
+        phone: details.phone,
         uploaded: true
       });
 
@@ -130,6 +131,7 @@ export class AuthenticationService {
       // update the user
       userExist.first_name = details.first_name
       userExist.last_name = details.last_name
+      userExist.phone = details?.phone
       await this.userRepository.save(userExist)
 
       return {
