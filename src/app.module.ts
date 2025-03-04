@@ -17,6 +17,7 @@ import { SeedersModule } from './seeders/seeders.module';
 import { MailModule } from './mail/mail.module';
 import { BankModule } from './bank/bank.module';
 import { IdentityTypesModule } from './identity-types/identity-types.module';
+import { KycModule } from './kyc/kyc.module';
 
 
 
@@ -63,6 +64,7 @@ import { IdentityTypesModule } from './identity-types/identity-types.module';
     MailModule,
     BankModule,
     IdentityTypesModule,
+    KycModule,
 
   ],
   controllers: [AppController],

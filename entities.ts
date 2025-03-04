@@ -5,6 +5,7 @@ import EmailVerificationToken from "./src/email-verification-token/email-verific
 import ResetPasswordToken from "./src/reset-password-token/reset-password-token.entity";
 import IdentityType from "./src/identity-types/identity-types.entity";
 import { Bank } from './src/bank/bank.entity';
+import Kyc from './src/kyc/kyc.entity';
 
 
 
@@ -17,5 +18,6 @@ export const entities = [
   EmailVerificationToken,
   ResetPasswordToken,
   IdentityType,
-  Bank
+  Bank,
+  Kyc
 ];
