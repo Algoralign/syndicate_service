@@ -1,5 +1,6 @@
 
 
+import { InvitationTracker } from 'src/invitation-tracker/invitation-tracker.entity';
 import Address from '../address/address.entity';
 import {
     Column,
@@ -8,10 +9,12 @@ import {
     JoinColumn,
     JoinTable,
     ManyToMany,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { Deal } from '../deal/deal.entity';
 
 @Entity({ name: 'users' })
 class User {
@@ -41,6 +44,16 @@ class User {
 
     @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true, eager: true })
     public address: Address;
+
+
+    @OneToMany(() => InvitationTracker, (invitation) => invitation.invited_by)
+    sent_invitations: InvitationTracker[];
+
+    @OneToMany(() => InvitationTracker, (invitation) => invitation.invitee)
+    received_invitations: InvitationTracker[];
+
+    @OneToMany(() => Deal, (deal) => deal.user)
+    deals: Deal[];
 
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })

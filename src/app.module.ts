@@ -18,6 +18,12 @@ import { MailModule } from './mail/mail.module';
 import { BankModule } from './bank/bank.module';
 import { IdentityTypesModule } from './identity-types/identity-types.module';
 import { KycModule } from './kyc/kyc.module';
+import { InvestmentInstrumentModule } from './investment-instrument/investment-instrument.module';
+import { IndustryModule } from './industry/industry.module';
+import { SchedulePeriodModule } from './schedule-period/schedule-period.module';
+import { DealModule } from './deal/deal.module';
+import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker.module';
+
 
 
 
@@ -65,6 +71,11 @@ import { KycModule } from './kyc/kyc.module';
     BankModule,
     IdentityTypesModule,
     KycModule,
+    InvestmentInstrumentModule,
+    IndustryModule,
+    SchedulePeriodModule,
+    DealModule,
+    InvitationTrackerModule,
 
   ],
   controllers: [AppController],
