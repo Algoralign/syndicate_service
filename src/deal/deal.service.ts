@@ -10,7 +10,7 @@ import Industry from '../industry/industry.entity';
 import { Deal } from './deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UserService } from '../user/user.service';
-import { Investment, InvestmentStatus } from '../investments/investments.entity';
+import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
 
 @Injectable()
 export class DealService {
@@ -226,5 +226,15 @@ export class DealService {
             }
         }
         throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
+    }
+
+
+    async getCurrency() {
+        return {
+            status_code: 200,
+            error: false,
+            data: Object.keys(Currency),
+            message: 'data retrieved succesfully',
+        };
     }
 }

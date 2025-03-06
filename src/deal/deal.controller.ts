@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -48,6 +48,19 @@ export class DealController {
     ): Promise<any> {
 
         return await this.dealService.submitDeal(files, request.user, details);
+    }
+
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('retrieve-currency')
+    async getCurrency(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+    ) {
+        const result = await this.dealService.getCurrency();
+        return response.status(HttpStatus.ACCEPTED).json(result);
+
     }
 
 }
