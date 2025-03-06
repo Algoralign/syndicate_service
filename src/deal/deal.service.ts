@@ -171,7 +171,7 @@ export class DealService {
                 const savedUsers = await transactionalEntityManager.save(User, users);
 
                 // Now create investments for each user
-                const investments = savedUsers.map((user, index) => {
+                const investments = savedUsers.map((user: User, index: number) => {
                     const investmentAmount = invitedInv[index].amount; // Get the amount from invited data
 
                     const investment = this.investmentRepository.create({
@@ -214,7 +214,7 @@ export class DealService {
         }
     }
 
-    async uploadWithRetry(file, email, attempts = 3): Promise<string> {
+    async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
         for (let i = 0; i < attempts; i++) {
             try {
                 const url = await this.cloudinaryService.uploadUseeDealDocument(file, email);
