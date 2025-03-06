@@ -24,6 +24,7 @@ import { SchedulePeriodModule } from './schedule-period/schedule-period.module';
 import { DealModule } from './deal/deal.module';
 import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker.module';
 import { InvestmentsModule } from './investments/investments.module';
+import { CronModule } from './cron/cron.module';
 
 
 
@@ -78,6 +79,7 @@ import { InvestmentsModule } from './investments/investments.module';
     DealModule,
     InvitationTrackerModule,
     InvestmentsModule,
+    CronModule,
 
   ],
   controllers: [AppController],

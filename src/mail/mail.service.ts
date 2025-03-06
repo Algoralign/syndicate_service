@@ -6,6 +6,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import * as postmark from 'postmark';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
+import { InvestorInvite } from '../cron/cron.interface';
 
 @Injectable()
 export class MailService {
@@ -17,9 +18,6 @@ export class MailService {
   ) {
     this.client = new postmark.Client(this.config.get(`POSTMARK_SERVER_TOKEN`));
   }
-
-
-
 
   async sendUserConfirmation(
     data: any
@@ -68,6 +66,31 @@ export class MailService {
       console.log('Email sent successfully');
     } catch (error) {
       console.error('Failed to send email:', error);
+    }
+  }
+
+
+  async sendInvestorInviteEmail(
+    data: InvestorInvite
+  ): Promise<void> {
+    console.log("starting email sending")
+    try {
+
+      const templatePath = 'src/mail/templates/investor-invite.hbs';
+      const template = fs.readFileSync(templatePath, 'utf8');
+      const compiledTemplate = handlebars.compile(template);
+      const htmlBody = compiledTemplate(data);
+
+      await this.client.sendEmail({
+        From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
+        To: data.receiver,
+        Subject: 'You’ve Been Invited by' + " " + data.syndicate_lead_name + " " + 'to Join a Deal on Algoralign',
+        HtmlBody: htmlBody,
+      });
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
     }
   }
 }
