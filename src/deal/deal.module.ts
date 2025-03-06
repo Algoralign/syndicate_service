@@ -16,11 +16,12 @@ import { ResetPasswordTokenService } from '../reset-password-token/reset-passwor
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
+import { Investment } from '../investments/investments.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Deal, 
-    User, Industry, InvestmentInstrument, 
-    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken])],
+  imports: [TypeOrmModule.forFeature([Deal,
+    User, Industry, InvestmentInstrument,
+    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
 })

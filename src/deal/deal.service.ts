@@ -10,6 +10,7 @@ import Industry from '../industry/industry.entity';
 import { Deal } from './deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UserService } from '../user/user.service';
+import { Investment, InvestmentStatus } from '../investments/investments.entity';
 
 @Injectable()
 export class DealService {
@@ -34,6 +35,9 @@ export class DealService {
 
         @InjectRepository(InvitationTracker)
         private invitationTrackerRepository: Repository<InvitationTracker>,
+
+        @InjectRepository(Investment)
+        private investmentRepository: Repository<Investment>,
 
     ) { }
 
@@ -152,16 +156,38 @@ export class DealService {
                     invited.passwordHash = await this.userService.createPasswordHash(invited.email);
                 }
 
-                // Create users
-                const users = invitedInv.map((invited) =>
-                    this.userRepository.create({
+                // Create users and their investments
+                const users = invitedInv.map((invited) => {
+                    const user = this.userRepository.create({
                         first_name: invited.first_name,
                         last_name: invited.last_name,
                         email: invited.email,
                         password: invited.passwordHash,
-                    })
-                );
+                    });
+
+                    return user;
+                });
+
                 const savedUsers = await transactionalEntityManager.save(User, users);
+
+                // Now create investments for each user
+                const investments = savedUsers.map((user, index) => {
+                    const investmentAmount = invitedInv[index].amount; // Get the amount from invited data
+
+                    const investment = this.investmentRepository.create({
+                        user: user, // Set the user
+                        deal: createdDeal, // Link to the current deal (assumed 'createdDeal' is the deal you're processing)
+                        investment_amount: investmentAmount, // The amount to be invested
+                        proposed_amount: investmentAmount, // You can adjust if you have a different proposed amount
+                        investment_status: InvestmentStatus.PENDING, // Set the initial status
+                        // Add any other relevant fields like currency, expected return, etc.
+                    });
+
+                    return investment;
+                });
+
+                // Save investments
+                await transactionalEntityManager.save(Investment, investments);
 
                 // Create invitation trackers
                 const trackers = savedUsers.map((user) =>
@@ -173,6 +199,7 @@ export class DealService {
                     })
                 );
                 await transactionalEntityManager.save(InvitationTracker, trackers);
+
 
                 return {
                     status_code: 201,
