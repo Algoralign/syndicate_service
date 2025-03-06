@@ -121,8 +121,8 @@ export class DealService {
                     repayment_schedule_code: details.repayment_schedule_code,
                     disbursement_schedule_code: details.disbursement_schedule_code,
                     spv_code: details.spv_code,
-                    spv_code: details.spv_code,
                     spv_name: details.spv_name,
+                    currency: details.currency,
                     investors: details.investors,
                     waterfall_distribution_structure: waterfall_distribution_structure_url,
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
@@ -172,15 +172,17 @@ export class DealService {
 
                 // Now create investments for each user
                 const investments = savedUsers.map((user: User, index: number) => {
-                    const investmentAmount = invitedInv[index].amount; // Get the amount from invited data
+                    const investmentAmount = invitedInv[index].amount;
+                    const investmentCurrency = invitedInv[index].currency;
 
                     const investment = this.investmentRepository.create({
-                        user: user, // Set the user
-                        deal: createdDeal, // Link to the current deal (assumed 'createdDeal' is the deal you're processing)
-                        investment_amount: investmentAmount, // The amount to be invested
-                        proposed_amount: investmentAmount, // You can adjust if you have a different proposed amount
-                        investment_status: InvestmentStatus.PENDING, // Set the initial status
-                        // Add any other relevant fields like currency, expected return, etc.
+                        user: user,
+                        deal: createdDeal,
+                        investment_amount: investmentAmount,
+                        proposed_amount: investmentAmount,
+                        investment_status: InvestmentStatus.PENDING,
+                        currency: investmentCurrency
+
                     });
 
                     return investment;
