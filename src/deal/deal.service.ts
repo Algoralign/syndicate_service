@@ -49,7 +49,7 @@ export class DealService {
         console.log(details.investors[0])
 
         try {
-            if (!files || !files.spv_file || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure) {
+            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure) {
                 throw new BadRequestException('All three files (spv, water fall structure, angel waterfall structure) are required');
             }
 
@@ -89,18 +89,17 @@ export class DealService {
 
             // Upload files with error handling
             const uploadResults = await Promise.allSettled([
-                this.uploadWithRetry(files.spv_file[0], userExist.email),
                 this.uploadWithRetry(files.waterfall_distribution_structure[0], userExist.email),
                 this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email)
             ]);
 
             // Extract results
-            const spv_file_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
-            const waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
-            const angel_waterfall_distribution_structure_url = uploadResults[2].status === 'fulfilled' ? uploadResults[2].value : null;
+
+            const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
+            const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
 
             // Check if any upload failed
-            if (!spv_file_url || !waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
+            if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
                 throw new Error('One or more document uploads failed. Please try again.');
             }
 
@@ -122,7 +121,8 @@ export class DealService {
                     repayment_schedule_code: details.repayment_schedule_code,
                     disbursement_schedule_code: details.disbursement_schedule_code,
                     spv_code: details.spv_code,
-                    spv_file: spv_file_url,
+                    spv_code: details.spv_code,
+                    spv_name: details.spv_name,
                     investors: details.investors,
                     waterfall_distribution_structure: waterfall_distribution_structure_url,
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url

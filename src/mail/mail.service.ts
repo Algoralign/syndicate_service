@@ -78,11 +78,38 @@ export class MailService {
   async sendInvestorInviteEmail(
     data: InvestorInvite
   ): Promise<void> {
-
-    console.log("reached here")
     try {
 
       const templatePath = 'src/mail/templates/investor-invite.hbs';
+      const template = fs.readFileSync(templatePath, 'utf8');
+      const compiledTemplate = handlebars.compile(template);
+      const htmlBody = compiledTemplate(data);
+
+      const response = await this.client.sendEmail({
+        From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
+        To: data.receiver,
+        Subject: 'You’ve Been Invited by' + " " + data.syndicate_lead_name + " " + 'to Join a Deal on Algoralign',
+        HtmlBody: htmlBody,
+      });
+
+      if (response.ErrorCode == 0) {
+        const tracker = await this.invitationTrackerRepository.findOne({ where: { id: data.tracker_id } })
+        tracker.email_sent = true
+        await this.invitationTrackerRepository.save(tracker);
+      }
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
+  }
+
+
+  async sendFounderInviteEmail(
+    data: InvestorInvite
+  ): Promise<void> {
+    try {
+
+      const templatePath = 'src/mail/templates/founder-invite.hbs';
       const template = fs.readFileSync(templatePath, 'utf8');
       const compiledTemplate = handlebars.compile(template);
       const htmlBody = compiledTemplate(data);

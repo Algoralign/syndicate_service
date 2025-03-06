@@ -11,7 +11,7 @@ import User from '../user/user.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import Industry from '../industry/industry.entity';
-import { Investment } from '../investments/investments.entity';
+import { Currency, Investment } from '../investments/investments.entity';
 
 // Enums for repayment schedule, disbursement schedule, and SPV code
 export enum RepaymentSchedule {
@@ -71,6 +71,9 @@ export class Deal {
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     funding_amount: number;
 
+    @Column({ type: 'enum', enum: Currency, default: Currency.USD })
+    currency: Currency;
+
     @Column({ type: 'enum', enum: RepaymentSchedule })
     repayment_schedule_code: RepaymentSchedule;
 
@@ -81,7 +84,7 @@ export class Deal {
     spv_code: SPVType;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    spv_file: string;
+    spv_name: string;
 
     @Column({ type: 'text', nullable: true })
     investors: string;

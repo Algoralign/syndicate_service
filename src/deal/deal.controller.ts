@@ -29,7 +29,6 @@ export class DealController {
     @UseInterceptors(
         FileFieldsInterceptor(
             [
-                { name: 'spv_file', maxCount: 1 },
                 { name: 'waterfall_distribution_structure', maxCount: 1 },
                 { name: 'angel_waterfall_distribution_structure', maxCount: 1 },
             ],
@@ -43,9 +42,8 @@ export class DealController {
         @Req() request: RequestWithUser,
         @UploadedFiles()
         files: {
-            passport?: Express.Multer.File[];
-            id_image?: Express.Multer.File[];
-            address_evidence?: Express.Multer.File[];
+            waterfall_distribution_structure?: Express.Multer.File[];
+            angel_waterfall_distribution_structure?: Express.Multer.File[];
         },
     ): Promise<any> {
 
