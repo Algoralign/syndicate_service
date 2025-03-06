@@ -6,6 +6,11 @@ import ResetPasswordToken from "./src/reset-password-token/reset-password-token.
 import IdentityType from "./src/identity-types/identity-types.entity";
 import { Bank } from './src/bank/bank.entity';
 import Kyc from './src/kyc/kyc.entity';
+import InvestmentInstrument from './src/investment-instrument/investment-instrument.entity';
+import Industry from "./src/industry/industry.entity";
+import SchedulePeriod from "./src/schedule-period/schedule-period.entity";
+import { Deal } from "./src/deal/deal.entity";
+import { InvitationTracker } from "./src/invitation-tracker/invitation-tracker.entity";
 
 
 
@@ -17,5 +22,10 @@ export const entities = [
   ResetPasswordToken,
   IdentityType,
   Bank,
-  Kyc
+  Kyc,
+  InvestmentInstrument,
+  Industry,
+  SchedulePeriod,
+  Deal,
+  InvitationTracker
 ];
