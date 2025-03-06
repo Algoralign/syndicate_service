@@ -11,6 +11,7 @@ import User from '../user/user.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import Industry from '../industry/industry.entity';
+import { Investment } from '../investments/investments.entity';
 
 // Enums for repayment schedule, disbursement schedule, and SPV code
 export enum RepaymentSchedule {
@@ -43,6 +44,9 @@ export class Deal {
     @OneToMany(() => InvitationTracker, (invitation) => invitation.deal)
     invitations: InvitationTracker[];
 
+    @OneToMany(() => Investment, (investment) => investment.deal)
+    investments: Investment[];
+
     @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.deals, { nullable: true, onDelete: 'CASCADE' })
     investment_instrument: InvestmentInstrument;
 
@@ -53,7 +57,10 @@ export class Deal {
     startup_industry: Industry;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    founder_name: string;
+    founder_firstname: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    founder_lastname: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     founder_email: string;
@@ -84,7 +91,7 @@ export class Deal {
 
     @Column({ type: 'text', nullable: true })
     angel_waterfall_distribution_structure: string;
-    
+
     @Column({ default: false })
     public verified: boolean;
 

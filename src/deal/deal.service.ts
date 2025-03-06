@@ -110,10 +110,11 @@ export class DealService {
                     investment_instrument: { id: investmentInstrument.id },
                     startup_name: details.startup_name,
                     startup_industry: { id: startupInd.id },
-                    founder_name: details.founder_name,
+                    founder_firstname: details.founder_firstname,
+                    founder_lastname: details.founder_lastname,
                     founder_email: details.founder_email,
                     startup_website: details.startup_website,
-                    funding_amount: details.funding_amount,
+                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
                     repayment_schedule_code: details.repayment_schedule_code,
                     disbursement_schedule_code: details.disbursement_schedule_code,
                     spv_code: details.spv_code,
@@ -125,7 +126,25 @@ export class DealService {
 
                 // const createdDeal = await this.dealRepository.save(deal);
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
-                //
+
+                // create a founder user
+                const founder = this.userRepository.create({
+                    first_name: details.founder_firstname,
+                    last_name: details.founder_lastname,
+                    email: details.founder_email,
+                    password: await this.userService.createPasswordHash(details.founder_email)
+                })
+                const createdFounder = await transactionalEntityManager.save(User, founder);
+
+                // add founder to tracker
+                const trackFounder = this.invitationTrackerRepository.create({
+                    invited_by: { id: userExist.id },
+                    invitee: { id: createdFounder.id },
+                    deal: { id: createdDeal.id },
+                    user_type: 'founder',
+                })
+
+                await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
                 const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
                 // Precompute password hashes
@@ -150,36 +169,10 @@ export class DealService {
                         invited_by: { id: userExist.id },
                         invitee: { id: user.id },
                         deal: { id: createdDeal.id },
+                        user_type: 'investor',
                     })
                 );
                 await transactionalEntityManager.save(InvitationTracker, trackers);
-
-                // create users 
-                // for (const invited of invitedInv) {
-
-
-                //     let createUser = this.userRepository.create({
-                //         first_name: invited.first_name,
-                //         last_name: invited.last_name,
-                //         email: invited.email,
-                //         password: await this.userService.createPasswordHash(invited.email)
-                //     })
-                //     // let theuser = await this.userRepository.save(createUser);
-                //     const theuser = await transactionalEntityManager.save(User, createUser);
-
-
-                //     //create the tracker
-                //     let theTracker = this.invitationTrackerRepository.create({
-                //         invited_by: { id: userExist.id },
-                //         invitee: { id: theuser.id },
-                //         deal: { id: createdDeal.id },
-
-                //     })
-
-                //     // await this.invitationTrackerRepository.save(theTracker);
-                //     await transactionalEntityManager.save(InvitationTracker, theTracker);
-
-                // }
 
                 return {
                     status_code: 201,

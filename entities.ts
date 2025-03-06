@@ -11,6 +11,7 @@ import Industry from "./src/industry/industry.entity";
 import SchedulePeriod from "./src/schedule-period/schedule-period.entity";
 import { Deal } from "./src/deal/deal.entity";
 import { InvitationTracker } from "./src/invitation-tracker/invitation-tracker.entity";
+import { Investment } from "./src/investments/investments.entity";
 
 
 
@@ -27,5 +28,6 @@ export const entities = [
   Industry,
   SchedulePeriod,
   Deal,
-  InvitationTracker
+  InvitationTracker,
+  Investment
 ];
