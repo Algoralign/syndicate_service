@@ -3,10 +3,25 @@ import { DealController } from './deal.controller';
 import { DealService } from './deal.service';
 import { Deal } from './deal.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import Industry from 'src/industry/industry.entity';
+import User from '../user/user.entity';
+import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import Country from '../country/country.entity';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import { UserService } from '../user/user.service';
+import Address from '../address/address.entity';
+import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
+import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
+import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
+import { Utility } from '../utilities/utility';
+import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Deal])],
+  imports: [TypeOrmModule.forFeature([Deal, 
+    User, Industry, InvestmentInstrument, 
+    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken])],
   controllers: [DealController],
-  providers: [DealService]
+  providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
 })
 export class DealModule { }

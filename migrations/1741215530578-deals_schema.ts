@@ -1,0 +1,34 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class DealsSchema1741215530578 implements MigrationInterface {
+    name = 'DealsSchema1741215530578'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TYPE "public"."deals_repayment_schedule_code_enum" AS ENUM('monthly', 'annually', 'bianually', 'custom')`);
+        await queryRunner.query(`CREATE TYPE "public"."deals_disbursement_schedule_code_enum" AS ENUM('monthly', 'annually', 'bianually', 'custom')`);
+        await queryRunner.query(`CREATE TYPE "public"."deals_spv_code_enum" AS ENUM('default', 'custom')`);
+        await queryRunner.query(`CREATE TABLE "deals" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "startup_name" character varying(255), "founder_name" character varying(255), "founder_email" character varying(255), "startup_website" character varying(255), "funding_amount" numeric(15,2) NOT NULL DEFAULT '0', "repayment_schedule_code" "public"."deals_repayment_schedule_code_enum" NOT NULL, "disbursement_schedule_code" "public"."deals_disbursement_schedule_code_enum" NOT NULL, "spv_code" "public"."deals_spv_code_enum" NOT NULL, "spv_file" character varying(255), "investors" text, "waterfall_distribution_structure" text, "angel_waterfall_distribution_structure" text, "verified" boolean NOT NULL DEFAULT false, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid NOT NULL, "investmentInstrumentId" uuid, "startupIndustryId" uuid, CONSTRAINT "PK_8c66f03b250f613ff8615940b4b" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "invitation_trackers" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email_sent" boolean NOT NULL DEFAULT false, "logged_in" boolean NOT NULL DEFAULT false, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "invitedById" uuid, "inviteeId" uuid, "dealId" uuid, CONSTRAINT "PK_5f520e6ceb6a46c2c5111165872" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "deals" ADD CONSTRAINT "FK_2ab80c329115e938c396ed5d418" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "deals" ADD CONSTRAINT "FK_d9f515caf447e01a2a238eb0222" FOREIGN KEY ("investmentInstrumentId") REFERENCES "investment_instruments"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "deals" ADD CONSTRAINT "FK_c8ae7832872368f9e0d96bbf50e" FOREIGN KEY ("startupIndustryId") REFERENCES "industries"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" ADD CONSTRAINT "FK_902c25e0dea85a656465994d60e" FOREIGN KEY ("invitedById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" ADD CONSTRAINT "FK_c3fbfaa3e976a0db4f426263945" FOREIGN KEY ("inviteeId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" ADD CONSTRAINT "FK_49e2f48467eb7c7d0648c87d732" FOREIGN KEY ("dealId") REFERENCES "deals"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" DROP CONSTRAINT "FK_49e2f48467eb7c7d0648c87d732"`);
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" DROP CONSTRAINT "FK_c3fbfaa3e976a0db4f426263945"`);
+        await queryRunner.query(`ALTER TABLE "invitation_trackers" DROP CONSTRAINT "FK_902c25e0dea85a656465994d60e"`);
+        await queryRunner.query(`ALTER TABLE "deals" DROP CONSTRAINT "FK_c8ae7832872368f9e0d96bbf50e"`);
+        await queryRunner.query(`ALTER TABLE "deals" DROP CONSTRAINT "FK_d9f515caf447e01a2a238eb0222"`);
+        await queryRunner.query(`ALTER TABLE "deals" DROP CONSTRAINT "FK_2ab80c329115e938c396ed5d418"`);
+        await queryRunner.query(`DROP TABLE "invitation_trackers"`);
+        await queryRunner.query(`DROP TABLE "deals"`);
+        await queryRunner.query(`DROP TYPE "public"."deals_spv_code_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."deals_disbursement_schedule_code_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."deals_repayment_schedule_code_enum"`);
+    }
+
+}

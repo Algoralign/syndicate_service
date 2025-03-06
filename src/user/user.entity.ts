@@ -1,6 +1,6 @@
 
 
-import { InvitationTracker } from 'src/invitation-tracker/invitation-tracker.entity';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import Address from '../address/address.entity';
 import {
     Column,

@@ -64,7 +64,6 @@ export class Deal {
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     funding_amount: number;
 
-
     @Column({ type: 'enum', enum: RepaymentSchedule })
     repayment_schedule_code: RepaymentSchedule;
 
@@ -85,6 +84,9 @@ export class Deal {
 
     @Column({ type: 'text', nullable: true })
     angel_waterfall_distribution_structure: string;
+    
+    @Column({ default: false })
+    public verified: boolean;
 
     @CreateDateColumn()
     created_at: Date;

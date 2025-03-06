@@ -26,6 +26,7 @@ import { IdentityTypesService } from '../identity-types/identity-types.service';
 import IdentityType from '../identity-types/identity-types.entity';
 import { Bank } from '../bank/bank.entity';
 import { BankService } from '../bank/bank.service';
+import { Deal } from '../deal/deal.entity';
 @Global()
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { BankService } from '../bank/bank.service';
       IdentityType,
       Bank,
       Kyc,
+      Deal,
     ])
   ],
   providers: [

@@ -49,9 +49,7 @@ export class DealController {
         },
     ): Promise<any> {
 
-        console.log(details)
-
-        // return await this.dealService.verifyIdentity(files, request.user, details);
+        return await this.dealService.submitDeal(files, request.user, details);
     }
 
 }
