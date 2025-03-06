@@ -57,6 +57,7 @@ export class CronService {
                     currency: proposedInvestment.currency,
                     receiver: invitee.email,
                     review_deal_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
+                    tracker_id: user.id,
                 }
 
 

@@ -7,6 +7,7 @@ export interface InvestorInvite {
     currency: string;
     receiver: string;
     review_deal_link: string;
+    tracker_id: string;
 }
 
 
