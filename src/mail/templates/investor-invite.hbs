@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>You’ve Been Invited by “Syndicate Name” to Join a Deal on Algoralign</title>
+  <style>
+    /* Global styles here (same as in your provided template) */
+    img {
+      border: none;
+      object-fit: contain;
+      -ms-interpolation-mode: bicubic;
+      width: 100%;
+      height: 100%;
+    }
+    .img-wrapper {
+      width: 160px;
+      height: 68px;
+      margin-bottom: 20px;
+    }
+    body {
+      background-color: #f6f6f6;
+      font-family: sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-size: 14px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+    table {
+      border-collapse: separate;
+      width: 100%;
+    }
+    table td {
+      font-family: sans-serif;
+      font-size: 14px;
+      vertical-align: top;
+    }
+    .dao_container {
+      display: block;
+      margin: 0 auto !important;
+      max-width: 650px;
+      padding: 10px;
+      width: 650px;
+    }
+    .content {
+      box-sizing: border-box;
+      display: block;
+      margin: 0 auto;
+      max-width: 650px;
+      padding: 10px;
+    }
+    .main {
+      background: #ffffff;
+      border-radius: 3px;
+      width: 100%;
+    }
+    .wrapper {
+      box-sizing: border-box;
+      padding: 20px;
+    }
+    .content-block {
+      padding-bottom: 10px;
+      padding-top: 10px;
+    }
+    .footer {
+      clear: both;
+      margin-top: 10px;
+      text-align: center;
+      width: 100%;
+    }
+    .footer td, .footer p, .footer span, .footer a {
+      color: #999999;
+      font-size: 12px;
+      text-align: center;
+    }
+    h1, h2, h3, h4 {
+      color: #000000;
+      font-family: sans-serif;
+      font-weight: 400;
+      line-height: 1.4;
+      margin: 0;
+      margin-bottom: 20px;
+    }
+    p, ul, ol {
+      font-family: sans-serif;
+      font-size: 14px;
+      font-weight: normal;
+      margin: 0;
+      margin-bottom: 15px;
+    }
+    a {
+      color: #2772f0;
+      text-decoration: underline;
+    }
+    .dao {
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .dao>tbody>tr>td {
+      padding-bottom: 15px;
+    }
+    .dao a {
+      background-color: #ffffff;
+      border: solid 1px #2772f0;
+      border-radius: 5px;
+      box-sizing: border-box;
+      color: #2772f0;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+      padding: 12px 25px;
+      text-decoration: none;
+      text-transform: capitalize;
+      transition: .3s ease-in-out;
+    }
+    .dao-primary table td {
+      background-color: #2772f0;
+    }
+    .dao-primary a {
+      background-color: #2772f0;
+      border-color: #2772f0;
+      color: #ffffff;
+    }
+    hr {
+      border: 0;
+      border-bottom: 1px solid #f6f6f6;
+      margin: 20px 0;
+    }
+    @media only screen and (max-width: 620px) {
+      table.body h1 {
+        font-size: 28px !important;
+        margin-bottom: 10px !important;
+      }
+      table.body p, table.body ul, table.body ol, table.body td, table.body span, table.body a {
+        font-size: 16px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <span class="preheader"></span>
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+    <tr>
+      <td>&nbsp;</td>
+      <td class="dao_container">
+        <div class="content">
+          <table role="presentation" class="main">
+            <tr>
+              <td class="wrapper">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <div class="img-wrapper">
+                        <img src="https://res.cloudinary.com/dfakuzuh2/image/upload/v1689410681/logo_cvkrer.png" alt="algoralign">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <h3>Dear<strong>{{investor_name}}</strong>,</h3>
+                      <p>You have been invited by <strong>{{syndicate_name}} </strong> to begin KYC for an investment deal. This is an exclusive opportunity to collaborate with other investors and support <strong>{{startup_name}}</strong> in achieving its next growth milestone.</p>
+                      <h4><strong>Deal Details:</strong></h4>
+                      <ul>
+                        <li><strong>Syndicate Lead:</strong> {{syndicate_lead_name}}</li>
+                        <li><strong>Startup:</strong> {{startup_name}}</li>
+                        <li><strong>Minimum Investment Amount:</strong> {{currency}}{{minimum_investment}}</li>
+                      </ul>
+                      <p><strong>Next Steps:</strong></p>
+                      <ol>
+                        <li>Click the link below to review the deal details.</li>
+                        <li>Complete your KYC verification (if not already done).</li>
+                        <li>Confirm your participation and funding commitment.</li>
+                      </ol>
+                      <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="dao dao-primary">
+                        <tr>
+                          <td align="left">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td>
+                                  <a href="{{review_deal_link}}" target="_blank">Review & Join Deal</a>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      <p>If you have any questions, feel free to reach out to <a href="mailto:support@algoralign.com">support@algoralign.com</a> or contact your syndicate lead directly.</p>
+                      <p>We look forward to having you onboard!</p>
+                      <p>Best regards,</p>
+                      <p>The Algoralign Team</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <div class="footer">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td class="content-block">
+                  <span class="apple-link">Address details</span><br>
+                  Don't like these emails? <a href="#">Unsubscribe</a>.
+                </td>
+              </tr>
+              <tr>
+                <td class="content-block powered-by">
+                  Powered by <a href="#">Algoralign</a>.
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+</body>
+</html>
