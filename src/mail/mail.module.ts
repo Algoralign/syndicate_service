@@ -5,9 +5,14 @@ import { MailService } from './mail.service';
 import path, { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailConsumer } from './mail.consumer';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 @Global()
 @Module({
   imports: [
+    TypeOrmModule.forFeature([
+      InvitationTracker,
+    ]),
     MailerModule.forRootAsync({
       // imports: [ConfigModule], // import module if not enabled globally
       useFactory: async (config: ConfigService) => ({
@@ -43,4 +48,4 @@ import { MailConsumer } from './mail.consumer';
   providers: [MailService, MailConsumer],
   exports: [MailService, MailConsumer],
 })
-export class MailModule {}
+export class MailModule { }

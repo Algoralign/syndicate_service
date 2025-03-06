@@ -7,6 +7,9 @@ import * as postmark from 'postmark';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import { InvestorInvite } from '../cron/cron.interface';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MailService {
@@ -15,6 +18,8 @@ export class MailService {
   constructor(
     private config: ConfigService,
     private mailerService: MailerService,
+
+    @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
   ) {
     this.client = new postmark.Client(this.config.get(`POSTMARK_SERVER_TOKEN`));
   }
@@ -73,7 +78,8 @@ export class MailService {
   async sendInvestorInviteEmail(
     data: InvestorInvite
   ): Promise<void> {
-    console.log("starting email sending")
+
+    console.log("reached here")
     try {
 
       const templatePath = 'src/mail/templates/investor-invite.hbs';
@@ -81,13 +87,18 @@ export class MailService {
       const compiledTemplate = handlebars.compile(template);
       const htmlBody = compiledTemplate(data);
 
-      await this.client.sendEmail({
+      const response = await this.client.sendEmail({
         From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
         To: data.receiver,
         Subject: 'You’ve Been Invited by' + " " + data.syndicate_lead_name + " " + 'to Join a Deal on Algoralign',
         HtmlBody: htmlBody,
       });
-      console.log('Email sent successfully');
+
+      if (response.ErrorCode == 0) {
+        const tracker = await this.invitationTrackerRepository.findOne({ where: { id: data.tracker_id } })
+        tracker.email_sent = true
+        await this.invitationTrackerRepository.save(tracker);
+      }
     } catch (error) {
       console.error('Failed to send email:', error);
       throw error;
