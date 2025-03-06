@@ -19,6 +19,9 @@ export class InvitationTracker {
     @Column({ type: 'boolean', default: false })
     email_sent: boolean;
 
+    @Column({ type: 'varchar', nullable: true })
+    user_type: string;  // founder or investor
+
     @Column({ type: 'boolean', default: false })
     logged_in: boolean;
 

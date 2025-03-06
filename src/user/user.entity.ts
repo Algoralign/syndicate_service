@@ -15,6 +15,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Deal } from '../deal/deal.entity';
+import { Investment } from '../investments/investments.entity';
 
 @Entity({ name: 'users' })
 class User {
@@ -54,6 +55,10 @@ class User {
 
     @OneToMany(() => Deal, (deal) => deal.user)
     deals: Deal[];
+
+
+    @OneToMany(() => Investment, (investment) => investment.user)
+    investments: Investment[];
 
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })

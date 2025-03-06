@@ -23,6 +23,7 @@ import { IndustryModule } from './industry/industry.module';
 import { SchedulePeriodModule } from './schedule-period/schedule-period.module';
 import { DealModule } from './deal/deal.module';
 import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker.module';
+import { InvestmentsModule } from './investments/investments.module';
 
 
 
@@ -76,6 +77,7 @@ import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker
     SchedulePeriodModule,
     DealModule,
     InvitationTrackerModule,
+    InvestmentsModule,
 
   ],
   controllers: [AppController],
