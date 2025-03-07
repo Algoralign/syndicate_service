@@ -10,6 +10,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import Address from '../address/address.entity';
+import { InvitationTracker } from 'src/invitation-tracker/invitation-tracker.entity';
 
 // module
 @Module({
@@ -18,7 +19,8 @@ import Address from '../address/address.entity';
     Country,
     EmailVerificationToken,
     ResetPasswordToken,
-    Address
+    Address,
+    InvitationTracker
 
   ])],
   controllers: [UserController],

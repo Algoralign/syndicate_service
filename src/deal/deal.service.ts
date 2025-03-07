@@ -93,7 +93,7 @@ export class DealService {
                 this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email)
             ]);
 
-            // Extract results
+            // Extract results  
 
             const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
             const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
@@ -128,7 +128,7 @@ export class DealService {
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
                 });
 
-                // const createdDeal = await this.dealRepository.save(deal);
+                
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
 

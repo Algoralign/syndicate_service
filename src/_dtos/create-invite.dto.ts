@@ -8,7 +8,7 @@ class CompleteInviteDto {
 
     @IsNotEmpty()
     @IsString()
-    user_id: string;
+    invite_id: string;
 
     @IsNotEmpty()
     @IsString()

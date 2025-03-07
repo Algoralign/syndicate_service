@@ -27,6 +27,7 @@ import Address from '../address/address.entity';
 import { MailService } from '../mail/mail.service';
 import CreateAdminDto from '../_dtos/create-admin.dto';
 import CompleteInviteDto from '../_dtos/create-invite.dto';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 @Injectable()
 export class UserService {
@@ -35,6 +36,9 @@ export class UserService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(InvitationTracker)
+    private invitationTrackerRepository: Repository<InvitationTracker>,
 
     @InjectRepository(Country)
     private countryRepository: Repository<Country>,
@@ -171,30 +175,57 @@ export class UserService {
       }
 
       // update and save User first
-      const newUser = await this.userRepository.findOne({
-        where: { id: userData.user_id }
+      const invitee = await this.invitationTrackerRepository.findOne({
+        where: { id: userData.invite_id }
       });
 
-      if (newUser.verified) {
+      if (!invitee) {
         return {
           error: true, // Fix: This should be `true` for an error
           status_code: HttpStatus.BAD_REQUEST,
-          message: 'you had already verified and completed your invite process',
+          message: 'invalid invitation',
         };
       }
-      newUser.password = await this.createPasswordHash(userData.password);
-      newUser.verified = true;
-      let user = await this.userRepository.save(newUser);
 
-      // Create and save Address
-      const address = this.addressRepository.create({ user, country });
-      await this.addressRepository.save(address);
+      //check if user exist 
+      const userExist = await this.userRepository.findOne({
+        where: { email: invitee.email }
+      });
 
-      return {
-        error: false,
-        status_code: HttpStatus.OK,
-        message: 'User account created',
-      };
+      if (userExist) {
+        return {
+          error: true, // Fix: This should be `true` for an error
+          status_code: HttpStatus.BAD_REQUEST,
+          message: 'You  have an account already, please login to your account and check the invitation tab/link to view the deal details',
+        };
+      }
+
+      const entityManager = this.userRepository.manager;
+
+      return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+        // create user 
+        const newUser = this.userRepository.create({
+          first_name: invitee.first_name,
+          last_name: invitee.last_name,
+          email: invitee.email,
+          password: await this.createPasswordHash(userData.password),
+          verified: true,
+        })
+
+        const user = await transactionalEntityManager.save(User, newUser);
+
+
+        // Create and save Address
+        const address = this.addressRepository.create({ user, country });
+        await transactionalEntityManager.save(Address, address);
+
+        return {
+          error: false,
+          status_code: HttpStatus.OK,
+          message: 'User account created successfully',
+        };
+
+      })
     } catch (error) {
       console.log(error)
       if (error?.code == PostgresErrorCode.UniqueViolation) {
