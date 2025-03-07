@@ -42,6 +42,9 @@ export class InvitationTracker {
     @Column({ type: 'boolean', default: false })
     logged_in: boolean;
 
+    // @Column({ type: 'boolean', default: false })
+    // user_invested: boolean;
+
     @CreateDateColumn()
     created_at: Date;
 

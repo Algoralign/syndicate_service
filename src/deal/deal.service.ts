@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '../user/user.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -12,6 +12,7 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 import { UserService } from '../user/user.service';
 import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
+
 
 @Injectable()
 export class DealService {
@@ -117,7 +118,9 @@ export class DealService {
                     founder_lastname: details.founder_lastname,
                     founder_email: details.founder_email,
                     startup_website: details.startup_website,
-                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                    funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
+                        ? Number(details.funding_amount)
+                        : 0.00,
                     repayment_schedule_code: details.repayment_schedule_code,
                     disbursement_schedule_code: details.disbursement_schedule_code,
                     spv_code: details.spv_code,
@@ -128,7 +131,7 @@ export class DealService {
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
                 });
 
-                
+
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
 
@@ -169,7 +172,7 @@ export class DealService {
                     status_code: 201,
                     error: false,
                     message: 'deals created succesfully',
-                    data: {},
+                    data: createdDeal,
                 };
             })
         } catch (error) {
@@ -199,4 +202,85 @@ export class DealService {
             message: 'data retrieved succesfully',
         };
     }
+
+
+
+
+
+    async getUserpendingdeal(user, details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+            // Using repository's findAndCount instead of query builder
+            const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
+                where: { email: user.email },
+                relations: ['deal', 'deal.user'],
+                select: [
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'user_type',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            // Manually remove the unwanted fields from deal
+            const sanitizedDeals = deals.map(deal => {
+                if (deal.deal) {
+                    delete deal.deal.investors; // Replace with actual field you want to remove
+                }
+                return deal;
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    sanitizedDeals,
+                    totalCount,
+                },
+            };
+
+
+
+            // No need for manual sanitization
+            // const [deals, totalCount] = await this.invitationTrackerRepository
+            // .createQueryBuilder('invitation')
+            // .leftJoinAndSelect('invitation.deal', 'deal')
+            // .leftJoinAndSelect('deal.user', 'user')
+            // .select([
+            //     'invitation.id',
+            //     'invitation.first_name',
+            //     'invitation.last_name',
+            //     'invitation.email',
+            //     'invitation.user_type',
+            //     'invitation.created_at',
+            //     'invitation.updated_at',
+            //     'deal.id',  // Only selecting deal ID (remove other fields)
+            //     'user.id',  // Only selecting user ID (remove other fields)
+            // ])
+            // .orderBy('invitation.created_at', 'DESC')
+            // .skip((pageNumber - 1) * pageSize)
+            // .take(pageSize)
+            // .getManyAndCount();
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
+
 }
