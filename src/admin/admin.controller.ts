@@ -47,10 +47,9 @@ export class AdminController {
     async getUsers(
         @Req() request: RequestWithUser,
         @Res() response: Response,
-        @Query() details: ApproveKYCDto,
+        @Query() details: any,
     ) {
 
-        console.log(details)
         const result = await this.adminService.getUsers(details);
         return response.status(result.status_code).json(result);
 

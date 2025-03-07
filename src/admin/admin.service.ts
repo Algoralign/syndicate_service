@@ -4,12 +4,14 @@ import Kyc from 'src/kyc/kyc.entity';
 import { MailService } from '../mail/mail.service';
 import { Repository } from 'typeorm';
 import ApproveKYCDto from './approve-kyc.dto';
+import User from '../user/user.entity';
 
 @Injectable()
 export class AdminService {
 
     constructor(
         @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
+        @InjectRepository(User) private userRepository: Repository<User>,
         private mailService: MailService
 
     ) { }
@@ -131,65 +133,50 @@ export class AdminService {
 
     }
 
-    async getUsers(detail: ApproveKYCDto) {
 
+
+    async getUsers(details: any) {
         try {
+            let { page_size, page_number } = details;
 
-            const kycExist = await this.kycRepository.findOne({ where: { id: detail.id }, relations: ['user'] })
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
 
-            if (kycExist.verified) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: "kyc already approved",
-                };
-            }
-            if (detail.verified == "true") {
+            // Using repository's findAndCount instead of query builder
+            const [kycs, totalCount] = await this.userRepository.findAndCount({
+                // relations: ['user'],
+                select: [
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'phone',
+                    'verified',
+                    'user_type',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
 
-                kycExist.verified = true
-                kycExist.rejected = false
-                await this.kycRepository.save(kycExist)
-
-                // send email 
-                const data = {
-                    receiver: kycExist.user.email,
-                    syndicate_lead_name: kycExist.user.first_name + " " + kycExist.user.last_name,
-                    dashboard_link: `${process.env.ROOT_URL}`,
-                }
-
-                await this.mailService.sendKycSuccessEmail(data);
-                return {
-                    status_code: 200,
-                    error: false,
-                    message: "kyc status updated succesfully",
-                };
-
-            } else {  //
-
-                const data = {
-                    receiver: kycExist.user.email,
-                    syndicate_lead_name: kycExist.user.first_name + " " + kycExist.user.last_name,
-                    retry_kyc_link: `${process.env.ROOT_URL}`,
-                    failure_reason: detail.failed_reason
-                }
-
-                kycExist.rejected = true
-                await this.kycRepository.save(kycExist)
-
-                await this.mailService.sendKycFailEmail(data);
-                return {
-                    status_code: 200,
-                    error: false,
-                    message: "kyc status updated succesfully",
-                };
-            }
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    kycs,
+                    totalCount,
+                },
+            };
         } catch (error) {
             throw new InternalServerErrorException({
-                status: false,
+                error: true,
                 status_code: 500,
-                message: 'error approving kyc',
+                message: error.message,
             });
         }
-
     }
+
 }
