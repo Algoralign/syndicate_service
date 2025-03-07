@@ -178,7 +178,7 @@ export class DealService {
                     const investment = this.investmentRepository.create({
                         user: user,
                         deal: createdDeal,
-                        investment_amount: investmentAmount,
+                        investment_amount: 0.00,  // will be 0 untill the user makes actuall money deposit or investment
                         proposed_amount: investmentAmount,
                         investment_status: InvestmentStatus.PENDING,
                         currency: investmentCurrency

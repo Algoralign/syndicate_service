@@ -6,7 +6,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import * as postmark from 'postmark';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
-import { FounderInvite, InvestorInvite } from '../cron/cron.interface';
+import { FounderInvite, InvestorInvite, KycFailed, KycVerified } from '../cron/cron.interface';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -126,6 +126,52 @@ export class MailService {
         tracker.email_sent = true
         await this.invitationTrackerRepository.save(tracker);
       }
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
+  }
+
+  async sendKycSuccessEmail(
+    data: KycVerified
+  ): Promise<void> {
+    try {
+
+      const templatePath = 'src/mail/templates/kyc-success.hbs';
+      const template = fs.readFileSync(templatePath, 'utf8');
+      const compiledTemplate = handlebars.compile(template);
+      const htmlBody = compiledTemplate(data);
+
+      const response = await this.client.sendEmail({
+        From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
+        To: data.receiver,
+        Subject: 'Your KYC Verification is Successful - Next Steps',
+        HtmlBody: htmlBody,
+      });
+
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
+  }
+
+  async sendKycFailEmail(
+    data: KycFailed
+  ): Promise<void> {
+    try {
+
+      const templatePath = 'src/mail/templates/kyc-fail.hbs';
+      const template = fs.readFileSync(templatePath, 'utf8');
+      const compiledTemplate = handlebars.compile(template);
+      const htmlBody = compiledTemplate(data);
+
+      const response = await this.client.sendEmail({
+        From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
+        To: data.receiver,
+        Subject: 'KYC Verification Failed',
+        HtmlBody: htmlBody,
+      });
+
     } catch (error) {
       console.error('Failed to send email:', error);
       throw error;

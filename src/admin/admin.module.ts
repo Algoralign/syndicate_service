@@ -7,10 +7,12 @@ import User from '../user/user.entity';
 import { Investment } from '../investments/investments.entity';
 import { Deal } from '../deal/deal.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
+import { MailService } from '../mail/mail.service';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Kyc, User, Investment, Deal, InvestmentInstrument])],
+  imports: [TypeOrmModule.forFeature([Kyc, User, Investment, Deal, InvestmentInstrument, InvitationTracker])],
   controllers: [AdminController],
-  providers: [AdminService]
+  providers: [AdminService, MailService]
 })
 export class AdminModule { }

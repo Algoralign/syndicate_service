@@ -22,6 +22,16 @@ export interface FounderInvite {
 
 
 
-
+export interface KycVerified {
+    receiver: string;
+    syndicate_lead_name: string;
+    dashboard_link: string;
+}
+export interface KycFailed {
+    receiver: string;
+    syndicate_lead_name: string;
+    failure_reason: string;
+    retry_kyc_link: string;
+}
 
 
