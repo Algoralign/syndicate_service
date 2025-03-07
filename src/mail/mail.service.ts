@@ -6,7 +6,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import * as postmark from 'postmark';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
-import { InvestorInvite } from '../cron/cron.interface';
+import { FounderInvite, InvestorInvite } from '../cron/cron.interface';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -75,12 +75,12 @@ export class MailService {
   }
 
 
-  async sendInvestorInviteEmail(
-    data: InvestorInvite
+  async sendFounderInviteEmail(
+    data: FounderInvite
   ): Promise<void> {
     try {
 
-      const templatePath = 'src/mail/templates/investor-invite.hbs';
+      const templatePath = 'src/mail/templates/founder-invite.hbs';
       const template = fs.readFileSync(templatePath, 'utf8');
       const compiledTemplate = handlebars.compile(template);
       const htmlBody = compiledTemplate(data);
@@ -88,7 +88,7 @@ export class MailService {
       const response = await this.client.sendEmail({
         From: `"Algoralign" <${this.config.get(`MAIL_FROM`)}>`,
         To: data.receiver,
-        Subject: 'You’ve Been Invited by' + " " + data.syndicate_lead_name + " " + 'to Join a Deal on Algoralign',
+        Subject: 'Invitation to Join' + " " + data.syndicate_name + " " + 'on Algoralign - Secure Your Investment ',
         HtmlBody: htmlBody,
       });
 
@@ -104,12 +104,12 @@ export class MailService {
   }
 
 
-  async sendFounderInviteEmail(
+  async sendInvestorInviteEmail(
     data: InvestorInvite
   ): Promise<void> {
     try {
 
-      const templatePath = 'src/mail/templates/founder-invite.hbs';
+      const templatePath = 'src/mail/templates/investor-invite.hbs';
       const template = fs.readFileSync(templatePath, 'utf8');
       const compiledTemplate = handlebars.compile(template);
       const htmlBody = compiledTemplate(data);

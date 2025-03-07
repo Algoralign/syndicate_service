@@ -10,4 +10,18 @@ export interface InvestorInvite {
     tracker_id: string;
 }
 
+export interface FounderInvite {
+    founder_name: string;
+    syndicate_name: string;
+    startup_name: string;
+    receiver: string;
+    accept_invitation_link: string;
+    tracker_id: string;
+}
+
+
+
+
+
+
 

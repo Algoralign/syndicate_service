@@ -7,7 +7,7 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 import { Investment } from '../investments/investments.entity';
 import { Cron } from '@nestjs/schedule';
 import { MailService } from '../mail/mail.service';
-import { InvestorInvite } from './cron.interface';
+import { FounderInvite, InvestorInvite } from './cron.interface';
 
 @Injectable()
 export class CronService {
@@ -89,20 +89,19 @@ export class CronService {
                 const invitee = user.invitee;
 
 
-                const data = {
-                    investor_name: invitee.first_name + " " + invitee.last_name,
+                const data: FounderInvite = {
+                    founder_name: invitee.first_name + " " + invitee.last_name,
                     syndicate_name: deal_creator.first_name + " " + deal_creator.last_name,
                     startup_name: deal.startup_name,
-                    syndicate_lead_name: deal_creator.first_name + " " + deal_creator.last_name,
                     receiver: invitee.email,
-                    review_deal_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
+                    accept_invitation_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
                     tracker_id: user.id,
                 }
 
                 console.log(data)
 
 
-                // await this.mailService.sendInvestorInviteEmail(data);
+                await this.mailService.sendFounderInviteEmail(data);
             }
 
 
