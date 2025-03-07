@@ -5,7 +5,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>You’ve Been Invited by “Syndicate Name” to Join a Deal on Algoralign</title>
   <style>
-    /* Global styles here (same as in your provided template) */
     img {
       border: none;
       object-fit: contain;
@@ -21,7 +20,6 @@
     body {
       background-color: #f6f6f6;
       font-family: sans-serif;
-      -webkit-font-smoothing: antialiased;
       font-size: 14px;
       line-height: 1.4;
       margin: 0;
@@ -31,20 +29,14 @@
       border-collapse: separate;
       width: 100%;
     }
-    table td {
-      font-family: sans-serif;
-      font-size: 14px;
-      vertical-align: top;
-    }
     .dao_container {
       display: block;
-      margin: 0 auto !important;
+      margin: 0 auto;
       max-width: 650px;
       padding: 10px;
       width: 650px;
     }
     .content {
-      box-sizing: border-box;
       display: block;
       margin: 0 auto;
       max-width: 650px;
@@ -56,12 +48,7 @@
       width: 100%;
     }
     .wrapper {
-      box-sizing: border-box;
       padding: 20px;
-    }
-    .content-block {
-      padding-bottom: 10px;
-      padding-top: 10px;
     }
     .footer {
       clear: both;
@@ -79,45 +66,34 @@
       font-family: sans-serif;
       font-weight: 400;
       line-height: 1.4;
-      margin: 0;
-      margin-bottom: 20px;
+      margin: 0 0 20px;
     }
     p, ul, ol {
       font-family: sans-serif;
       font-size: 14px;
       font-weight: normal;
-      margin: 0;
-      margin-bottom: 15px;
+      margin: 0 0 15px;
     }
     a {
       color: #2772f0;
       text-decoration: underline;
     }
     .dao {
-      box-sizing: border-box;
       width: 100%;
-    }
-    .dao>tbody>tr>td {
-      padding-bottom: 15px;
     }
     .dao a {
       background-color: #ffffff;
       border: solid 1px #2772f0;
       border-radius: 5px;
-      box-sizing: border-box;
       color: #2772f0;
       cursor: pointer;
       display: inline-block;
       font-size: 14px;
       font-weight: bold;
-      margin: 0;
       padding: 12px 25px;
       text-decoration: none;
       text-transform: capitalize;
       transition: .3s ease-in-out;
-    }
-    .dao-primary table td {
-      background-color: #2772f0;
     }
     .dao-primary a {
       background-color: #2772f0;
@@ -160,7 +136,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <h3>Dear,  <br/> <strong>{{investor_name}}</strong></h3>
+                      <h3>Dear <strong>{{investor_name}}</strong>,</h3>
                       <p>You have been invited by <strong>{{syndicate_name}} </strong> to begin KYC for an investment deal. This is an exclusive opportunity to collaborate with other investors and support <strong>{{startup_name}}</strong> in achieving its next growth milestone.</p>
                       <h4><strong>Deal Details:</strong></h4>
                       <ul>
@@ -187,6 +163,7 @@
                           </td>
                         </tr>
                       </table>
+                      <p>If you already have an Algoralign account, simply <a href="{{login_link}}" style="color: #2772f0; font-weight: bold;">log in</a> to review and participate in the deal.</p>
                       <p>If you have any questions, feel free to reach out to <a href="mailto:support@algoralign.com">support@algoralign.com</a> or contact your syndicate lead directly.</p>
                       <p>We look forward to having you onboard!</p>
                       <p>Best regards,</p>

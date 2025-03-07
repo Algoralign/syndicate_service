@@ -24,12 +24,12 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('* * * * *')
+    @Cron('*/5 * * * *')
     async sendInviteEmailToInvestor() {
         try {
 
             const invitations = await this.invitationTrackerRepository.find({
-                where: { email_sent: false, user_type: UserType.SYNDICATE },
+                where: { email_sent: false, user_type: 'syndicate' },
                 relations: ['deal', 'deal.user'],
             })
 
