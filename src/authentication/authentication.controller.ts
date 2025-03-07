@@ -40,6 +40,8 @@ import { diskStorage, memoryStorage } from 'multer';
 import { ResetPasswordEmailDto } from '../_dtos/reset-password-email.dto';
 import { ChangePasswordDto } from '../_dtos/change-password.dto';
 import { RequestPasswordVerificationEmailDto } from '../_dtos/request-password-verification-email.dto';
+import CreateAdminDto from '../_dtos/create-admin.dto';
+import CompleteInviteDto from 'src/_dtos/create-invite.dto';
 
 
 
@@ -88,13 +90,21 @@ export class AuthenticationController {
   }
 
 
- 
+
+
+  @Post('/complete-invite-signup')
+  async completeInviteSignup(@Body() userData: CompleteInviteDto, @Res() response: Response) {
+    const user = await this.authenticationService.completeInviteSignup(userData);
+    return response.status(user.status_code).json(user);
+  }
+
 
   @Post('/signup')
   async createUser(@Body() userData: CreateUserDto, @Res() response: Response) {
     const user = await this.authenticationService.createUser(userData);
-    return response.status(HttpStatus.ACCEPTED).json(user);
+    return response.status(user.status_code).json(user);
   }
+
 
 
   @Post('request-verification-email')
@@ -103,7 +113,7 @@ export class AuthenticationController {
     @Res() response: Response,
   ) {
     const user = await this.authenticationService.requestVerificationEmail(userData);
-    return response.status(HttpStatus.ACCEPTED).json(user);
+    return response.status(user.status_code).json(user);
   }
 
   @HttpCode(200)
@@ -282,6 +292,11 @@ export class AuthenticationController {
 
 
 
+  @Post('/signup-admin')
+  async createAdmin(@Body() userData: CreateAdminDto, @Res() response: Response) {
+    const user = await this.authenticationService.createAdmin(userData);
+    return response.status(HttpStatus.ACCEPTED).json(user);
+  }
 
 
 }

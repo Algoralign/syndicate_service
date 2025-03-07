@@ -69,4 +69,45 @@ export class CronService {
             console.log(error)
         }
     }
+
+
+    //1. get proposal check 
+    @Cron('*/5 * * * *')
+    async sendInviteEmailToFounder() {
+        try {
+
+            const invitations = await this.invitationTrackerRepository.find({
+                where: { email_sent: false, user_type: "founder" },
+                relations: ['invitee', 'deal', 'deal.user'],
+            })
+
+
+            for (const user of invitations) {
+
+                const deal_creator = user.deal.user;
+                const deal = user.deal;
+                const invitee = user.invitee;
+
+
+                const data = {
+                    investor_name: invitee.first_name + " " + invitee.last_name,
+                    syndicate_name: deal_creator.first_name + " " + deal_creator.last_name,
+                    startup_name: deal.startup_name,
+                    syndicate_lead_name: deal_creator.first_name + " " + deal_creator.last_name,
+                    receiver: invitee.email,
+                    review_deal_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
+                    tracker_id: user.id,
+                }
+
+                console.log(data)
+
+
+                // await this.mailService.sendInvestorInviteEmail(data);
+            }
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }

@@ -16,6 +16,10 @@ import {
 } from 'typeorm';
 import { Deal } from '../deal/deal.entity';
 import { Investment } from '../investments/investments.entity';
+import { UserType } from '../_enums/user-type.enum';
+
+
+
 
 @Entity({ name: 'users' })
 class User {
@@ -46,7 +50,6 @@ class User {
     @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true, eager: true })
     public address: Address;
 
-
     @OneToMany(() => InvitationTracker, (invitation) => invitation.invited_by)
     sent_invitations: InvitationTracker[];
 
@@ -59,6 +62,10 @@ class User {
 
     @OneToMany(() => Investment, (investment) => investment.user)
     investments: Investment[];
+
+
+    @Column({ type: 'enum', enum: UserType, default: UserType.OTHERS })
+    user_type: UserType;
 
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
