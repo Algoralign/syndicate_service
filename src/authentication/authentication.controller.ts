@@ -124,7 +124,6 @@ export class AuthenticationController {
       userData,
     );
 
-    console.log(token)
 
     return response.status(token.status_code).json(token);
   }

@@ -27,6 +27,7 @@ import IdentityType from '../identity-types/identity-types.entity';
 import { Bank } from '../bank/bank.entity';
 import { BankService } from '../bank/bank.service';
 import { Deal } from '../deal/deal.entity';
+import { InvitationTracker } from 'src/invitation-tracker/invitation-tracker.entity';
 @Global()
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { Deal } from '../deal/deal.entity';
       Bank,
       Kyc,
       Deal,
+      InvitationTracker
     ])
   ],
   providers: [

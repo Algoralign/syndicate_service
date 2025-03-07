@@ -46,25 +46,19 @@ class User {
     @Column({ default: false })
     public verified: boolean;
 
-
     @OneToOne(() => Address, (address) => address.user, { nullable: true, cascade: true, eager: true })
     public address: Address;
 
     @OneToMany(() => InvitationTracker, (invitation) => invitation.invited_by)
     sent_invitations: InvitationTracker[];
 
-    @OneToMany(() => InvitationTracker, (invitation) => invitation.invitee)
-    received_invitations: InvitationTracker[];
-
     @OneToMany(() => Deal, (deal) => deal.user)
     deals: Deal[];
-
 
     @OneToMany(() => Investment, (investment) => investment.user)
     investments: Investment[];
 
-
-    @Column({ type: 'enum', enum: UserType, default: UserType.OTHERS })
+    @Column({ type: 'enum', enum: UserType, default: UserType.SYNDICATE })
     user_type: UserType;
 
 

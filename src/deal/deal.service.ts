@@ -11,6 +11,7 @@ import { Deal } from './deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UserService } from '../user/user.service';
 import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
+import { UserType } from '../_enums/user-type.enum';
 
 @Injectable()
 export class DealService {
@@ -75,7 +76,6 @@ export class DealService {
             }
 
 
-
             // check id type
             const startupInd = await this.industryRepository.findOne({ where: { id: details.startup_industry_id } })
             if (!startupInd) {
@@ -93,7 +93,7 @@ export class DealService {
                 this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email)
             ]);
 
-            // Extract results
+            // Extract results  
 
             const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
             const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
@@ -128,76 +128,38 @@ export class DealService {
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
                 });
 
-                // const createdDeal = await this.dealRepository.save(deal);
+                
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
-                // create a founder user
-                const founder = this.userRepository.create({
-                    first_name: details.founder_firstname,
-                    last_name: details.founder_lastname,
-                    email: details.founder_email,
-                    password: await this.userService.createPasswordHash(details.founder_email)
-                })
-                const createdFounder = await transactionalEntityManager.save(User, founder);
 
                 // add founder to tracker
                 const trackFounder = this.invitationTrackerRepository.create({
+                    first_name: details.founder_firstname,
+                    last_name: details.founder_lastname,
+                    email: details.founder_email,
+                    currency: details.currency,
+                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
                     invited_by: { id: userExist.id },
-                    invitee: { id: createdFounder.id },
                     deal: { id: createdDeal.id },
-                    user_type: 'founder',
+                    user_type: UserType.FOUNDER,
                 })
-
                 await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
                 const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
-                // Precompute password hashes
-                for (const invited of invitedInv) {
-                    invited.passwordHash = await this.userService.createPasswordHash(invited.email);
-                }
 
-                // Create users and their investments
-                const users = invitedInv.map((invited) => {
-                    const user = this.userRepository.create({
-                        first_name: invited.first_name,
-                        last_name: invited.last_name,
-                        email: invited.email,
-                        password: invited.passwordHash,
-                    });
-
-                    return user;
-                });
-
-                const savedUsers = await transactionalEntityManager.save(User, users);
-
-                // Now create investments for each user
-                const investments = savedUsers.map((user: User, index: number) => {
-                    const investmentAmount = invitedInv[index].amount;
-                    const investmentCurrency = invitedInv[index].currency;
-
-                    const investment = this.investmentRepository.create({
-                        user: user,
-                        deal: createdDeal,
-                        investment_amount: 0.00,  // will be 0 untill the user makes actuall money deposit or investment
-                        proposed_amount: investmentAmount,
-                        investment_status: InvestmentStatus.PENDING,
-                        currency: investmentCurrency
-
-                    });
-
-                    return investment;
-                });
-
-                // Save investments
-                await transactionalEntityManager.save(Investment, investments);
 
                 // Create invitation trackers
-                const trackers = savedUsers.map((user) =>
+                const trackers = invitedInv.map((invitee) =>
                     this.invitationTrackerRepository.create({
+                        first_name: invitee.first_name,
+                        last_name: invitee.last_name,
+                        email: invitee.email,
+                        currency: invitee.currency,
+                        proposed_amount: invitee.amount,
+                        funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
                         invited_by: { id: userExist.id },
-                        invitee: { id: user.id },
                         deal: { id: createdDeal.id },
-                        user_type: 'investor',
+                        user_type: UserType.SYNDICATE,
                     })
                 );
                 await transactionalEntityManager.save(InvitationTracker, trackers);

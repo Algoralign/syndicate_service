@@ -1,5 +1,6 @@
 export enum UserType {
-    OTHERS = "others",
+    FOUNDER = "founder",
+    SYNDICATE = "syndicate",
     ADMIN = "admin",
     SUPER_ADMIN = "super_admin"
 }

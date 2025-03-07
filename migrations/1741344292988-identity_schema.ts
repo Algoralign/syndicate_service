@@ -1,10 +1,27 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class BankSchema1741067138967 implements MigrationInterface {
-    name = 'BankSchema1741067138967'
+export class IdentitySchema1741344292988 implements MigrationInterface {
+    name = 'IdentitySchema1741344292988'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE "identity_types" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, "updated_at" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, CONSTRAINT "PK_31aaa225433b9b5a86da90147ae" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "banks" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "slug" character varying, "code" character varying, "country_code" character varying, "country_name" character varying, "createdAt" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, "updatedAt" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, CONSTRAINT "PK_3975b5f684ec241e3901db62d77" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "kycs" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "first_name" character varying, "last_name" character varying, "passport" character varying, "id_image" character varying, "address" character varying, "address_evidence" character varying, "bvn" character varying, "swift_bic_code" character varying, "account_number" character varying, "account_name" character varying, "uploaded" boolean NOT NULL DEFAULT false, "verified" boolean NOT NULL DEFAULT false, "rejected" boolean NOT NULL DEFAULT false, "phone" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "user_id" uuid NOT NULL, "id_type" uuid NOT NULL, "bank_id" uuid, CONSTRAINT "REL_bbfe1fa864841e82cff1be09e8" UNIQUE ("user_id"), CONSTRAINT "PK_6e61a5975007a8dae889765bbbf" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "schedule_periods" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "code" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, "updated_at" TIMESTAMP NOT NULL DEFAULT ('now'::text)::timestamp(6) with time zone, CONSTRAINT "PK_f0e81c9b218c3551fba74793186" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "kycs" ADD CONSTRAINT "FK_bbfe1fa864841e82cff1be09e8b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "kycs" ADD CONSTRAINT "FK_10cd01dd91cb2cee5b4aa10fa0e" FOREIGN KEY ("id_type") REFERENCES "identity_types"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "kycs" ADD CONSTRAINT "FK_fece62446bcd7ffceac2d9ed303" FOREIGN KEY ("bank_id") REFERENCES "banks"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+
+        // Insert default values
+        await queryRunner.query(`
+                INSERT INTO "identity_types" ("id", "name", "created_at", "updated_at") 
+                VALUES 
+                    (uuid_generate_v4(), 'National ID', NOW(), NOW()),
+                    (uuid_generate_v4(), 'International Passport', NOW(), NOW()),
+                    (uuid_generate_v4(), 'Driver License', NOW(), NOW());
+        `);
+
+
         await queryRunner.query(`
             INSERT INTO banks (name, slug, code, country_code, country_name) VALUES
             ('GTB', 'guaranty-trust-bank', '058', 'NG', 'Nigeria'),
@@ -246,10 +263,25 @@ export class BankSchema1741067138967 implements MigrationInterface {
             ('KCB Bank Tanzania', 'kcb-bank-tanzania', '40815000', 'TZ', 'Tanzania');
                         
           `);
+
+        await queryRunner.query(`
+            INSERT INTO "schedule_periods" ("id", "name", "code", "created_at", "updated_at") 
+            VALUES 
+                (uuid_generate_v4(), 'Monthly', 'monthly', NOW(), NOW()),
+                (uuid_generate_v4(), 'Annually', 'annually', NOW(), NOW()),
+                (uuid_generate_v4(), 'Bi-Annually', 'bianually', NOW(), NOW()),
+                (uuid_generate_v4(), 'Custom', 'custom', NOW(), NOW());
+        `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "kycs" DROP CONSTRAINT "FK_fece62446bcd7ffceac2d9ed303"`);
+        await queryRunner.query(`ALTER TABLE "kycs" DROP CONSTRAINT "FK_10cd01dd91cb2cee5b4aa10fa0e"`);
+        await queryRunner.query(`ALTER TABLE "kycs" DROP CONSTRAINT "FK_bbfe1fa864841e82cff1be09e8b"`);
+        await queryRunner.query(`DROP TABLE "schedule_periods"`);
+        await queryRunner.query(`DROP TABLE "kycs"`);
         await queryRunner.query(`DROP TABLE "banks"`);
+        await queryRunner.query(`DROP TABLE "identity_types"`);
     }
 
 }
