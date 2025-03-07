@@ -17,17 +17,18 @@ import { Investment } from "./src/investments/investments.entity";
 
 export const entities = [
   User,
-  Country,
   Address,
+  Country,
+  InvitationTracker,
+  Deal,
+  Investment,
+  InvestmentInstrument,
+  Industry,
   EmailVerificationToken,
   ResetPasswordToken,
+  
   IdentityType,
   Bank,
   Kyc,
-  InvestmentInstrument,
-  Industry,
   SchedulePeriod,
-  Deal,
-  InvitationTracker,
-  Investment
 ];

@@ -8,6 +8,7 @@ import { Investment } from '../investments/investments.entity';
 import { Cron } from '@nestjs/schedule';
 import { MailService } from '../mail/mail.service';
 import { FounderInvite, InvestorInvite } from './cron.interface';
+import { UserType } from '../_enums/user-type.enum';
 
 @Injectable()
 export class CronService {
@@ -23,43 +24,37 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('*/5 * * * *')
+    @Cron('* * * * *')
     async sendInviteEmailToInvestor() {
         try {
 
             const invitations = await this.invitationTrackerRepository.find({
-                where: { email_sent: false, user_type: "investor" },
-                relations: ['invitee', 'deal', 'deal.user'],
+                where: { email_sent: false, user_type: UserType.SYNDICATE },
+                relations: ['deal', 'deal.user'],
             })
 
 
-            for (const user of invitations) {
+            console.log(invitations)
+            for (const invite of invitations) {
 
-                const deal_creator = user.deal.user;
-                const deal = user.deal;
-                const invitee = user.invitee;
-
-
-                // // get the user proposed investment
-                const proposedInvestment = await this.investmentRepository.findOne({
-                    where: { user: { id: invitee.id } },
-                    relations: ["user"] // Ensure the relation is loaded if needed
-                });
-
+                const deal_creator = invite.deal.user;
+                const deal = invite.deal;
 
 
                 const data: InvestorInvite = {
-                    investor_name: invitee.first_name + " " + invitee.last_name,
+                    investor_name: invite.first_name + " " + invite.last_name,
                     syndicate_name: deal_creator.first_name + " " + deal_creator.last_name,
                     startup_name: deal.startup_name,
                     syndicate_lead_name: deal_creator.first_name + " " + deal_creator.last_name,
-                    minimum_investment: proposedInvestment.proposed_amount,
-                    currency: proposedInvestment.currency,
-                    receiver: invitee.email,
-                    review_deal_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
-                    tracker_id: user.id,
+                    minimum_investment: invite.proposed_amount,
+                    currency: invite.currency,
+                    receiver: invite.email,
+                    review_deal_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invite.id}`,
+                    tracker_id: invite.id,
                 }
 
+
+                console.log(data)
 
                 await this.mailService.sendInvestorInviteEmail(data);
             }
@@ -77,25 +72,25 @@ export class CronService {
         try {
 
             const invitations = await this.invitationTrackerRepository.find({
-                where: { email_sent: false, user_type: "founder" },
-                relations: ['invitee', 'deal', 'deal.user'],
+                where: { email_sent: false, user_type: UserType.FOUNDER },
+                relations: ['deal', 'deal.user'],
             })
 
 
-            for (const user of invitations) {
+            for (const invite of invitations) {
 
-                const deal_creator = user.deal.user;
-                const deal = user.deal;
-                const invitee = user.invitee;
+                const deal_creator = invite.deal.user;
+                const deal = invite.deal;
+
 
 
                 const data: FounderInvite = {
-                    founder_name: invitee.first_name + " " + invitee.last_name,
+                    founder_name: invite.first_name + " " + invite.last_name,
                     syndicate_name: deal_creator.first_name + " " + deal_creator.last_name,
                     startup_name: deal.startup_name,
-                    receiver: invitee.email,
-                    accept_invitation_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invitee.id}`,
-                    tracker_id: user.id,
+                    receiver: invite.email,
+                    accept_invitation_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invite.id}`,
+                    tracker_id: invite.id,
                 }
 
                 await this.mailService.sendFounderInviteEmail(data);
