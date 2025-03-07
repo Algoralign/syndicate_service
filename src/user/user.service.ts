@@ -25,6 +25,8 @@ import ChangePasswordDto from '../_dtos/change-password.dto';
 import RequestPasswordVerificationEmailDto from '../_dtos/request-password-verification-email.dto';
 import Address from '../address/address.entity';
 import { MailService } from '../mail/mail.service';
+import CreateAdminDto from '../_dtos/create-admin.dto';
+import CompleteInviteDto from '../_dtos/create-invite.dto';
 
 @Injectable()
 export class UserService {
@@ -155,6 +157,112 @@ export class UserService {
     }
   }
 
+  public async completeInviteSignup(userData: CompleteInviteDto) {
+    try {
+      // Check if country exists
+      const country = await this.countryRepository.findOne({ where: { id: userData.country_id } });
+
+      if (!country) {
+        return {
+          error: true, // Fix: This should be `true` for an error
+          status_code: HttpStatus.BAD_REQUEST,
+          message: 'Country selected does not exist',
+        };
+      }
+
+      // update and save User first
+      const newUser = await this.userRepository.findOne({
+        where: { id: userData.user_id }
+      });
+
+      if (newUser.verified) {
+        return {
+          error: true, // Fix: This should be `true` for an error
+          status_code: HttpStatus.BAD_REQUEST,
+          message: 'you had already verified and completed your invite process',
+        };
+      }
+      newUser.password = await this.createPasswordHash(userData.password);
+      newUser.verified = true;
+      let user = await this.userRepository.save(newUser);
+
+      // Create and save Address
+      const address = this.addressRepository.create({ user, country });
+      await this.addressRepository.save(address);
+
+      return {
+        error: false,
+        status_code: HttpStatus.OK,
+        message: 'User account created',
+      };
+    } catch (error) {
+      console.log(error)
+      if (error?.code == PostgresErrorCode.UniqueViolation) {
+        throw new CustomHttpException(
+          'User email already exists',
+          HttpStatus.BAD_REQUEST,
+          { status_code: HttpStatus.BAD_REQUEST, error: true },
+        );
+      }
+      throw new CustomHttpException(
+        'Error creating user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        { status_code: HttpStatus.INTERNAL_SERVER_ERROR, error: true },
+      );
+    }
+  }
+
+
+  public async createAdmin(userData: CreateAdminDto) {
+    try {
+
+      // Create and save User first
+      const newUser = this.userRepository.create({
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        email: userData.email,
+        password: await this.createPasswordHash(userData.password),
+        user_type: UserType.ADMIN
+      });
+
+      const user = await this.userRepository.save(newUser);
+
+
+      // Generate email verification token
+      const token = await this.emailVerificationTokenService.createEmailverificationToken(userData.email);
+
+      // Prepare response data
+      const data = {
+        email: user.email,
+        email_verification_token: token.token,
+        verified: user.verified,
+        verification_link: `${process.env.ROOT_URL}/verify-email?token=${token.token}`,
+      };
+
+      // Send email verification mail (if needed)
+      await this.mailService.sendUserConfirmation(data);
+
+      return {
+        error: false,
+        status_code: HttpStatus.OK,
+        message: 'User account created',
+      };
+    } catch (error) {
+      console.log(error)
+      if (error?.code == PostgresErrorCode.UniqueViolation) {
+        throw new CustomHttpException(
+          'User email already exists',
+          HttpStatus.BAD_REQUEST,
+          { status_code: HttpStatus.BAD_REQUEST, error: true },
+        );
+      }
+      throw new CustomHttpException(
+        'Error creating user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        { status_code: HttpStatus.INTERNAL_SERVER_ERROR, error: true },
+      );
+    }
+  }
 
   public async requestVerificationEmail(userData: RequestPasswordVerificationEmailDto) {
     try {

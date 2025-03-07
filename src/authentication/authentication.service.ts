@@ -23,6 +23,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import IdentityType from '../identity-types/identity-types.entity';
 import { Bank } from '../bank/bank.entity';
+import CreateAdminDto from '../_dtos/create-admin.dto';
+import CompleteInviteDto from '../_dtos/create-invite.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -195,6 +197,14 @@ export class AuthenticationService {
 
   async createUser(userData: CreateUserDto) {
     return await this.userService.create(userData);
+  }
+
+  async completeInviteSignup(userData: CompleteInviteDto) {
+    return await this.userService.completeInviteSignup(userData);
+  }
+
+  async createAdmin(userData: CreateAdminDto) {
+    return await this.userService.createAdmin(userData);
   }
 
   async requestVerificationEmail(userData: RequestPasswordVerificationEmailDto) {

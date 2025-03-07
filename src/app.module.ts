@@ -25,6 +25,7 @@ import { DealModule } from './deal/deal.module';
 import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker.module';
 import { InvestmentsModule } from './investments/investments.module';
 import { CronModule } from './cron/cron.module';
+import { AdminModule } from './admin/admin.module';
 
 
 
@@ -80,6 +81,7 @@ import { CronModule } from './cron/cron.module';
     InvitationTrackerModule,
     InvestmentsModule,
     CronModule,
+    AdminModule,
 
   ],
   controllers: [AppController],
