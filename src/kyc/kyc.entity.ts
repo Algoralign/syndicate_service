@@ -67,6 +67,9 @@ class Kyc {
     @Column({ default: false })
     public verified: boolean;
 
+    @Column({ default: false })
+    public rejected: boolean;
+
     @Column({ nullable: true })
     public phone: string;
 

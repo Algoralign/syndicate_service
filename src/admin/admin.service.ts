@@ -1,13 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Kyc from 'src/kyc/kyc.entity';
+import { MailService } from '../mail/mail.service';
 import { Repository } from 'typeorm';
+import ApproveKYCDto from './approve-kyc.dto';
 
 @Injectable()
 export class AdminService {
 
     constructor(
         @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
+        private mailService: MailService
 
     ) { }
 
@@ -66,30 +69,58 @@ export class AdminService {
 
 
 
-    async approveKyc(id: string, verify: string) {
+    async approveKyc(detail: ApproveKYCDto) {
 
         try {
-            if (verify == "true") {
-                //
-                console.log("nice")
-                const kycExist = await this.kycRepository.findOne({ where: { id: id } })
+
+            const kycExist = await this.kycRepository.findOne({ where: { id: detail.id }, relations: ['user'] })
+
+            if (kycExist.verified) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "kyc already approved",
+                };
+            }
+            if (detail.verified == "true") {
+
                 kycExist.verified = true
+                kycExist.rejected = false
                 await this.kycRepository.save(kycExist)
 
                 // send email 
+                const data = {
+                    receiver: kycExist.user.email,
+                    syndicate_lead_name: kycExist.user.first_name + " " + kycExist.user.last_name,
+                    dashboard_link: `${process.env.ROOT_URL}`,
+                }
+
+                await this.mailService.sendKycSuccessEmail(data);
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: "kyc status updated succesfully",
+                };
+
+            } else {  //
+
+                const data = {
+                    receiver: kycExist.user.email,
+                    syndicate_lead_name: kycExist.user.first_name + " " + kycExist.user.last_name,
+                    retry_kyc_link: `${process.env.ROOT_URL}`,
+                    failure_reason: detail.failed_reason
+                }
+
+                kycExist.rejected = true
+                await this.kycRepository.save(kycExist)
+
+                await this.mailService.sendKycFailEmail(data);
                 return {
                     status_code: 200,
                     error: false,
                     message: "kyc status updated succesfully",
                 };
             }
-
-            console.log("not nice")
-            return {
-                status_code: 200,
-                error: false,
-                message: "kyc status updated succesfully",
-            };
         } catch (error) {
             throw new InternalServerErrorException({
                 status: false,
