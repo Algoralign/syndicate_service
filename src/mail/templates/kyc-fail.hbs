@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Action Required - KYC Verification Failed</title>
+  <style>
+    body {
+      background-color: #f6f6f6;
+      font-family: sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 5px;
+    }
+    .content {
+      padding: 20px;
+    }
+    h3 {
+      color: #000000;
+      margin-bottom: 20px;
+    }
+    p, ul {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    a.button {
+      display: inline-block;
+      padding: 12px 25px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #ff4d4d;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h3>Dear {{syndicate_lead_name}},</h3>
+      <p>Unfortunately, your KYC verification could not be completed due to <strong>{{failure_reason}}</strong>.</p>
+      <p>To proceed, please log in to your Algoralign account and restart the KYC process with the correct documents.</p>
+      <h4>What to Do Next:</h4>
+      <ul>
+        <li>🔹 Review the reason for failure in your dashboard.</li>
+        <li>🔹 Re-upload the required documents.</li>
+        <li>🔹 Submit again for review.</li>
+      </ul>
+      <p><a href="{{retry_kyc_link}}" class="button">Retry KYC Verification</a></p>
+      <p>If you have any questions, feel free to contact our support team at <a href="mailto:support@algoralign.com">support@algoralign.com</a>.</p>
+      <p>Best regards,<br>The Algoralign Team</p>
+    </div>
+  </div>
+  <div class="footer">
+    <p>Powered by Algoralign</p>
+  </div>
+</body>
+</html>

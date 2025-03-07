@@ -98,9 +98,6 @@ export class CronService {
                     tracker_id: user.id,
                 }
 
-                console.log(data)
-
-
                 await this.mailService.sendFounderInviteEmail(data);
             }
 
