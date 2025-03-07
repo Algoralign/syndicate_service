@@ -113,6 +113,16 @@ export class UserService {
         };
       }
 
+      //check if user exist
+      const userExist = await this.userRepository.findOne({ where: { email: userData.email, } })
+      if (userExist) {
+        return {
+          error: true, // Fix: This should be `true` for an error
+          status_code: HttpStatus.BAD_REQUEST,
+          message: 'duplicate account - signup rejected',
+        };
+      }
+
       // Create and save User first
       const newUser = this.userRepository.create({
         email: userData.email,

@@ -38,4 +38,21 @@ export class AdminController {
         return response.status(result.status_code).json(result);
 
     }
+
+
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('get-users')
+    async getUsers(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: ApproveKYCDto,
+    ) {
+
+        console.log(details)
+        const result = await this.adminService.getUsers(details);
+        return response.status(result.status_code).json(result);
+
+    }
 }
