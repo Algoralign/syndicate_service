@@ -12,6 +12,7 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 import { UserService } from '../user/user.service';
 import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
+import CreateDealDto from './deal.dto';
 
 
 @Injectable()
@@ -59,6 +60,14 @@ export class DealService {
 
             if (!user) {
                 throw new BadRequestException('user unauthorized');
+            }
+
+            if (details.funding_amount && isNaN(Number(details.funding_amount))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'funding amount must be a valid number',
+                };
             }
 
 

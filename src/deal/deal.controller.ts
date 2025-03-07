@@ -6,6 +6,7 @@ import JwtAuthenticationGuard from '../authentication/jwt-authentication.guard';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique filenames
 import RequestWithUser from '../authentication/interfaces/request-with-user.interface';
 import { DealService } from './deal.service';
+import CreateDealDto from './deal.dto';
 
 
 
@@ -38,7 +39,7 @@ export class DealController {
     @UseGuards(JwtAuthenticationGuard)
     @Post('/submit-deal')
     async submitDeal(
-        @Body() details: any,
+        @Body() details: CreateDealDto,
         @Req() request: RequestWithUser,
         @UploadedFiles()
         files: {
@@ -46,7 +47,6 @@ export class DealController {
             angel_waterfall_distribution_structure?: Express.Multer.File[];
         },
     ): Promise<any> {
-
         return await this.dealService.submitDeal(files, request.user, details);
     }
 
