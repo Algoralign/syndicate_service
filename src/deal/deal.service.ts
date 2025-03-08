@@ -234,8 +234,6 @@ export class DealService {
 
 
 
-
-
     async getUserpendingdeal(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
@@ -243,7 +241,7 @@ export class DealService {
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
-            
+
 
             // Using repository's findAndCount instead of query builder
             const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
@@ -271,9 +269,10 @@ export class DealService {
             });
 
             // Manually remove the unwanted fields from deal
-            const sanitizedDeals = deals.map(deal => {
-                if (deal.deal) {
-                    delete deal.deal.investors; // Replace with actual field you want to remove
+            const pendingdeals = deals.map(deal => {
+                if (deal.invited_by) {
+                    delete deal.invited_by.password; // Replace with actual field you want to remove
+                    delete deal.deal.investors;
                 }
                 return deal;
             });
@@ -283,7 +282,7 @@ export class DealService {
                 error: false,
                 message: "data retrieved successfully",
                 data: {
-                    sanitizedDeals,
+                    pendingdeals,
                     totalCount,
                 },
             };
