@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import { promisify } from 'util';
+import * as path from 'path';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '../user/user.entity';
@@ -14,6 +17,8 @@ import { Currency, Investment, InvestmentStatus } from '../investments/investmen
 import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
 
+
+const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class DealService {
@@ -210,17 +215,46 @@ export class DealService {
         }
     }
 
+    // async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
+    //     for (let i = 0; i < attempts; i++) {
+    //         try {
+    //             const url = await this.cloudinaryService.uploadUseeDealDocument(file, email);
+    //             if (url) return url;
+    //         } catch (error) {
+    //             console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
+    //         }
+    //     }
+    //     throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
+    // }
+
     async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
+        const storagePath = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
+
         for (let i = 0; i < attempts; i++) {
             try {
                 const url = await this.cloudinaryService.uploadUseeDealDocument(file, email);
-                if (url) return url;
+                if (url) {
+                    // Delete the file after successful upload
+                    await unlinkAsync(storagePath);
+                    console.log(`Deleted local file after successful upload: ${storagePath}`);
+                    return url;
+                }
             } catch (error) {
                 console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
             }
         }
+
+        // Delete file from local storage after all attempts fail
+        try {
+            await unlinkAsync(storagePath);
+            console.log(`Deleted local file after failed upload: ${storagePath}`);
+        } catch (deleteError) {
+            console.error(`Failed to delete file after unsuccessful upload: ${storagePath}`, deleteError);
+        }
+
         throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
     }
+
 
 
     async getCurrency() {
