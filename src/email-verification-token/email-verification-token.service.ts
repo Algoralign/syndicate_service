@@ -3,7 +3,6 @@ import EmailVerificationToken from './email-verification-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Utility } from '../utilities/utility';
-import { UserService } from 'src/user/user.service';
 import User from '../user/user.entity';
 
 @Injectable()

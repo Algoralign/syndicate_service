@@ -12,6 +12,7 @@ import SchedulePeriod from "./src/schedule-period/schedule-period.entity";
 import { Deal } from "./src/deal/deal.entity";
 import { InvitationTracker } from "./src/invitation-tracker/invitation-tracker.entity";
 import { Investment } from "./src/investments/investments.entity";
+import PaymentReceipt from "./src/payment-receipt/payment-receipt.entity";
 
 
 
@@ -31,4 +32,5 @@ export const entities = [
   Bank,
   Kyc,
   SchedulePeriod,
+  PaymentReceipt
 ];

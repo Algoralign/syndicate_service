@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import InvestmentInstrument from './investment-instrument.entity';
-import { JsonResponse } from 'src/user/respose-interface';
+import { JsonResponse } from '../user/respose-interface';
 import { Repository } from 'typeorm';
 
 @Injectable()

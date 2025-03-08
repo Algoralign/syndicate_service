@@ -12,6 +12,7 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import Industry from '../industry/industry.entity';
 import { Currency, Investment } from '../investments/investments.entity';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 // Enums for repayment schedule, disbursement schedule, and SPV code
 export enum RepaymentSchedule {

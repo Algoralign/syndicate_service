@@ -3,7 +3,7 @@ import { DealController } from './deal.controller';
 import { DealService } from './deal.service';
 import { Deal } from './deal.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import Industry from 'src/industry/industry.entity';
+import Industry from '../industry/industry.entity';
 import User from '../user/user.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';

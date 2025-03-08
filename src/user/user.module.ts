@@ -10,7 +10,7 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import Address from '../address/address.entity';
-import { InvitationTracker } from 'src/invitation-tracker/invitation-tracker.entity';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 // module
 @Module({

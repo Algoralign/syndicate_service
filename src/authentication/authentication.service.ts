@@ -1,10 +1,9 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import CreateUserDto from 'src/_dtos/create-user.dto';
+import CreateUserDto from '../_dtos/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
-import CreateUserRoleDto from 'src/_dtos/create-role.dto';
 import User from '../user/user.entity';
 import LoginUserDto from '../_dtos/login-user.dto';
 

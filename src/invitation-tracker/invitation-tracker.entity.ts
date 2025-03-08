@@ -1,12 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index, JoinColumn, OneToOne } from 'typeorm';
 import User from '../user/user.entity';
 import { Deal } from '../deal/deal.entity';
 import { Currency } from '../investments/investments.entity';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 @Entity('invitation_trackers')
 export class InvitationTracker {
     @PrimaryGeneratedColumn('uuid')
-    id: string; 
+    id: string;
 
     @Column({ nullable: true })
     public first_name: string;
@@ -32,6 +33,11 @@ export class InvitationTracker {
 
     @ManyToOne(() => Deal, (deal) => deal.invitations, { nullable: true, onDelete: 'CASCADE' })
     deal: Deal;
+
+    @OneToOne(() => PaymentReceipt, (PaymentReceipt) => PaymentReceipt.invitation_tracker)
+    @JoinColumn({ name: 'payment_receipt_id' })
+    public payment_receipt: PaymentReceipt;
+
 
     @Column({ type: 'boolean', default: false })
     email_sent: boolean;

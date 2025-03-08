@@ -41,7 +41,7 @@ import { ResetPasswordEmailDto } from '../_dtos/reset-password-email.dto';
 import { ChangePasswordDto } from '../_dtos/change-password.dto';
 import { RequestPasswordVerificationEmailDto } from '../_dtos/request-password-verification-email.dto';
 import CreateAdminDto from '../_dtos/create-admin.dto';
-import CompleteInviteDto from 'src/_dtos/create-invite.dto';
+import CompleteInviteDto from '../_dtos/create-invite.dto';
 
 
 
