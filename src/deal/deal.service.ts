@@ -234,16 +234,14 @@ export class DealService {
 
 
 
-
-
-    async getUserpendingdeal(user: User, details: any) {
+    async getUserPendingDeal(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
 
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
-            
+
 
             // Using repository's findAndCount instead of query builder
             const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
@@ -271,9 +269,10 @@ export class DealService {
             });
 
             // Manually remove the unwanted fields from deal
-            const sanitizedDeals = deals.map(deal => {
-                if (deal.deal) {
-                    delete deal.deal.investors; // Replace with actual field you want to remove
+            const pendingdeals = deals.map(deal => {
+                if (deal.invited_by) {
+                    delete deal.invited_by.password; // Replace with actual field you want to remove
+                    delete deal.deal.investors;
                 }
                 return deal;
             });
@@ -283,7 +282,7 @@ export class DealService {
                 error: false,
                 message: "data retrieved successfully",
                 data: {
-                    sanitizedDeals,
+                    pendingdeals,
                     totalCount,
                 },
             };
@@ -321,4 +320,88 @@ export class DealService {
 
 
 
+
+    async getUserDeals(user: User, details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+
+
+            // Using repository's findAndCount instead of query builder
+            const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
+                where: { email: user.email, user_invested_in_deal: true },
+                relations: ['deal', 'invited_by'],
+                select: [
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'proposed_amount',
+                    'funding_amount',
+                    'currency',
+                    'email_sent',
+                    'user_type',
+                    'user_invested_in_deal',
+                    'user_accepted_invite',
+                    'invite_type',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            // Manually remove the unwanted fields from deal
+            const pendingdeals = deals.map(deal => {
+                if (deal.invited_by) {
+                    delete deal.invited_by.password; // Replace with actual field you want to remove
+                    delete deal.deal.investors;
+                }
+                return deal;
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    pendingdeals,
+                    totalCount,
+                },
+            };
+
+
+
+            // No need for manual sanitization
+            // const [deals, totalCount] = await this.invitationTrackerRepository
+            // .createQueryBuilder('invitation')
+            // .leftJoinAndSelect('invitation.deal', 'deal')
+            // .leftJoinAndSelect('deal.user', 'user')
+            // .select([
+            //     'invitation.id',
+            //     'invitation.first_name',
+            //     'invitation.last_name',
+            //     'invitation.email',
+            //     'invitation.user_type',
+            //     'invitation.created_at',
+            //     'invitation.updated_at',
+            //     'deal.id',  // Only selecting deal ID (remove other fields)
+            //     'user.id',  // Only selecting user ID (remove other fields)
+            // ])
+            // .orderBy('invitation.created_at', 'DESC')
+            // .skip((pageNumber - 1) * pageSize)
+            // .take(pageSize)
+            // .getManyAndCount();
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
 }

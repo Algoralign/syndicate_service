@@ -75,8 +75,25 @@ export class DealController {
 
         const user: User = request.user['data'].user
 
-        const result = await this.dealService.getUserpendingdeal(user, details);
+        const result = await this.dealService.getUserPendingDeal(user, details);
 
+        return response.status(result.status_code).json(result);
+
+    }
+
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('user-deals')
+    async getDeals(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: any,
+    ) {
+
+        const user: User = request.user['data'].user
+
+        const result = await this.dealService.getUserDeals(user, details);
         return response.status(result.status_code).json(result);
 
     }
