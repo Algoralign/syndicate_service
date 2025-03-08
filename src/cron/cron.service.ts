@@ -29,7 +29,7 @@ export class CronService {
         try {
 
             const invitations = await this.invitationTrackerRepository.find({
-                where: { email_sent: false, user_type: 'syndicate' },
+                where: { email_sent: false, user_type: UserType.SYNDICATE_INVESTOR },
                 relations: ['deal', 'deal.user'],
             })
 

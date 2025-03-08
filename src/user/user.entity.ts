@@ -58,8 +58,8 @@ class User {
     @OneToMany(() => Investment, (investment) => investment.user)
     investments: Investment[];
 
-    @Column({ type: 'enum', enum: UserType, default: UserType.SYNDICATE })
-    user_type: UserType;
+    @Column({ type: 'enum', enum: UserType, nullable: true })
+    user_type?: UserType;
 
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })

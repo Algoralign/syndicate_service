@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique filenames
 import RequestWithUser from '../authentication/interfaces/request-with-user.interface';
 import { DealService } from './deal.service';
 import CreateDealDto from './deal.dto';
+import User from '../user/user.entity';
 
 
 
@@ -59,7 +60,7 @@ export class DealController {
         @Res() response: Response,
     ) {
         const result = await this.dealService.getCurrency();
-        return response.status(HttpStatus.ACCEPTED).json(result);
+        return response.status(result.status_code).json(result);
 
     }
 
@@ -72,8 +73,11 @@ export class DealController {
         @Query() details: any,
     ) {
 
-        const result = await this.dealService.getUserpendingdeal(request.user, details);
-        return response.status(HttpStatus.ACCEPTED).json(result);
+        const user: User = request.user['data'].user
+
+        const result = await this.dealService.getUserpendingdeal(user, details);
+
+        return response.status(result.status_code).json(result);
 
     }
 

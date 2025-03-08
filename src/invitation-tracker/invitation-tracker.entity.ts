@@ -6,7 +6,7 @@ import { Currency } from '../investments/investments.entity';
 @Entity('invitation_trackers')
 export class InvitationTracker {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id: string; 
 
     @Column({ nullable: true })
     public first_name: string;
@@ -42,8 +42,14 @@ export class InvitationTracker {
     @Column({ type: 'boolean', default: false })
     logged_in: boolean;
 
-    // @Column({ type: 'boolean', default: false })
-    // user_invested: boolean;
+    @Column({ type: 'boolean', default: false })
+    user_invested_in_deal: boolean;  // for both syndicate_lead & syndicate_investor
+
+    @Column({ type: 'boolean', default: false })
+    user_accepted_invite: boolean;  // for  all users
+
+    @Column({ type: 'varchar', nullable: true })
+    invite_type: string;
 
     @CreateDateColumn()
     created_at: Date;
