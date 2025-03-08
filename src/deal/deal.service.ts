@@ -154,6 +154,7 @@ export class DealService {
                     invited_by: { id: userExist.id },
                     deal: { id: createdDeal.id },
                     user_type: UserType.FOUNDER,
+                    invite_type: 'refferral'
                 })
                 await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
@@ -171,11 +172,30 @@ export class DealService {
                         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
                         invited_by: { id: userExist.id },
                         deal: { id: createdDeal.id },
-                        user_type: UserType.SYNDICATE,
+                        user_type: UserType.SYNDICATE_INVESTOR,
+                        invite_type: 'refferral'
                     })
                 );
                 await transactionalEntityManager.save(InvitationTracker, trackers);
 
+
+                //invite self to deal
+                const selfInvite = this.invitationTrackerRepository.create({
+                    first_name: userExist.first_name,
+                    last_name: userExist.last_name,
+                    email: userExist.email,
+                    currency: details.currency,
+                    proposed_amount: 0.00,
+                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                    invited_by: { id: userExist.id },
+                    deal: { id: createdDeal.id },
+                    user_type: UserType.SYNDICATE_LEAD,
+                    invite_type: 'self',
+                    email_sent: true,
+                    logged_in: true,
+                })
+
+                await transactionalEntityManager.save(InvitationTracker, selfInvite);
 
                 return {
                     status_code: 201,
@@ -216,23 +236,32 @@ export class DealService {
 
 
 
-    async getUserpendingdeal(user, details: any) {
+    async getUserpendingdeal(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
 
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
+            
+
             // Using repository's findAndCount instead of query builder
             const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
                 where: { email: user.email },
-                relations: ['deal', 'deal.user'],
+                relations: ['deal', 'invited_by'],
                 select: [
                     'id',
                     'first_name',
                     'last_name',
                     'email',
+                    'proposed_amount',
+                    'funding_amount',
+                    'currency',
+                    'email_sent',
                     'user_type',
+                    'user_invested_in_deal',
+                    'user_accepted_invite',
+                    'invite_type',
                     'created_at',
                     'updated_at'
                 ],
