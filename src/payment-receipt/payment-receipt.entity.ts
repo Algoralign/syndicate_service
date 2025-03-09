@@ -9,6 +9,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import User from '../user/user.entity';
+import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 
 
 @Entity({ name: 'payment_receipts' })
@@ -28,8 +29,11 @@ class PaymentReceipt {
     @ManyToOne(() => User, (user) => user.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     user: User;
 
-    @OneToOne(() => InvitationTracker, (invitation_tracker) => invitation_tracker.payment_receipt, { nullable: true, cascade: true, eager: true })
-    public invitation_tracker: InvitationTracker;
+    @ManyToOne(() => SystemReceivingAccount, (systemReceivingAccount) => systemReceivingAccount.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
+    system_receiving_account: SystemReceivingAccount;
+
+    @OneToOne(() => InvitationTracker, (invitationTracker) => invitationTracker.payment_receipt, { nullable: true })
+    public invitation_tracker?: InvitationTracker;
 
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;

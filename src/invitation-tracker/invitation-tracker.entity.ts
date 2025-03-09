@@ -34,7 +34,7 @@ export class InvitationTracker {
     @ManyToOne(() => Deal, (deal) => deal.invitations, { nullable: true, onDelete: 'CASCADE' })
     deal: Deal;
 
-    @OneToOne(() => PaymentReceipt, (PaymentReceipt) => PaymentReceipt.invitation_tracker)
+    @OneToOne(() => PaymentReceipt, (PaymentReceipt) => PaymentReceipt.invitation_tracker, { nullable: true })
     @JoinColumn({ name: 'payment_receipt_id' })
     public payment_receipt: PaymentReceipt;
 

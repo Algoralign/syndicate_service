@@ -17,11 +17,12 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import { Investment } from '../investments/investments.entity';
+import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Deal,
     User, Industry, InvestmentInstrument,
-    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment])],
+    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment, SystemReceivingAccount])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
 })

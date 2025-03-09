@@ -66,6 +66,18 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
+    @Get('system-banks')
+    async getSystemBank(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+    ) {
+        const result = await this.dealService.getSystemBank();
+        return response.status(result.status_code).json(result);
+
+    }
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
     @Get('user-pending-deal')
     async getUserpendingdeal(
         @Req() request: RequestWithUser,
@@ -84,7 +96,7 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('user-deals')
+    @Get('user-onboarded-deals')
     async getDeals(
         @Req() request: RequestWithUser,
         @Res() response: Response,
@@ -93,7 +105,23 @@ export class DealController {
 
         const user: User = request.user['data'].user
 
-        const result = await this.dealService.getUserDeals(user, details);
+        const result = await this.dealService.getUserOnboardedDeals(user, details);
+        return response.status(result.status_code).json(result);
+
+    }
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('user-created-deals')
+    async getCreatedDeals(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: any,
+    ) {
+
+        const user: User = request.user['data'].user
+
+        const result = await this.dealService.getCreatedDeals(user, details);
         return response.status(result.status_code).json(result);
 
     }

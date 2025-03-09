@@ -28,6 +28,8 @@ import { CronModule } from './cron/cron.module';
 import { AdminModule } from './admin/admin.module';
 import { PaymentReceiptModule } from './payment-receipt/payment-receipt.module';
 
+import { SystemReceivingAccountModule } from './system-receiving-account/system-receiving-account.module';
+
 
 
 
@@ -84,6 +86,7 @@ import { PaymentReceiptModule } from './payment-receipt/payment-receipt.module';
     CronModule,
     AdminModule,
     PaymentReceiptModule,
+    SystemReceivingAccountModule,
 
   ],
   controllers: [AppController],
