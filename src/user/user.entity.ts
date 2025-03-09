@@ -17,6 +17,7 @@ import {
 import { Deal } from '../deal/deal.entity';
 import { Investment } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 
 
@@ -57,6 +58,9 @@ class User {
 
     @OneToMany(() => Investment, (investment) => investment.user)
     investments: Investment[];
+
+    @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.user)
+    payment_receipts: PaymentReceipt[];
 
     @Column({ type: 'enum', enum: UserType, nullable: true })
     user_type?: UserType;

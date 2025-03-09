@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import Kyc from 'src/kyc/kyc.entity';
+import Kyc from '../kyc/kyc.entity';
 import { MailService } from '../mail/mail.service';
 import { Repository } from 'typeorm';
 import ApproveKYCDto from './approve-kyc.dto';

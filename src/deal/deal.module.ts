@@ -3,7 +3,7 @@ import { DealController } from './deal.controller';
 import { DealService } from './deal.service';
 import { Deal } from './deal.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import Industry from 'src/industry/industry.entity';
+import Industry from '../industry/industry.entity';
 import User from '../user/user.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
@@ -17,11 +17,12 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import { Investment } from '../investments/investments.entity';
+import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Deal,
     User, Industry, InvestmentInstrument,
-    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment])],
+    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment, SystemReceivingAccount])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
 })

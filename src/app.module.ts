@@ -26,6 +26,9 @@ import { InvitationTrackerModule } from './invitation-tracker/invitation-tracker
 import { InvestmentsModule } from './investments/investments.module';
 import { CronModule } from './cron/cron.module';
 import { AdminModule } from './admin/admin.module';
+import { PaymentReceiptModule } from './payment-receipt/payment-receipt.module';
+
+import { SystemReceivingAccountModule } from './system-receiving-account/system-receiving-account.module';
 
 
 
@@ -82,6 +85,8 @@ import { AdminModule } from './admin/admin.module';
     InvestmentsModule,
     CronModule,
     AdminModule,
+    PaymentReceiptModule,
+    SystemReceivingAccountModule,
 
   ],
   controllers: [AppController],

@@ -12,6 +12,8 @@ import SchedulePeriod from "./src/schedule-period/schedule-period.entity";
 import { Deal } from "./src/deal/deal.entity";
 import { InvitationTracker } from "./src/invitation-tracker/invitation-tracker.entity";
 import { Investment } from "./src/investments/investments.entity";
+import PaymentReceipt from "./src/payment-receipt/payment-receipt.entity";
+import SystemReceivingAccount from "./src/system-receiving-account/system-receiving-account.entity";
 
 
 
@@ -26,9 +28,10 @@ export const entities = [
   Industry,
   EmailVerificationToken,
   ResetPasswordToken,
-  
   IdentityType,
   Bank,
   Kyc,
   SchedulePeriod,
+  PaymentReceipt,
+  SystemReceivingAccount
 ];

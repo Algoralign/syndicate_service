@@ -2,7 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus, Req, Res, UseGuards } from '@nes
 import { InvestmentInstrumentService } from './investment-instrument.service';
 import { Response } from 'express';
 import RequestWithUser from '../authentication/interfaces/request-with-user.interface';
-import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import JwtAuthenticationGuard from '../authentication/jwt-authentication.guard';
 
 @Controller('investment-instrument')
 export class InvestmentInstrumentController {

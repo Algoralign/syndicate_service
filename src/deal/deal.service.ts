@@ -16,6 +16,7 @@ import { UserService } from '../user/user.service';
 import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
+import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -37,6 +38,9 @@ export class DealService {
 
         @InjectRepository(Industry)
         private industryRepository: Repository<Industry>,
+
+        @InjectRepository(SystemReceivingAccount)
+        private systemReceivingAccountRepository: Repository<SystemReceivingAccount>,
 
         @InjectRepository(Deal)
         private dealRepository: Repository<Deal>,
@@ -266,6 +270,25 @@ export class DealService {
         };
     }
 
+    async getSystemBank() {
+        try {
+
+            const data = await this.systemReceivingAccountRepository.find()
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: data
+            };
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
 
 
     async getUserPendingDeal(user: User, details: any) {
@@ -355,7 +378,7 @@ export class DealService {
 
 
 
-    async getUserDeals(user: User, details: any) {
+    async getUserOnboardedDeals(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
 
@@ -390,7 +413,7 @@ export class DealService {
             });
 
             // Manually remove the unwanted fields from deal
-            const pendingdeals = deals.map(deal => {
+            const onboardeddeals = deals.map(deal => {
                 if (deal.invited_by) {
                     delete deal.invited_by.password; // Replace with actual field you want to remove
                     delete deal.deal.investors;
@@ -403,33 +426,12 @@ export class DealService {
                 error: false,
                 message: "data retrieved successfully",
                 data: {
-                    pendingdeals,
+                    onboardeddeals,
                     totalCount,
                 },
             };
 
 
-
-            // No need for manual sanitization
-            // const [deals, totalCount] = await this.invitationTrackerRepository
-            // .createQueryBuilder('invitation')
-            // .leftJoinAndSelect('invitation.deal', 'deal')
-            // .leftJoinAndSelect('deal.user', 'user')
-            // .select([
-            //     'invitation.id',
-            //     'invitation.first_name',
-            //     'invitation.last_name',
-            //     'invitation.email',
-            //     'invitation.user_type',
-            //     'invitation.created_at',
-            //     'invitation.updated_at',
-            //     'deal.id',  // Only selecting deal ID (remove other fields)
-            //     'user.id',  // Only selecting user ID (remove other fields)
-            // ])
-            // .orderBy('invitation.created_at', 'DESC')
-            // .skip((pageNumber - 1) * pageSize)
-            // .take(pageSize)
-            // .getManyAndCount();
         } catch (error) {
             throw new InternalServerErrorException({
                 error: true,
@@ -438,4 +440,71 @@ export class DealService {
             });
         }
     }
+    async getCreatedDeals(user: User, details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+
+
+            // Using repository's findAndCount instead of query builder
+            const [createddeals, totalCount] = await this.dealRepository.findAndCount({
+                where: { user: { id: user.id } },
+                relations: ['startup_industry', 'investment_instrument', 'investments', 'invitations'],
+                select: [
+                    'id',
+                    'startup_name',
+                    'founder_firstname',
+                    'founder_lastname',
+                    'founder_email',
+                    'startup_website',
+                    'funding_amount',
+                    'repayment_schedule_code',
+                    'disbursement_schedule_code',
+                    'spv_code',
+                    'spv_name',
+                    'waterfall_distribution_structure',
+                    'angel_waterfall_distribution_structure',
+                    'verified',
+                    'currency',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            // Manually remove the unwanted fields from deal
+            // const pendingdeals = deals.map(deal => {
+            //     if (deal.invited_by) {
+            //         delete deal.invited_by.password; // Replace with actual field you want to remove
+            //         delete deal.deal.investors;
+            //     }
+            //     return deal;
+            // });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    createddeals,
+                    totalCount,
+                },
+            };
+
+
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
 }
