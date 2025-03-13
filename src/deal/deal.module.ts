@@ -18,11 +18,23 @@ import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import { Investment } from '../investments/investments.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Deal,
-    User, Industry, InvestmentInstrument,
-    Country, InvitationTracker, Address, EmailVerificationToken, ResetPasswordToken, Investment, SystemReceivingAccount])],
+  imports: [TypeOrmModule.forFeature([
+    Deal,
+    User,
+    Industry,
+    InvestmentInstrument,
+    Country,
+    InvitationTracker,
+    Address,
+    EmailVerificationToken,
+    ResetPasswordToken,
+    Investment,
+    SystemReceivingAccount,
+    Syndicate
+  ])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
 })
