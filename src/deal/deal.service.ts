@@ -93,11 +93,19 @@ export class DealService {
             // check for syndicate 
             const theSyndicate = await this.syndicateRepository.findOne({
                 where: { id: details.syndicate_id },
-                relations: ['user'],  // Ensure 'user' is the correct relation name
+                relations: ['user', 'deal'],  // Ensure 'user' is the correct relation name
             });
 
-            console.log(theSyndicate)
 
+            console.log(theSyndicate, "the syndicate")
+
+            if (theSyndicate?.deal) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'this syndicate already have a created deal',
+                };
+            }
 
             if (theSyndicate.user.email != userExist.email) {
                 return {
@@ -141,6 +149,7 @@ export class DealService {
                 // Save deals details if all uploads are successful
                 const deal = this.dealRepository.create({
                     user: userExist,
+                    syndicate: theSyndicate,
                     startup_name: details.startup_name,
                     startup_industry: { id: startupInd.id },
                     founder_firstname: details.founder_firstname,
