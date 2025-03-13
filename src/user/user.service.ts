@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import User from './user.entity';
+import User, { InviteType } from './user.entity';
 import { EntityManager, Repository } from 'typeorm';
 import CreateUserDto from '../_dtos/create-user.dto';
 
@@ -127,6 +127,7 @@ export class UserService {
       const newUser = this.userRepository.create({
         email: userData.email,
         password: await this.createPasswordHash(userData.password),
+        invite_type: InviteType.SELF
       });
 
       const user = await this.userRepository.save(newUser);

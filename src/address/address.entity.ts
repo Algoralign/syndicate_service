@@ -7,7 +7,7 @@ class Address {
     @PrimaryGeneratedColumn('uuid')
     public id: string;
 
-    @OneToOne(() => User, (user) => user.address)
+    @OneToOne(() => User, (user) => user.address, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     public user: User;
 

@@ -29,6 +29,7 @@ import { AdminModule } from './admin/admin.module';
 import { PaymentReceiptModule } from './payment-receipt/payment-receipt.module';
 
 import { SystemReceivingAccountModule } from './system-receiving-account/system-receiving-account.module';
+import { SyndicateModule } from './syndicate/syndicate.module';
 
 
 
@@ -87,6 +88,7 @@ import { SystemReceivingAccountModule } from './system-receiving-account/system-
     AdminModule,
     PaymentReceiptModule,
     SystemReceivingAccountModule,
+    SyndicateModule,
 
   ],
   controllers: [AppController],
