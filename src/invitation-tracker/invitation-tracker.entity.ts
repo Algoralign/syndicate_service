@@ -3,6 +3,8 @@ import User from '../user/user.entity';
 import { Deal } from '../deal/deal.entity';
 import { Currency } from '../investments/investments.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import Syndicate from '../syndicate/syndicate.entity';
+
 
 @Entity('invitation_trackers')
 export class InvitationTracker {
@@ -33,6 +35,11 @@ export class InvitationTracker {
 
     @ManyToOne(() => Deal, (deal) => deal.invitations, { nullable: true, onDelete: 'CASCADE' })
     deal: Deal;
+
+
+    @ManyToOne(() => Syndicate, (syndicate) => syndicate.invitations, { nullable: true, onDelete: 'CASCADE' })
+    syndicate: Syndicate;
+
 
     @OneToOne(() => PaymentReceipt, (PaymentReceipt) => PaymentReceipt.invitation_tracker, { nullable: true })
     @JoinColumn({ name: 'payment_receipt_id' })

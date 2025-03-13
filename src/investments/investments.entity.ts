@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import User from '../user/user.entity';
 import { Deal } from '../deal/deal.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 export enum InvestmentStatus {
     PENDING = 'PENDING',
@@ -97,6 +98,9 @@ export class Investment {
 
     @ManyToOne(() => Deal, (deal) => deal.investments, { nullable: false, onDelete: 'CASCADE' })
     deal: Deal;
+
+    @ManyToOne(() => Syndicate, (syndicate) => syndicate.investments, { nullable: false, onDelete: 'CASCADE' })
+    syndicate: Syndicate;
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     investment_amount: number;
