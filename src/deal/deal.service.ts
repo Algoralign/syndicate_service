@@ -19,6 +19,7 @@ import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import CreatePaymentDto from './payment.dto';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -56,6 +57,9 @@ export class DealService {
 
         @InjectRepository(Syndicate)
         private syndicateRepository: Repository<Syndicate>,
+
+        @InjectRepository(PaymentReceipt)
+        private paymentReceiptRepository: Repository<PaymentReceipt>,
 
     ) { }
 
@@ -133,6 +137,7 @@ export class DealService {
                     message: 'industry selected do not exist',
                 };
             }
+
 
 
             // Upload files with error handling
@@ -253,8 +258,13 @@ export class DealService {
     }
 
 
-    async uploadPayment(files: any, user: any, details: CreatePaymentDto): Promise<any> {
+    async uploadPayment(files: any, user: User, details: CreatePaymentDto): Promise<any> {
         try {
+
+            if (!files || !files.receipt_img) {
+                throw new BadRequestException('payment receipt is required');
+            }
+
             // check syndicate exist
             const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id } })
             if (!syndicateExist) {
@@ -265,7 +275,34 @@ export class DealService {
                 };
             }
 
-            // 
+            // check invite if this syndicate invited this user 
+            const inviteExist = await this.invitationTrackerRepository.findOne({ where: { email: user.email, syndicate: { id: syndicateExist.id } } })
+            if (!inviteExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'user do not belong to syndicate',
+                };
+            }
+
+
+
+            // Upload files with error handling
+            const uploadResults = await Promise.allSettled([
+                this.uploadWithRetryPaymentUpload(files.waterfall_distribution_structure[0], inviteExist.email),
+                this.uploadWithRetryPaymentUpload(files.angel_waterfall_distribution_structure[0], inviteExist.email)
+            ]);
+
+            // create payment 
+            const payment = this.paymentReceiptRepository.create({
+
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: 'syndicate do not exist',
+            };
 
         } catch (error) {
             console.error('Payment Submission Error:', error);
@@ -274,7 +311,7 @@ export class DealService {
     }
 
     async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
-        const storagePath = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
+        let storagePath: string = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
 
         for (let i = 0; i < attempts; i++) {
             try {
@@ -302,6 +339,35 @@ export class DealService {
     }
 
 
+
+    async uploadWithRetryPaymentUpload(file: any, email: string, attempts = 3): Promise<string> {
+        let storagePath: string = path.join(path.resolve('./'), `uploads/payment-document/${file.filename}`);
+
+
+        for (let i = 0; i < attempts; i++) {
+            try {
+                const url = await this.cloudinaryService.uploadUseePaymentDocument(file, email);
+                if (url) {
+                    // Delete the file after successful upload
+                    await unlinkAsync(storagePath);
+                    console.log(`Deleted local file after successful upload: ${storagePath}`);
+                    return url;
+                }
+            } catch (error) {
+                console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
+            }
+        }
+
+        // Delete file from local storage after all attempts fail
+        try {
+            await unlinkAsync(storagePath);
+            console.log(`Deleted local file after failed upload: ${storagePath}`);
+        } catch (deleteError) {
+            console.error(`Failed to delete file after unsuccessful upload: ${storagePath}`, deleteError);
+        }
+
+        throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
+    }
 
     async getCurrency() {
         return {
