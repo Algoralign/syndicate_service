@@ -97,6 +97,14 @@ export class DealService {
             });
 
 
+            if (!theSyndicate) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'this syndicate with the given id do not exist',
+                };
+            }
+
             console.log(theSyndicate, "the syndicate")
 
             if (theSyndicate?.deal) {
