@@ -43,9 +43,19 @@ export class SyndicateService {
             }
 
 
+
+            if (details.ticket_size && isNaN(Number(details.ticket_size))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'ticket size must be a valid number',
+                };
+            }
+
             const syndicate = this.syndicateRepository.create({
                 user: userExist,
                 name: details.name,
+                ticket_size: details.ticket_size,
                 investment_instrument: investmentInstrument,
             })
 

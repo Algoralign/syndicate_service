@@ -221,6 +221,7 @@ export class UserService {
           email: invitee.email,
           password: await this.createPasswordHash(userData.password),
           verified: true,
+          invite_type: InviteType.REFFERRAL,
         })
 
         const user = await transactionalEntityManager.save(User, newUser);

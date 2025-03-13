@@ -10,6 +10,8 @@ import {
 } from 'typeorm';
 import User from '../user/user.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
+import { Deal } from '../deal/deal.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 
 @Entity({ name: 'payment_receipts' })
@@ -28,6 +30,13 @@ class PaymentReceipt {
 
     @ManyToOne(() => User, (user) => user.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     user: User;
+
+    @ManyToOne(() => Deal, (deal) => deal.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
+    deal: Deal;
+
+    @ManyToOne(() => Syndicate, (syndicate) => syndicate.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
+    syndicate: Syndicate;
+
 
     @ManyToOne(() => SystemReceivingAccount, (systemReceivingAccount) => systemReceivingAccount.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     system_receiving_account: SystemReceivingAccount;

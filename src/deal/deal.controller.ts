@@ -8,12 +8,24 @@ import RequestWithUser from '../authentication/interfaces/request-with-user.inte
 import { DealService } from './deal.service';
 import CreateDealDto from './deal.dto';
 import User from '../user/user.entity';
+import CreatePaymentDto from './payment.dto';
 
 
 
 export const storage = {
     storage: diskStorage({
         destination: './uploads/deals-document',
+        filename: (req, file, cb) => {
+            const splitFileName = file.originalname.split('.');
+            const extension = splitFileName.length - 1;
+            cb(null, uuidv4() + '.' + splitFileName[extension]);
+        },
+    }),
+};
+
+export const storagePayment = {
+    storage: diskStorage({
+        destination: './uploads/payment-document',
         filename: (req, file, cb) => {
             const splitFileName = file.originalname.split('.');
             const extension = splitFileName.length - 1;
@@ -49,6 +61,30 @@ export class DealController {
         },
     ): Promise<any> {
         return await this.dealService.submitDeal(files, request.user, details);
+    }
+
+
+
+
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'receipt_img', maxCount: 1 },
+            ],
+            storagePayment,
+        ),
+    )
+    @UseGuards(JwtAuthenticationGuard)
+    @Post('/upload-payment')
+    async uploadPayment(
+        @Body() details: CreatePaymentDto,
+        @Req() request: RequestWithUser,
+        @UploadedFiles()
+        files: {
+            receipt_img?: Express.Multer.File[];
+        },
+    ): Promise<any> {
+        return await this.dealService.uploadPayment(files, request.user, details);
     }
 
 
