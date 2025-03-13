@@ -8,6 +8,7 @@ import { JsonResponse, JwtPayload } from '../interfaces/jwt-payload.interface';
 import { UserService } from '../../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import Kyc from '../../kyc/kyc.entity';
+import { InvitationTracker } from '../../invitation-tracker/invitation-tracker.entity';
 
 
 
@@ -18,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly userService: UserService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
+    @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
 
 
   ) {
@@ -51,6 +53,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     user.password = undefined;
 
+    // const userDeals = await this.invitationTrackerRepository.find({
+    //   where: { email: user.email },
+    //   relations: ['deal', 'syndicate'],
+    // });
+
+    const userDeals = await this.invitationTrackerRepository
+      .createQueryBuilder('invitation')
+      .leftJoinAndSelect('invitation.syndicate', 'syndicate')
+      .where('invitation.email = :email', { email: user.email })
+      .distinctOn(['invitation.syndicate']) // PostgreSQL only
+      .getMany();
+
+
+
+    console.log("The user deal", userDeals)
     // Construct the response
     const response: JsonResponse = {
       error: false,
@@ -58,7 +75,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       status_code: HttpStatus.OK,
       data: {
         user,         // Include the original user object      // Include the extracted roles array
-        kyc_detail: kyc || {}
+        kyc_detail: kyc || {},
+        invited_syndicates: userDeals,
       }
     };
 

@@ -93,11 +93,27 @@ export class DealService {
             // check for syndicate 
             const theSyndicate = await this.syndicateRepository.findOne({
                 where: { id: details.syndicate_id },
-                relations: ['user'],  // Ensure 'user' is the correct relation name
+                relations: ['user', 'deal'],  // Ensure 'user' is the correct relation name
             });
 
-            console.log(theSyndicate)
 
+            if (!theSyndicate) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'this syndicate with the given id do not exist',
+                };
+            }
+
+            console.log(theSyndicate, "the syndicate")
+
+            if (theSyndicate?.deal) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'this syndicate already have a created deal',
+                };
+            }
 
             if (theSyndicate.user.email != userExist.email) {
                 return {
@@ -141,6 +157,7 @@ export class DealService {
                 // Save deals details if all uploads are successful
                 const deal = this.dealRepository.create({
                     user: userExist,
+                    syndicate: theSyndicate,
                     startup_name: details.startup_name,
                     startup_industry: { id: startupInd.id },
                     founder_firstname: details.founder_firstname,
@@ -176,11 +193,30 @@ export class DealService {
                     funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
                     invited_by: { id: userExist.id },
                     deal: { id: createdDeal.id },
+                    syndicate: { id: theSyndicate.id },
                     user_type: UserType.FOUNDER,
                     invite_type: InviteType.REFFERRAL
                 })
                 await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
+                // Create invitation trackers
+                const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
+                const trackers = invitedInv.map((invitee) =>
+                    this.invitationTrackerRepository.create({
+                        first_name: invitee.first_name,
+                        last_name: invitee.last_name,
+                        email: invitee.email,
+                        currency: invitee.currency,
+                        proposed_amount: invitee.amount,
+                        funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                        invited_by: { id: userExist.id },
+                        deal: { id: createdDeal.id },
+                        syndicate: { id: theSyndicate.id },
+                        user_type: UserType.SYNDICATE_INVESTOR,
+                        invite_type: InviteType.REFFERRAL
+                    })
+                );
+                await transactionalEntityManager.save(InvitationTracker, trackers);
 
 
                 //invite self to deal
@@ -193,8 +229,9 @@ export class DealService {
                     funding_amount: details.funding_amount ? Number(details.funding_amount) : 0.00,
                     invited_by: { id: userExist.id },
                     deal: { id: createdDeal.id },
+                    syndicate: { id: theSyndicate.id },
                     user_type: UserType.SYNDICATE_LEAD,
-                    invite_type: 'self',
+                    invite_type: InviteType.SELF,
                     email_sent: true,
                     logged_in: true,
                 })

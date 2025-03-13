@@ -51,9 +51,6 @@ export class Deal {
     @OneToMany(() => Investment, (investment) => investment.deal)
     investments: Investment[];
 
-    // @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.syndicates, { nullable: true, onDelete: 'CASCADE' })
-    // investment_instrument: InvestmentInstrument;
-
     @Column({ type: 'varchar', length: 255, nullable: true })
     startup_name: string;
 
@@ -87,12 +84,8 @@ export class Deal {
     @Column({ type: 'enum', enum: SPVType })
     spv_code: SPVType;
 
-
     @Column({ type: 'varchar', length: 255, nullable: true })
     spv_name: string;
-
-    // @Column({ type: 'text', nullable: true })
-    // investors: string;
 
     @Column({ type: 'text', nullable: true })
     waterfall_distribution_structure: string;
