@@ -326,7 +326,7 @@ export class DealService {
             // Using repository's findAndCount instead of query builder
             const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
                 where: { email: user.email },
-                relations: ['deal', 'deal.investment_instrument', 'deal.startup_industry', 'invited_by'],
+                relations: ['deal', 'deal.startup_industry', 'syndicate', 'invited_by'],
                 select: [
                     'id',
                     'first_name',
@@ -413,7 +413,7 @@ export class DealService {
             // Using repository's findAndCount instead of query builder
             const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
                 where: { email: user.email, user_invested_in_deal: true },
-                relations: ['deal', 'deal.investment_instrument', 'deal.startup_industry', 'invited_by'],
+                relations: ['deal', 'deal.startup_industry', 'syndicate', 'invited_by'],
                 select: [
                     'id',
                     'first_name',
@@ -475,7 +475,7 @@ export class DealService {
             // Using repository's findAndCount instead of query builder
             const [createddeals, totalCount] = await this.dealRepository.findAndCount({
                 where: { user: { id: user.id } },
-                relations: ['startup_industry', 'investment_instrument', 'investments', 'invitations'],
+                relations: ['startup_industry', 'investments', 'invitations'],
                 select: [
                     'id',
                     'startup_name',
