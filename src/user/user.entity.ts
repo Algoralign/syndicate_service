@@ -6,9 +6,6 @@ import {
     Column,
     Entity,
     Index,
-    JoinColumn,
-    JoinTable,
-    ManyToMany,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -18,9 +15,13 @@ import { Deal } from '../deal/deal.entity';
 import { Investment } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 
-
+export enum InviteType {
+    SELF = 'self',
+    REFFERRAL = 'refferral',
+}
 
 @Entity({ name: 'users' })
 class User {
@@ -62,9 +63,15 @@ class User {
     @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.user)
     payment_receipts: PaymentReceipt[];
 
+    @OneToMany(() => Syndicate, (syndicate) => syndicate.user)
+    public syndicates: Syndicate[];
+
     @Column({ type: 'enum', enum: UserType, nullable: true })
     user_type?: UserType;
 
+
+    @Column({ nullable: true })
+    public invite_type: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     public created_at: Date;

@@ -1,6 +1,8 @@
 
 
-import { Deal } from '../deal/deal.entity';
+import Syndicate from '../syndicate/syndicate.entity';
+
+
 import {
     Column,
     Entity,
@@ -20,9 +22,8 @@ class InvestmentInstrument {
     @Column({ nullable: true })
     code: string;
 
-
-    @OneToMany(() => Deal, (deal) => deal.investment_instrument)
-    deals: Deal[];
+    @OneToMany(() => Syndicate, (syndicate) => syndicate.investment_instrument)
+    syndicates: Syndicate[];
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     created_at: Date;

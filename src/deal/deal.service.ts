@@ -124,112 +124,103 @@ export class DealService {
 
             const entityManager = this.dealRepository.manager;
 
-            return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+            // return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
-                // Save deals details if all uploads are successful
-                const deal = this.dealRepository.create({
-                    user: userExist,
-                    investment_instrument: { id: investmentInstrument.id },
-                    startup_name: details.startup_name,
-                    startup_industry: { id: startupInd.id },
-                    founder_firstname: details.founder_firstname,
-                    founder_lastname: details.founder_lastname,
-                    founder_email: details.founder_email,
-                    startup_website: details.startup_website,
-                    funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
-                        ? Number(details.funding_amount)
-                        : 0.00,
-                    repayment_schedule_code: details.repayment_schedule_code,
-                    disbursement_schedule_code: details.disbursement_schedule_code,
-                    spv_code: details.spv_code,
-                    spv_name: details.spv_name,
-                    currency: details.currency,
-                    investors: details.investors,
-                    waterfall_distribution_structure: waterfall_distribution_structure_url,
-                    angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
-                });
-
-
-                const createdDeal = await transactionalEntityManager.save(Deal, deal);
+            //     // Save deals details if all uploads are successful
+            //     const deal = this.dealRepository.create({
+            //         user: userExist,
+            //         investment_instrument: { id: investmentInstrument.id },
+            //         startup_name: details.startup_name,
+            //         startup_industry: { id: startupInd.id },
+            //         founder_firstname: details.founder_firstname,
+            //         founder_lastname: details.founder_lastname,
+            //         founder_email: details.founder_email,
+            //         startup_website: details.startup_website,
+            //         funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
+            //             ? Number(details.funding_amount)
+            //             : 0.00,
+            //         repayment_schedule_code: details.repayment_schedule_code,
+            //         disbursement_schedule_code: details.disbursement_schedule_code,
+            //         spv_code: details.spv_code,
+            //         spv_name: details.spv_name,
+            //         currency: details.currency,
+            //         investors: details.investors,
+            //         waterfall_distribution_structure: waterfall_distribution_structure_url,
+            //         angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
+            //     });
 
 
-                // add founder to tracker
-                const trackFounder = this.invitationTrackerRepository.create({
-                    first_name: details.founder_firstname,
-                    last_name: details.founder_lastname,
-                    email: details.founder_email,
-                    currency: details.currency,
-                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-                    invited_by: { id: userExist.id },
-                    deal: { id: createdDeal.id },
-                    user_type: UserType.FOUNDER,
-                    invite_type: 'refferral'
-                })
-                await transactionalEntityManager.save(InvitationTracker, trackFounder);
-
-                const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
+            //     const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
 
-                // Create invitation trackers
-                const trackers = invitedInv.map((invitee) =>
-                    this.invitationTrackerRepository.create({
-                        first_name: invitee.first_name,
-                        last_name: invitee.last_name,
-                        email: invitee.email,
-                        currency: invitee.currency,
-                        proposed_amount: invitee.amount,
-                        funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-                        invited_by: { id: userExist.id },
-                        deal: { id: createdDeal.id },
-                        user_type: UserType.SYNDICATE_INVESTOR,
-                        invite_type: 'refferral'
-                    })
-                );
-                await transactionalEntityManager.save(InvitationTracker, trackers);
+            //     // add founder to tracker
+            //     const trackFounder = this.invitationTrackerRepository.create({
+            //         first_name: details.founder_firstname,
+            //         last_name: details.founder_lastname,
+            //         email: details.founder_email,
+            //         currency: details.currency,
+            //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+            //         invited_by: { id: userExist.id },
+            //         deal: { id: createdDeal.id },
+            //         user_type: UserType.FOUNDER,
+            //         invite_type: 'refferral'
+            //     })
+            //     await transactionalEntityManager.save(InvitationTracker, trackFounder);
+
+            //     const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
 
 
-                //invite self to deal
-                const selfInvite = this.invitationTrackerRepository.create({
-                    first_name: userExist.first_name,
-                    last_name: userExist.last_name,
-                    email: userExist.email,
-                    currency: details.currency,
-                    proposed_amount: 0.00,
-                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-                    invited_by: { id: userExist.id },
-                    deal: { id: createdDeal.id },
-                    user_type: UserType.SYNDICATE_LEAD,
-                    invite_type: 'self',
-                    email_sent: true,
-                    logged_in: true,
-                })
+            //     // Create invitation trackers
+            //     const trackers = invitedInv.map((invitee) =>
+            //         this.invitationTrackerRepository.create({
+            //             first_name: invitee.first_name,
+            //             last_name: invitee.last_name,
+            //             email: invitee.email,
+            //             currency: invitee.currency,
+            //             proposed_amount: invitee.amount,
+            //             funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+            //             invited_by: { id: userExist.id },
+            //             deal: { id: createdDeal.id },
+            //             user_type: UserType.SYNDICATE_INVESTOR,
+            //             invite_type: 'refferral'
+            //         })
+            //     );
+            //     await transactionalEntityManager.save(InvitationTracker, trackers);
 
-                await transactionalEntityManager.save(InvitationTracker, selfInvite);
 
-                return {
-                    status_code: 201,
-                    error: false,
-                    message: 'deals created succesfully',
-                    data: createdDeal,
-                };
-            })
+            //     //invite self to deal
+            //     const selfInvite = this.invitationTrackerRepository.create({
+            //         first_name: userExist.first_name,
+            //         last_name: userExist.last_name,
+            //         email: userExist.email,
+            //         currency: details.currency,
+            //         proposed_amount: 0.00,
+            //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+            //         invited_by: { id: userExist.id },
+            //         deal: { id: createdDeal.id },
+            //         user_type: UserType.SYNDICATE_LEAD,
+            //         invite_type: 'self',
+            //         email_sent: true,
+            //         logged_in: true,
+            //     })
+
+            //     await transactionalEntityManager.save(InvitationTracker, selfInvite);
+
+            //     return {
+            //         status_code: 201,
+            //         error: false,
+            //         message: 'deals created succesfully',
+            //         data: createdDeal,
+            //     };
+            // })
         } catch (error) {
             console.error('KYC Submission Error:', error);
             throw new BadRequestException({ message: error.message });
         }
     }
 
-    // async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
-    //     for (let i = 0; i < attempts; i++) {
-    //         try {
-    //             const url = await this.cloudinaryService.uploadUseeDealDocument(file, email);
-    //             if (url) return url;
-    //         } catch (error) {
-    //             console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
-    //         }
-    //     }
-    //     throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
-    // }
+
+
 
     async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
         const storagePath = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
@@ -329,7 +320,7 @@ export class DealService {
             const pendingdeals = deals.map(deal => {
                 if (deal.invited_by) {
                     delete deal.invited_by.password; // Replace with actual field you want to remove
-                    delete deal.deal.investors;
+                    // delete deal.deal.investors;
                 }
                 return deal;
             });
@@ -416,7 +407,7 @@ export class DealService {
             const onboardeddeals = deals.map(deal => {
                 if (deal.invited_by) {
                     delete deal.invited_by.password; // Replace with actual field you want to remove
-                    delete deal.deal.investors;
+                    // delete deal.deal.investors;
                 }
                 return deal;
             });

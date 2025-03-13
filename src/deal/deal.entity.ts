@@ -5,7 +5,9 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToMany
+    OneToMany,
+    OneToOne,
+    JoinColumn
 } from 'typeorm';
 import User from '../user/user.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
@@ -13,6 +15,7 @@ import InvestmentInstrument from '../investment-instrument/investment-instrument
 import Industry from '../industry/industry.entity';
 import { Currency, Investment } from '../investments/investments.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 // Enums for repayment schedule, disbursement schedule, and SPV code
 export enum RepaymentSchedule {
@@ -48,8 +51,8 @@ export class Deal {
     @OneToMany(() => Investment, (investment) => investment.deal)
     investments: Investment[];
 
-    @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.deals, { nullable: true, onDelete: 'CASCADE' })
-    investment_instrument: InvestmentInstrument;
+    // @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.syndicates, { nullable: true, onDelete: 'CASCADE' })
+    // investment_instrument: InvestmentInstrument;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     startup_name: string;
@@ -84,11 +87,12 @@ export class Deal {
     @Column({ type: 'enum', enum: SPVType })
     spv_code: SPVType;
 
+
     @Column({ type: 'varchar', length: 255, nullable: true })
     spv_name: string;
 
-    @Column({ type: 'text', nullable: true })
-    investors: string;
+    // @Column({ type: 'text', nullable: true })
+    // investors: string;
 
     @Column({ type: 'text', nullable: true })
     waterfall_distribution_structure: string;
@@ -98,6 +102,10 @@ export class Deal {
 
     @Column({ default: false })
     public verified: boolean;
+
+    @OneToOne(() => Syndicate, (syndicate) => syndicate.deal, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'syndicate_id' }) // Specifies the foreign key
+    public syndicate: Syndicate;
 
     @CreateDateColumn()
     created_at: Date;

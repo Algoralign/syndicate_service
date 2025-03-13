@@ -14,6 +14,7 @@ import { InvitationTracker } from "./src/invitation-tracker/invitation-tracker.e
 import { Investment } from "./src/investments/investments.entity";
 import PaymentReceipt from "./src/payment-receipt/payment-receipt.entity";
 import SystemReceivingAccount from "./src/system-receiving-account/system-receiving-account.entity";
+import Syndicate from './src/syndicate/syndicate.entity';
 
 
 
@@ -33,5 +34,6 @@ export const entities = [
   Kyc,
   SchedulePeriod,
   PaymentReceipt,
-  SystemReceivingAccount
+  SystemReceivingAccount,
+  Syndicate
 ];
