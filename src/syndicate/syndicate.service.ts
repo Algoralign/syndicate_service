@@ -114,4 +114,28 @@ export class SyndicateService {
             });
         }
     }
+
+
+    async getSyndicateById(id: any) {
+        try {
+            // Using repository's findAndCount instead of query builder
+            const syndicate = await this.syndicateRepository.findOne({
+                where: { id: id },
+                relations: ['user', 'deal', 'investment_instrument'],
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: syndicate
+            };
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
 }
