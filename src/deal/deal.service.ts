@@ -181,23 +181,6 @@ export class DealService {
                 })
                 await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
-                // // Create invitation trackers
-                // const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
-                // const trackers = invitedInv.map((invitee) =>
-                //     this.invitationTrackerRepository.create({
-                //         first_name: invitee.first_name,
-                //         last_name: invitee.last_name,
-                //         email: invitee.email,
-                //         currency: invitee.currency,
-                //         proposed_amount: invitee.amount,
-                //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-                //         invited_by: { id: userExist.id },
-                //         deal: { id: createdDeal.id },
-                //         user_type: UserType.SYNDICATE_INVESTOR,
-                //         invite_type: 'refferral'
-                //     })
-                // );
-                // await transactionalEntityManager.save(InvitationTracker, trackers);
 
 
                 //invite self to deal
