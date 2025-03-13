@@ -18,6 +18,7 @@ import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import CreatePaymentDto from './payment.dto';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -252,7 +253,25 @@ export class DealService {
     }
 
 
+    async uploadPayment(files: any, user: any, details: CreatePaymentDto): Promise<any> {
+        try {
+            // check syndicate exist
+            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id } })
+            if (!syndicateExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'syndicate do not exist',
+                };
+            }
 
+            // 
+
+        } catch (error) {
+            console.error('Payment Submission Error:', error);
+            throw new BadRequestException({ message: error.message });
+        }
+    }
 
     async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
         const storagePath = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);

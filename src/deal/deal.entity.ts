@@ -100,6 +100,9 @@ export class Deal {
     @JoinColumn({ name: 'syndicate_id' }) // Specifies the foreign key
     public syndicate: Syndicate;
 
+    @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.deal)
+    payment_receipts: PaymentReceipt[];
+
     @CreateDateColumn()
     created_at: Date;
 
