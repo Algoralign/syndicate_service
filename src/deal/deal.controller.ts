@@ -86,9 +86,7 @@ export class DealController {
     ) {
 
         const user: User = request.user['data'].user
-
         const result = await this.dealService.getUserPendingDeal(user, details);
-
         return response.status(result.status_code).json(result);
 
     }

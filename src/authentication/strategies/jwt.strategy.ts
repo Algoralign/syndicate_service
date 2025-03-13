@@ -53,16 +53,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     user.password = undefined;
 
-    // const userDeals = await this.invitationTrackerRepository.find({
-    //   where: { email: user.email },
-    //   relations: ['deal', 'syndicate'],
-    // });
 
     const userDeals = await this.invitationTrackerRepository
       .createQueryBuilder('invitation')
+      .leftJoinAndSelect('invitation.deal', 'deal')
       .leftJoinAndSelect('invitation.syndicate', 'syndicate')
       .where('invitation.email = :email', { email: user.email })
-      .distinctOn(['invitation.syndicate']) // PostgreSQL only
+      .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
       .getMany();
 
 
