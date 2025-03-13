@@ -12,8 +12,9 @@ class CreateSyndicateDto {
     investment_instrument_id: string;
 
     @IsNotEmpty()
-    @IsString()
-    ticket_size: string;
+    @Transform(({ value }) => Number(value)) // Converts the string to a number
+    @IsNumber()
+    ticket_size: number;
 }
 
 export default CreateSyndicateDto;
