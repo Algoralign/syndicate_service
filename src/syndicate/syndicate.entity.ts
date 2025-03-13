@@ -25,6 +25,9 @@ class Syndicate {
     @Column({ nullable: true })
     public name: string;
 
+    @Column({ nullable: true })
+    public ticket_size: number;
+
     @ManyToOne(() => User, (user) => user.syndicates, { nullable: false, onDelete: 'CASCADE' })
     public user: User;
 

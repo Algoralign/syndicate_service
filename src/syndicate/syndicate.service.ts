@@ -47,6 +47,7 @@ export class SyndicateService {
                 user: userExist,
                 name: details.name,
                 investment_instrument: investmentInstrument,
+                ticket_size: details.ticket_size
             })
 
 

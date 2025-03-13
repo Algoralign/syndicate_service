@@ -10,6 +10,10 @@ class CreateSyndicateDto {
     @IsNotEmpty()
     @IsString()
     investment_instrument_id: string;
+
+    @IsNotEmpty()
+    @IsString()
+    ticket_size: string;
 }
 
 export default CreateSyndicateDto;
