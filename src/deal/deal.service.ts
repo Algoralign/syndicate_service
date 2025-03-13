@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import * as path from 'path';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import User from '../user/user.entity';
+import User, { InviteType } from '../user/user.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
@@ -17,6 +17,7 @@ import { Currency, Investment, InvestmentStatus } from '../investments/investmen
 import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -51,14 +52,15 @@ export class DealService {
         @InjectRepository(Investment)
         private investmentRepository: Repository<Investment>,
 
+
+        @InjectRepository(Syndicate)
+        private syndicateRepository: Repository<Syndicate>,
+
     ) { }
 
 
 
     async submitDeal(files: any, user: any, details: any): Promise<any> {
-
-
-        console.log(details.investors[0])
 
         try {
             if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure) {
@@ -80,20 +82,30 @@ export class DealService {
             }
 
 
-            const investmentInstrument = await this.investmentInstrumentRepository
-                .createQueryBuilder('inv')
-                .where('inv.id = :id', { id: details.investment_instrument_id })
-                .getOne();
-
-
-            if (!investmentInstrument) {
+            if (details.investing_amount && isNaN(Number(details.investing_amount))) {
                 return {
                     status_code: 400,
                     error: true,
-                    message: 'investment instrument do not exist',
+                    message: 'investing amount must be a valid number',
                 };
             }
 
+            // check for syndicate 
+            const theSyndicate = await this.syndicateRepository.findOne({
+                where: { id: details.syndicate_id },
+                relations: ['user'],  // Ensure 'user' is the correct relation name
+            });
+
+            console.log(theSyndicate)
+
+
+            if (theSyndicate.user.email != userExist.email) {
+                return {
+                    status_code: 401,
+                    error: true,
+                    message: 'user can not create a deal in this syndicate - unauthorised',
+                };
+            }
 
             // check id type
             const startupInd = await this.industryRepository.findOne({ where: { id: details.startup_industry_id } })
@@ -124,95 +136,95 @@ export class DealService {
 
             const entityManager = this.dealRepository.manager;
 
-            // return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+            return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
-            //     // Save deals details if all uploads are successful
-            //     const deal = this.dealRepository.create({
-            //         user: userExist,
-            //         investment_instrument: { id: investmentInstrument.id },
-            //         startup_name: details.startup_name,
-            //         startup_industry: { id: startupInd.id },
-            //         founder_firstname: details.founder_firstname,
-            //         founder_lastname: details.founder_lastname,
-            //         founder_email: details.founder_email,
-            //         startup_website: details.startup_website,
-            //         funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
-            //             ? Number(details.funding_amount)
-            //             : 0.00,
-            //         repayment_schedule_code: details.repayment_schedule_code,
-            //         disbursement_schedule_code: details.disbursement_schedule_code,
-            //         spv_code: details.spv_code,
-            //         spv_name: details.spv_name,
-            //         currency: details.currency,
-            //         investors: details.investors,
-            //         waterfall_distribution_structure: waterfall_distribution_structure_url,
-            //         angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
-            //     });
+                // Save deals details if all uploads are successful
+                const deal = this.dealRepository.create({
+                    user: userExist,
+                    startup_name: details.startup_name,
+                    startup_industry: { id: startupInd.id },
+                    founder_firstname: details.founder_firstname,
+                    founder_lastname: details.founder_lastname,
+                    founder_email: details.founder_email,
+                    startup_website: details.startup_website,
+                    funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
+                        ? Number(details.funding_amount)
+                        : 0.00,
+                    repayment_schedule_code: details.repayment_schedule_code,
+                    disbursement_schedule_code: details.disbursement_schedule_code,
+                    spv_code: details.spv_code,
+                    spv_name: details.spv_name,
+                    currency: details.currency,
+                    waterfall_distribution_structure: waterfall_distribution_structure_url,
+                    angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
+                });
 
 
-            //     const createdDeal = await transactionalEntityManager.save(Deal, deal);
+                const createdDeal = await transactionalEntityManager.save(Deal, deal);
+
+                // update syndicate
+                theSyndicate.deal = createdDeal
+                await transactionalEntityManager.save(Syndicate, theSyndicate);
 
 
-            //     // add founder to tracker
-            //     const trackFounder = this.invitationTrackerRepository.create({
-            //         first_name: details.founder_firstname,
-            //         last_name: details.founder_lastname,
-            //         email: details.founder_email,
-            //         currency: details.currency,
-            //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-            //         invited_by: { id: userExist.id },
-            //         deal: { id: createdDeal.id },
-            //         user_type: UserType.FOUNDER,
-            //         invite_type: 'refferral'
-            //     })
-            //     await transactionalEntityManager.save(InvitationTracker, trackFounder);
+                // add founder to tracker
+                const trackFounder = this.invitationTrackerRepository.create({
+                    first_name: details.founder_firstname,
+                    last_name: details.founder_lastname,
+                    email: details.founder_email,
+                    currency: details.currency,
+                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                    invited_by: { id: userExist.id },
+                    deal: { id: createdDeal.id },
+                    user_type: UserType.FOUNDER,
+                    invite_type: InviteType.REFFERRAL
+                })
+                await transactionalEntityManager.save(InvitationTracker, trackFounder);
 
-            //     const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
-
-
-            //     // Create invitation trackers
-            //     const trackers = invitedInv.map((invitee) =>
-            //         this.invitationTrackerRepository.create({
-            //             first_name: invitee.first_name,
-            //             last_name: invitee.last_name,
-            //             email: invitee.email,
-            //             currency: invitee.currency,
-            //             proposed_amount: invitee.amount,
-            //             funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-            //             invited_by: { id: userExist.id },
-            //             deal: { id: createdDeal.id },
-            //             user_type: UserType.SYNDICATE_INVESTOR,
-            //             invite_type: 'refferral'
-            //         })
-            //     );
-            //     await transactionalEntityManager.save(InvitationTracker, trackers);
+                // // Create invitation trackers
+                // const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
+                // const trackers = invitedInv.map((invitee) =>
+                //     this.invitationTrackerRepository.create({
+                //         first_name: invitee.first_name,
+                //         last_name: invitee.last_name,
+                //         email: invitee.email,
+                //         currency: invitee.currency,
+                //         proposed_amount: invitee.amount,
+                //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                //         invited_by: { id: userExist.id },
+                //         deal: { id: createdDeal.id },
+                //         user_type: UserType.SYNDICATE_INVESTOR,
+                //         invite_type: 'refferral'
+                //     })
+                // );
+                // await transactionalEntityManager.save(InvitationTracker, trackers);
 
 
-            //     //invite self to deal
-            //     const selfInvite = this.invitationTrackerRepository.create({
-            //         first_name: userExist.first_name,
-            //         last_name: userExist.last_name,
-            //         email: userExist.email,
-            //         currency: details.currency,
-            //         proposed_amount: 0.00,
-            //         funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
-            //         invited_by: { id: userExist.id },
-            //         deal: { id: createdDeal.id },
-            //         user_type: UserType.SYNDICATE_LEAD,
-            //         invite_type: 'self',
-            //         email_sent: true,
-            //         logged_in: true,
-            //     })
+                //invite self to deal
+                const selfInvite = this.invitationTrackerRepository.create({
+                    first_name: userExist.first_name,
+                    last_name: userExist.last_name,
+                    email: userExist.email,
+                    currency: details.currency,
+                    proposed_amount: details.investing_amount ? Number(details.funding_amount) : 0.00,
+                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0.00,
+                    invited_by: { id: userExist.id },
+                    deal: { id: createdDeal.id },
+                    user_type: UserType.SYNDICATE_LEAD,
+                    invite_type: 'self',
+                    email_sent: true,
+                    logged_in: true,
+                })
 
-            //     await transactionalEntityManager.save(InvitationTracker, selfInvite);
+                await transactionalEntityManager.save(InvitationTracker, selfInvite);
 
-            //     return {
-            //         status_code: 201,
-            //         error: false,
-            //         message: 'deals created succesfully',
-            //         data: createdDeal,
-            //     };
-            // })
+                return {
+                    status_code: 201,
+                    error: false,
+                    message: 'deals created succesfully',
+                    data: createdDeal,
+                };
+            })
         } catch (error) {
             console.error('KYC Submission Error:', error);
             throw new BadRequestException({ message: error.message });

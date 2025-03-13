@@ -47,10 +47,7 @@ export class SyndicateController {
         @Param('id') id: string, // Retrieve the id from the route
         @Res() response: Response,
     ) {
-        const user: User = request.user['data'].user;
-
         const result = await this.syndicateService.getSyndicateById(id); // Pass id to the service
-
         return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
     }
 
