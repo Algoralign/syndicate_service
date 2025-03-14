@@ -28,6 +28,9 @@ class PaymentReceipt {
     @Column({ default: false })
     public rejected: boolean;
 
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    investment_amount: number;
+
     @ManyToOne(() => User, (user) => user.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     user: User;
 
@@ -43,6 +46,9 @@ class PaymentReceipt {
 
     @OneToOne(() => InvitationTracker, (invitationTracker) => invitationTracker.payment_receipt, { nullable: true })
     public invitation_tracker?: InvitationTracker;
+
+    @Column({ type: 'text', nullable: true })
+    reject_reason: string;
 
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;

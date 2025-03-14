@@ -19,6 +19,7 @@ import ResetPasswordToken from '../reset-password-token/reset-password-token.ent
 import { Investment } from '../investments/investments.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -33,7 +34,8 @@ import Syndicate from '../syndicate/syndicate.entity';
     ResetPasswordToken,
     Investment,
     SystemReceivingAccount,
-    Syndicate
+    Syndicate,
+    PaymentReceipt
   ])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]

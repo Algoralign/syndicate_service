@@ -84,7 +84,9 @@ export class DealController {
             receipt_img?: Express.Multer.File[];
         },
     ): Promise<any> {
-        return await this.dealService.uploadPayment(files, request.user, details);
+
+        const user: User = request.user['data'].user
+        return await this.dealService.uploadPayment(files, user, details);
     }
 
 

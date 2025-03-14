@@ -19,6 +19,7 @@ import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import CreatePaymentDto from './payment.dto';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -56,6 +57,9 @@ export class DealService {
 
         @InjectRepository(Syndicate)
         private syndicateRepository: Repository<Syndicate>,
+
+        @InjectRepository(PaymentReceipt)
+        private paymentReceiptRepository: Repository<PaymentReceipt>,
 
     ) { }
 
@@ -135,6 +139,7 @@ export class DealService {
             }
 
 
+
             // Upload files with error handling
             const uploadResults = await Promise.allSettled([
                 this.uploadWithRetry(files.waterfall_distribution_structure[0], userExist.email),
@@ -149,7 +154,7 @@ export class DealService {
             // Check if any upload failed
             if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
                 throw new Error('One or more document uploads failed. Please try again.');
-            }
+            }  //
 
             const entityManager = this.dealRepository.manager;
 
@@ -253,10 +258,36 @@ export class DealService {
     }
 
 
-    async uploadPayment(files: any, user: any, details: CreatePaymentDto): Promise<any> {
+    async uploadPayment(files: any, user: User, details: CreatePaymentDto): Promise<any> {
         try {
+
+            if (!files || !files.receipt_img) {
+                throw new BadRequestException('payment receipt is required');
+            }
+
+
+            console.log(details.investment_amount, "amountnfnfnfnfnf")
+            if (details.investment_amount && isNaN(Number(details.investment_amount))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'investment amount must be a valid number',
+                };
+            }
+
+            const userExist = await this.userRepository.findOneBy({ id: user.id })
+            if (!user) {
+                throw new BadRequestException('user unauthorized');
+            }
+
+
+            const systemBankExist = await this.systemReceivingAccountRepository.findOneBy({ id: details.system_receiving_account_id })
+            if (!user) {
+                throw new BadRequestException('user unauthorized');
+            }
+
             // check syndicate exist
-            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id } })
+            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id }, relations: ['deal'], })
             if (!syndicateExist) {
                 return {
                     status_code: 400,
@@ -265,7 +296,66 @@ export class DealService {
                 };
             }
 
-            // 
+            const dealExist = await this.dealRepository.findOne({ where: { id: syndicateExist.deal.id } })
+            if (!dealExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'deal do not exist',
+                };
+            }
+
+            // check invite if this syndicate invited this user 
+            const inviteExist = await this.invitationTrackerRepository.findOne({
+                where: {
+                    email: user.email,
+                    id: details.invite_id,
+                    syndicate: { id: syndicateExist.id }, // This works in TypeORM v0.3+
+                },
+            });
+            if (!inviteExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'invalid invite or syndicate supplied',
+                };
+            }
+
+
+
+            // Upload files with error handling
+            const uploadResults = await Promise.allSettled([
+                this.uploadWithRetryPaymentUpload(files.receipt_img[0], inviteExist.email),
+            ]);
+
+
+            // Extract results  
+            const receipt_img_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
+
+
+            // Check if any upload failed
+            if (!receipt_img_url) {
+                throw new Error('One or more document uploads failed. Please try again.');
+            }
+
+            // create payment 
+            const payment = this.paymentReceiptRepository.create({
+                recipt_img: receipt_img_url,
+                user: userExist,
+                deal: dealExist,
+                syndicate: syndicateExist,
+                system_receiving_account: systemBankExist,
+                invitation_tracker: inviteExist,
+                investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
+            });
+
+            await this.paymentReceiptRepository.save(payment)
+
+            return {
+                status_code: 200,
+                error: false,
+                message: 'payments uploaded succesfully',
+            };
 
         } catch (error) {
             console.error('Payment Submission Error:', error);
@@ -274,7 +364,7 @@ export class DealService {
     }
 
     async uploadWithRetry(file: any, email: string, attempts = 3): Promise<string> {
-        const storagePath = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
+        let storagePath: string = path.join(path.resolve('./'), `uploads/deals-document/${file.filename}`);
 
         for (let i = 0; i < attempts; i++) {
             try {
@@ -302,6 +392,35 @@ export class DealService {
     }
 
 
+
+    async uploadWithRetryPaymentUpload(file: any, email: string, attempts = 3): Promise<string> {
+        let storagePath: string = path.join(path.resolve('./'), `uploads/payment-document/${file.filename}`);
+
+
+        for (let i = 0; i < attempts; i++) {
+            try {
+                const url = await this.cloudinaryService.uploadUseePaymentDocument(file, email);
+                if (url) {
+                    // Delete the file after successful upload
+                    await unlinkAsync(storagePath);
+                    console.log(`Deleted local file after successful upload: ${storagePath}`);
+                    return url;
+                }
+            } catch (error) {
+                console.error(`Upload attempt ${i + 1} failed for ${file.filename}:`, error);
+            }
+        }
+
+        // Delete file from local storage after all attempts fail
+        try {
+            await unlinkAsync(storagePath);
+            console.log(`Deleted local file after failed upload: ${storagePath}`);
+        } catch (deleteError) {
+            console.error(`Failed to delete file after unsuccessful upload: ${storagePath}`, deleteError);
+        }
+
+        throw new Error(`Failed to upload ${file.filename} after ${attempts} attempts.`);
+    }
 
     async getCurrency() {
         return {
