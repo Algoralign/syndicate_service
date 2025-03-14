@@ -154,7 +154,7 @@ export class DealService {
             // Check if any upload failed
             if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
                 throw new Error('One or more document uploads failed. Please try again.');
-            }
+            }  //
 
             const entityManager = this.dealRepository.manager;
 
@@ -266,15 +266,22 @@ export class DealService {
             }
 
 
-            const userExist = await this.userRepository.findOneBy({ id: user.id })
+            console.log(details.investment_amount, "amountnfnfnfnfnf")
+            if (details.investment_amount && isNaN(Number(details.investment_amount))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'investment amount must be a valid number',
+                };
+            }
 
+            const userExist = await this.userRepository.findOneBy({ id: user.id })
             if (!user) {
                 throw new BadRequestException('user unauthorized');
             }
 
 
             const systemBankExist = await this.systemReceivingAccountRepository.findOneBy({ id: details.system_receiving_account_id })
-
             if (!user) {
                 throw new BadRequestException('user unauthorized');
             }
@@ -338,7 +345,8 @@ export class DealService {
                 deal: dealExist,
                 syndicate: syndicateExist,
                 system_receiving_account: systemBankExist,
-                invitation_tracker: inviteExist
+                invitation_tracker: inviteExist,
+                investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
             });
 
             await this.paymentReceiptRepository.save(payment)

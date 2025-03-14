@@ -2,11 +2,14 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Kyc from '../kyc/kyc.entity';
 import { MailService } from '../mail/mail.service';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import ApproveKYCDto from './approve-kyc.dto';
 import User from '../user/user.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import RejectPaymentDto from './reject-payment.dto';
+import ApprovePaymentDto from './approve-payment.dto';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import { Investment } from '../investments/investments.entity';
 
 @Injectable()
 export class AdminService {
@@ -15,6 +18,8 @@ export class AdminService {
         @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(PaymentReceipt) private paymentReceiptRepository: Repository<PaymentReceipt>,
+        @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
+        @InjectRepository(Investment) private InvestmentRepository: Repository<Investment>,
         private mailService: MailService
 
     ) { }
@@ -250,6 +255,63 @@ export class AdminService {
                 message: "reject message updated succesfully",
 
             };
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
+    async approvePayment(detail: ApprovePaymentDto) {
+        try {
+            const receiptExist = await this.paymentReceiptRepository.findOne({
+                where: { id: detail.receipt_id },
+                relations: ['deal', 'syndicate', 'user', 'system_receiving_account'],
+            })
+
+            if (!receiptExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "payment with id do not exist",
+                };
+            }
+
+            // update the invitation_tracker
+            const inviteExist = await this.invitationTrackerRepository.findOne({
+                where: {
+                    email: receiptExist.user.email,
+                    syndicate: { id: receiptExist.syndicate.id },
+                    deal: { id: receiptExist.deal.id },
+                },
+            });
+
+
+
+            const entityManager = this.InvestmentRepository.manager;
+
+            return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+
+
+                // create investment
+                // update invite
+                // update payment receipt
+
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: "reject message updated succesfully",
+                    data: {
+                        receiptExist,
+                        inviteExist
+                    }
+                };
+            })
+
+            // create investment
         } catch (error) {
             throw new InternalServerErrorException({
                 error: true,

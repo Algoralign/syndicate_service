@@ -21,7 +21,8 @@ import { UtilityService } from '../utility/utility.service';
     Deal,
     InvestmentInstrument,
     InvitationTracker,
-    PaymentReceipt
+    PaymentReceipt,
+
   ])],
   controllers: [AdminController],
   providers: [AdminService, MailService, UtilityService]
