@@ -44,6 +44,9 @@ class PaymentReceipt {
     @OneToOne(() => InvitationTracker, (invitationTracker) => invitationTracker.payment_receipt, { nullable: true })
     public invitation_tracker?: InvitationTracker;
 
+    @Column({ type: 'text', nullable: true })
+    reject_reason: string;
+
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;
 

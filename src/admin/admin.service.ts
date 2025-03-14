@@ -5,6 +5,8 @@ import { MailService } from '../mail/mail.service';
 import { Repository } from 'typeorm';
 import ApproveKYCDto from './approve-kyc.dto';
 import User from '../user/user.entity';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import RejectPaymentDto from './reject-payment.dto';
 
 @Injectable()
 export class AdminService {
@@ -12,6 +14,7 @@ export class AdminService {
     constructor(
         @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
         @InjectRepository(User) private userRepository: Repository<User>,
+        @InjectRepository(PaymentReceipt) private paymentReceiptRepository: Repository<PaymentReceipt>,
         private mailService: MailService
 
     ) { }
@@ -169,6 +172,83 @@ export class AdminService {
                     kycs,
                     totalCount,
                 },
+            };
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+    async getPayments(details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+            // Using repository's findAndCount instead of query builder
+            const [receipts, totalCount] = await this.paymentReceiptRepository.findAndCount({
+                relations: ['deal', 'syndicate', 'user', 'system_receiving_account'],
+                select: [
+                    'id',
+                    'recipt_img',
+                    'approved',
+                    'rejected',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    receipts,
+                    totalCount,
+                },
+            };
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
+    async rejectPayment(detail: RejectPaymentDto) {
+        try {
+            const receiptExist = await this.paymentReceiptRepository.findOne({
+                where: { id: detail.receipt_id }
+            })
+
+            if (!receiptExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "payment with id do not exist",
+
+                };
+            }
+
+            receiptExist.reject_reason = detail.reason
+            receiptExist.rejected = true
+
+            await this.paymentReceiptRepository.save(receiptExist)
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "reject message updated succesfully",
+
             };
         } catch (error) {
             throw new InternalServerErrorException({
