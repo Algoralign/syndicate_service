@@ -9,7 +9,7 @@ import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import RejectPaymentDto from './reject-payment.dto';
 import ApprovePaymentDto from './approve-payment.dto';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
-import { Investment } from '../investments/investments.entity';
+import { Investment, InvestmentStatus } from '../investments/investments.entity';
 
 @Injectable()
 export class AdminService {
@@ -289,30 +289,45 @@ export class AdminService {
                 },
             });
 
-
-
             const entityManager = this.InvestmentRepository.manager;
 
             return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
-
                 // create investment
+                const createdInvest = this.InvestmentRepository.create({
+                    user: { id: receiptExist.user.id },
+                    deal: { id: receiptExist.deal.id },
+                    syndicate: { id: receiptExist.syndicate.id },
+                    investment_amount: receiptExist.investment_amount,
+                    proposed_amount: inviteExist.proposed_amount,
+                    investment_status: InvestmentStatus.APPROVED,
+                    currency: inviteExist.currency,
+                    is_active: true,
+
+                })
+                await transactionalEntityManager.save(Investment, createdInvest);
+
                 // update invite
+                inviteExist.funding_amount = receiptExist.investment_amount
+                inviteExist.user_invested_in_deal = true
+                inviteExist.user_accepted_invite = true
+                await transactionalEntityManager.save(InvitationTracker, inviteExist);
+
                 // update payment receipt
+                receiptExist.approved = true;
+                receiptExist.rejected = false;
+                await transactionalEntityManager.save(PaymentReceipt, receiptExist);
 
                 return {
                     status_code: 200,
                     error: false,
-                    message: "reject message updated succesfully",
-                    data: {
-                        receiptExist,
-                        inviteExist
-                    }
+                    message: "payment received and updated succesfully",
                 };
             })
 
             // create investment
         } catch (error) {
+            console.log(error)
             throw new InternalServerErrorException({
                 error: true,
                 status_code: 500,
