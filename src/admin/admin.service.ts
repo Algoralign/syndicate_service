@@ -244,6 +244,14 @@ export class AdminService {
                 };
             }
 
+            if (receiptExist.approved) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "payment receipt already approved",
+                };
+            }
+
             receiptExist.reject_reason = detail.reason
             receiptExist.rejected = true
 
@@ -277,6 +285,14 @@ export class AdminService {
                     status_code: 400,
                     error: true,
                     message: "payment with id do not exist",
+                };
+            }
+
+            if (receiptExist.approved) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "payment receipt already approved",
                 };
             }
 
