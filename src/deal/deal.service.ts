@@ -265,8 +265,22 @@ export class DealService {
                 throw new BadRequestException('payment receipt is required');
             }
 
+
+            const userExist = await this.userRepository.findOneBy({ id: user.id })
+
+            if (!user) {
+                throw new BadRequestException('user unauthorized');
+            }
+
+
+            const systemBankExist = await this.systemReceivingAccountRepository.findOneBy({ id: details.system_receiving_account_id })
+
+            if (!user) {
+                throw new BadRequestException('user unauthorized');
+            }
+
             // check syndicate exist
-            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id } })
+            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id }, relations: ['deal'], })
             if (!syndicateExist) {
                 return {
                     status_code: 400,
@@ -275,13 +289,28 @@ export class DealService {
                 };
             }
 
+            const dealExist = await this.dealRepository.findOne({ where: { id: syndicateExist.deal.id } })
+            if (!dealExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'deal do not exist',
+                };
+            }
+
             // check invite if this syndicate invited this user 
-            const inviteExist = await this.invitationTrackerRepository.findOne({ where: { email: user.email, syndicate: { id: syndicateExist.id } } })
+            const inviteExist = await this.invitationTrackerRepository.findOne({
+                where: {
+                    email: user.email,
+                    id: details.invite_id,
+                    syndicate: { id: syndicateExist.id }, // This works in TypeORM v0.3+
+                },
+            });
             if (!inviteExist) {
                 return {
                     status_code: 400,
                     error: true,
-                    message: 'user do not belong to syndicate',
+                    message: 'invalid invite or syndicate supplied',
                 };
             }
 
@@ -289,19 +318,35 @@ export class DealService {
 
             // Upload files with error handling
             const uploadResults = await Promise.allSettled([
-                this.uploadWithRetryPaymentUpload(files.waterfall_distribution_structure[0], inviteExist.email),
-                this.uploadWithRetryPaymentUpload(files.angel_waterfall_distribution_structure[0], inviteExist.email)
+                this.uploadWithRetryPaymentUpload(files.receipt_img[0], inviteExist.email),
             ]);
+
+
+            // Extract results  
+            const receipt_img_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
+
+
+            // Check if any upload failed
+            if (!receipt_img_url) {
+                throw new Error('One or more document uploads failed. Please try again.');
+            }
 
             // create payment 
             const payment = this.paymentReceiptRepository.create({
-
+                recipt_img: receipt_img_url,
+                user: userExist,
+                deal: dealExist,
+                syndicate: syndicateExist,
+                system_receiving_account: systemBankExist,
+                invitation_tracker: inviteExist
             });
+
+            await this.paymentReceiptRepository.save(payment)
 
             return {
                 status_code: 200,
                 error: false,
-                message: 'syndicate do not exist',
+                message: 'payments uploaded succesfully',
             };
 
         } catch (error) {
