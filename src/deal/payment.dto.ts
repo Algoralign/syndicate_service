@@ -8,6 +8,10 @@ class CreatePaymentDto {
 
     @IsUUID()
     @IsNotEmpty()
+    deal_id: string;
+
+    @IsUUID()
+    @IsNotEmpty()
     system_receiving_account_id: string;
 
     @IsUUID()

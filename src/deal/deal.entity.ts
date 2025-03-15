@@ -96,8 +96,8 @@ export class Deal {
     @Column({ default: false })
     public verified: boolean;
 
-    @OneToOne(() => Syndicate, (syndicate) => syndicate.deal, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'syndicate_id' }) // Specifies the foreign key
+    @ManyToOne(() => Syndicate, (syndicate) => syndicate.deals, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'syndicate_id' }) // Foreign key column
     public syndicate: Syndicate;
 
     @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.deal)

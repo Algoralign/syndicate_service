@@ -31,9 +31,8 @@ class Syndicate {
     @ManyToOne(() => User, (user) => user.syndicates, { nullable: false, onDelete: 'CASCADE' })
     public user: User;
 
-    @OneToOne(() => Deal, (deal) => deal.syndicate, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'deal_id' }) // Specifies the foreign key
-    public deal: Deal;
+    @OneToMany(() => Deal, (deal) => deal.syndicate, { cascade: true })
+    public deals: Deal[];
 
     @OneToMany(() => Investment, (investment) => investment.syndicate)
     investments: Investment[];

@@ -72,7 +72,21 @@ export class DealService {
                 throw new BadRequestException('All three files (spv, water fall structure, angel waterfall structure) are required');
             }
 
-            const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
+            // const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
+            const userExist = await this.userRepository.findOne({
+                where: { id: user.data.user.id },
+                relations: ['deals', 'syndicates', 'kyc'] // Add other relations if needed
+            });
+
+
+            if (userExist.kyc.verified === false) {
+                return {
+                    status_code: 401,
+                    error: true,
+                    message: 'your kyc has not been verified - still going through verification',
+                };
+            }
+
 
             if (!user) {
                 throw new BadRequestException('user unauthorized');
@@ -98,7 +112,7 @@ export class DealService {
             // check for syndicate 
             const theSyndicate = await this.syndicateRepository.findOne({
                 where: { id: details.syndicate_id },
-                relations: ['user', 'deal'],  // Ensure 'user' is the correct relation name
+                relations: ['user', 'deals'],  // Ensure 'user' is the correct relation name
             });
 
 
@@ -110,15 +124,7 @@ export class DealService {
                 };
             }
 
-            console.log(theSyndicate, "the syndicate")
 
-            if (theSyndicate?.deal) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: 'this syndicate already have a created deal',
-                };
-            }
 
             if (theSyndicate.user.email != userExist.email) {
                 return {
@@ -185,9 +191,9 @@ export class DealService {
 
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
-                // update syndicate
-                theSyndicate.deal = createdDeal
-                await transactionalEntityManager.save(Syndicate, theSyndicate);
+                // // update syndicate
+                // theSyndicate.deal = createdDeal
+                // await transactionalEntityManager.save(Syndicate, theSyndicate);
 
 
                 // add founder to tracker
@@ -266,7 +272,6 @@ export class DealService {
             }
 
 
-            console.log(details.investment_amount, "amountnfnfnfnfnf")
             if (details.investment_amount && isNaN(Number(details.investment_amount))) {
                 return {
                     status_code: 400,
@@ -287,7 +292,7 @@ export class DealService {
             }
 
             // check syndicate exist
-            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id }, relations: ['deal'], })
+            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: details.syndicate_id }, relations: ['deals'], })
             if (!syndicateExist) {
                 return {
                     status_code: 400,
@@ -296,7 +301,18 @@ export class DealService {
                 };
             }
 
-            const dealExist = await this.dealRepository.findOne({ where: { id: syndicateExist.deal.id } })
+
+            // Extract the deal from the array in syndicate
+            const retrieve_deal = syndicateExist.deals.find(deal => deal.id === details.deal_id);
+
+            if (!retrieve_deal) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'Deal does not exist within this syndicate',
+                };
+            }
+            const dealExist = await this.dealRepository.findOne({ where: { id: retrieve_deal.id } })
             if (!dealExist) {
                 return {
                     status_code: 400,
