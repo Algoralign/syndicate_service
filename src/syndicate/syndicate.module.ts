@@ -13,7 +13,7 @@ import { UtilityService } from '../utility/utility.service';
   controllers: [SyndicateController],
   providers: [SyndicateService, UtilityService]
 })
-// export class SyndicateModule { }
+
 
 export class SyndicateModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
