@@ -56,6 +56,9 @@ export class InvitationTracker {
     logged_in: boolean;
 
     @Column({ type: 'boolean', default: false })
+    receipt_uploaded: boolean;
+
+    @Column({ type: 'boolean', default: false })
     user_invested_in_deal: boolean;  // for both syndicate_lead & syndicate_investor
 
     @Column({ type: 'boolean', default: false })

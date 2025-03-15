@@ -354,25 +354,36 @@ export class DealService {
                 throw new Error('One or more document uploads failed. Please try again.');
             }
 
-            // create payment 
-            const payment = this.paymentReceiptRepository.create({
-                recipt_img: receipt_img_url,
-                user: userExist,
-                deal: dealExist,
-                syndicate: syndicateExist,
-                system_receiving_account: systemBankExist,
-                invitation_tracker: inviteExist,
-                investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
-            });
+            const entityManager = this.paymentReceiptRepository.manager;
 
-            await this.paymentReceiptRepository.save(payment)
+            return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
-            return {
-                status_code: 200,
-                error: false,
-                message: 'payments uploaded succesfully',
-            };
+                // create payment 
+                const payment = this.paymentReceiptRepository.create({
+                    recipt_img: receipt_img_url,
+                    user: userExist,
+                    deal: dealExist,
+                    syndicate: syndicateExist,
+                    system_receiving_account: systemBankExist,
+                    invitation_tracker: inviteExist,
+                    investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
+                });
 
+
+                await transactionalEntityManager.save(PaymentReceipt, payment);
+
+                // updaate inviation 
+                inviteExist.receipt_uploaded = true
+                inviteExist.logged_in = true
+                await transactionalEntityManager.save(InvitationTracker, inviteExist);
+
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: 'payments uploaded succesfully',
+                };
+
+            })
         } catch (error) {
             console.error('Payment Submission Error:', error);
             throw new BadRequestException({ message: error.message });
