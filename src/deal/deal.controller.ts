@@ -162,4 +162,20 @@ export class DealController {
 
     }
 
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('user-created-syndicates')
+    async getCreatedSyndicates(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: any,
+    ) {
+
+        const user: User = request.user['data'].user
+
+        const result = await this.dealService.getCreatedSyndicates(user, details);
+        return response.status(result.status_code).json(result);
+
+    }
+
 }

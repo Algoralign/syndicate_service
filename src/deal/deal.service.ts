@@ -684,4 +684,51 @@ export class DealService {
     }
 
 
+    async getCreatedSyndicates(user: User, details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+
+
+            // Using repository's findAndCount instead of query builder
+            const [createddeals, totalCount] = await this.syndicateRepository.findAndCount({
+                where: { user: { id: user.id } },
+                relations: ['deals', 'deals.user'],
+                select: [
+                    'id',
+                    'name',
+                    'ticket_size',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    createddeals,
+                    totalCount,
+                },
+            };
+
+
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
 }
