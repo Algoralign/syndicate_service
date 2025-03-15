@@ -22,21 +22,21 @@ export class AdminMiddleware implements NestMiddleware {
 
     if (!user) {
       throw new UnauthorizedException({
-        statusCode: 401,
-        status: false,
+        status_code: 401,
+        error: true,
         message: 'Unauthorized access: Access to route denied',
       });
     } else if (user.user_type != UserType.ADMIN) {
       throw new UnauthorizedException({
-        statusCode: 401,
-        status: false,
+        status_code: 401,
+        error: true,
         message:
           'Access denied: Only admin have the permissions for this route',
       });
     } else if (!user.verified) {
       throw new UnauthorizedException({
-        statusCode: 401,
-        status: false,
+        status_code: 401,
+        error: true,
         message: 'Access denied: Only verified users can access this route',
       });
     }

@@ -156,7 +156,7 @@ export class AuthenticationController {
   @Post('log-out')
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     return response.status(HttpStatus.ACCEPTED).json({
-      status: true,
+      error: false,
       status_code: 200,
       message: 'logged out successfully',
     });

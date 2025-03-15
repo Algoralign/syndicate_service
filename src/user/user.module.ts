@@ -11,6 +11,7 @@ import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import Address from '../address/address.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import { UtilityService } from '../utility/utility.service';
 
 // module
 @Module({
@@ -24,6 +25,6 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 
   ])],
   controllers: [UserController],
-  providers: [UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
+  providers: [UserService, EmailVerificationTokenService, ResetPasswordTokenService, UtilityService]
 })
 export class UserModule { }

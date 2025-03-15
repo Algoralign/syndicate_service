@@ -6,7 +6,6 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { entities } from '../entities';
 import { AuthenticationModule } from './authentication/authentication.module';
-import { UtilitiesModule } from './utilities/utilities.module';
 import { UserModule } from './user/user.module';
 import { AddressModule } from './address/address.module';
 import { CountryModule } from './country/country.module';
@@ -68,7 +67,6 @@ import { UtilityModule } from './utility/utility.module';
 
     AuthenticationModule,
     UserModule,
-    UtilitiesModule,
     AddressModule,
     CountryModule,
     EmailVerificationTokenModule,

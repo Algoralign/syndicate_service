@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import ResetPasswordToken from './reset-password-token.entity';
-import { Utility } from '../utilities/utility';
+import { UtilityService } from '../utility/utility.service';
 import User from '../user/user.entity';
 import { Repository } from 'typeorm';
 
@@ -11,7 +11,7 @@ export class ResetPasswordTokenService {
     constructor(
         @InjectRepository(ResetPasswordToken)
         private resetPasswordTokenRepository: Repository<ResetPasswordToken>,
-        private utilities: Utility,
+        private utilities: UtilityService,
     ) { }
 
     public async createEmailverificationToken(email: string) {

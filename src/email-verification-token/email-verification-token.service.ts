@@ -2,8 +2,9 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import EmailVerificationToken from './email-verification-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Utility } from '../utilities/utility';
+
 import User from '../user/user.entity';
+import { UtilityService } from '../utility/utility.service';
 
 @Injectable()
 export class EmailVerificationTokenService {
@@ -13,7 +14,7 @@ export class EmailVerificationTokenService {
         @InjectRepository(EmailVerificationToken)
         private emailVerificationTokenRepository: Repository<EmailVerificationToken>,
 
-        private utilities: Utility,
+        private utilities: UtilityService,
 
         @InjectRepository(User)
         private userRepository: Repository<User>,

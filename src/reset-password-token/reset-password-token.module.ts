@@ -5,11 +5,12 @@ import EmailVerificationToken from '../email-verification-token/email-verificati
 import User from '../user/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
-import { Utility } from '../utilities/utility';
+
+import { UtilityService } from '../utility/utility.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ResetPasswordToken, User])],
   controllers: [ResetPasswordTokenController],
-  providers: [ResetPasswordTokenService, Utility]
+  providers: [ResetPasswordTokenService, UtilityService]
 })
 export class ResetPasswordTokenModule { }

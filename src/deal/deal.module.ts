@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { DealController } from './deal.controller';
 import { DealService } from './deal.service';
 import { Deal } from './deal.entity';
@@ -20,6 +20,8 @@ import { Investment } from '../investments/investments.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import { BlockAdminMiddleware } from '../middlewares/block-admin.middleware';
+import { UtilityService } from '../utility/utility.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -38,6 +40,12 @@ import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
     PaymentReceipt
   ])],
   controllers: [DealController],
-  providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility]
+  providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility, UtilityService]
 })
-export class DealModule { }
+// export class DealModule { }
+
+export class DealModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(BlockAdminMiddleware).forRoutes('/deal');
+  }
+}

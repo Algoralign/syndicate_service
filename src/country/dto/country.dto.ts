@@ -8,7 +8,7 @@ export class LocationDto {
   code: number;
 
   @IsBoolean()
-  status: boolean;
+  error: boolean;
 
   @IsString()
   message: string;
