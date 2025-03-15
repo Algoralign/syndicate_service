@@ -7,9 +7,10 @@ import InvestmentInstrument from '../investment-instrument/investment-instrument
 import User from '../user/user.entity';
 import { BlockAdminMiddleware } from '../middlewares/block-admin.middleware';
 import { UtilityService } from '../utility/utility.service';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Syndicate, InvestmentInstrument, User])],
+  imports: [TypeOrmModule.forFeature([Syndicate, InvestmentInstrument, User, InvitationTracker])],
   controllers: [SyndicateController],
   providers: [SyndicateService, UtilityService]
 })

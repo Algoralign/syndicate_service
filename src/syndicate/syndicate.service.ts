@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import InvestmentInstrument from 'src/investment-instrument/investment-instrument.entity';
 import User from '../user/user.entity';
 import CreateSyndicateDto from './syndicate.dto';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 @Injectable()
 export class SyndicateService {
@@ -14,6 +15,7 @@ export class SyndicateService {
         @InjectRepository(Syndicate) private syndicateRepository: Repository<Syndicate>,
         @InjectRepository(InvestmentInstrument) private investmentInstrumentRepository: Repository<InvestmentInstrument>,
         @InjectRepository(User) private userRepository: Repository<User>,
+        @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
 
     ) { }
 
@@ -81,6 +83,50 @@ export class SyndicateService {
 
 
 
+    // async getUserSyndicates(user: User, details: any) {
+    //     try {
+    //         let { page_size, page_number } = details;
+
+    //         const pageNumber = Number(page_number) || 1;
+    //         const pageSize = Number(page_size) || 100;
+
+
+
+    //         // Using repository's findAndCount instead of query builder
+    //         const [syndicate, totalCount] = await this.syndicateRepository.findAndCount({
+    //             where: { user: { email: user.email } },
+    //             relations: ['user', 'deal', 'investment_instrument'],
+    //             select: [
+    //                 'id',
+    //                 'name',
+    //                 'created_at',
+    //                 'updated_at'
+    //             ],
+    //             order: { created_at: 'DESC' },
+    //             skip: (pageNumber - 1) * pageSize,
+    //             take: pageSize,
+    //         });
+
+
+
+    //         return {
+    //             status_code: 200,
+    //             error: false,
+    //             message: "data retrieved successfully",
+    //             data: {
+    //                 syndicate,
+    //                 totalCount,
+    //             },
+    //         };
+    //     } catch (error) {
+    //         throw new InternalServerErrorException({
+    //             error: true,
+    //             status_code: 500,
+    //             message: error.message,
+    //         });
+    //     }
+    // }
+
     async getUserSyndicates(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
@@ -88,31 +134,43 @@ export class SyndicateService {
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
-
-
-            // Using repository's findAndCount instead of query builder
-            const [syndicate, totalCount] = await this.syndicateRepository.findAndCount({
+            // Fetch syndicates directly associated with the user
+            const [syndicatesFromUser, totalUserSyndicates] = await this.syndicateRepository.findAndCount({
                 where: { user: { email: user.email } },
-                relations: ['user', 'deal', 'investment_instrument'],
-                select: [
-                    'id',
-                    'name',
-                    'created_at',
-                    'updated_at'
-                ],
+                relations: ['user', 'deals', 'investment_instrument'],
+                select: ['id', 'name', 'created_at', 'updated_at'],
                 order: { created_at: 'DESC' },
-                skip: (pageNumber - 1) * pageSize,
-                take: pageSize,
             });
 
+            // Fetch syndicates from deals where the user was invited
+            const userDeals = await this.invitationTrackerRepository
+                .createQueryBuilder('invitation')
+                .leftJoinAndSelect('invitation.deal', 'deal')
+                .leftJoinAndSelect('invitation.syndicate', 'syndicate')
+                .where('invitation.email = :email', { email: user.email })
+                .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
+                .getMany();
 
+            // Extract syndicates from invitations
+            const syndicatesFromDeals = userDeals.map(invite => invite.syndicate);
+
+            // Merge both sources and remove duplicates based on `id`
+            const uniqueSyndicates = [
+                ...new Map(
+                    [...syndicatesFromUser, ...syndicatesFromDeals].map(syndicate => [syndicate.id, syndicate])
+                ).values()
+            ];
+
+            // Implement pagination on the merged syndicates
+            const totalCount = uniqueSyndicates.length;
+            const paginatedSyndicates = uniqueSyndicates.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
 
             return {
                 status_code: 200,
                 error: false,
-                message: "data retrieved successfully",
+                message: "Data retrieved successfully",
                 data: {
-                    syndicate,
+                    syndicates: paginatedSyndicates,
                     totalCount,
                 },
             };
@@ -124,7 +182,6 @@ export class SyndicateService {
             });
         }
     }
-
 
     async getSyndicateById(id: any) {
         try {
