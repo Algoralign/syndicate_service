@@ -43,7 +43,7 @@ class User {
     @Column({ nullable: true })
     public phone: string;
 
-    @Column()
+    @Column({ select: false })
     public password: string;
 
     @Column({ default: false })

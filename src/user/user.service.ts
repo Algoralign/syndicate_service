@@ -54,8 +54,13 @@ export class UserService {
 
   public async getByEmail(email: string, password: string) {
     try {
+      // const user = await this.userRepository.findOne({
+      //   where: { email: email },
+      // });
+
       const user = await this.userRepository.findOne({
         where: { email: email },
+        select: ['id', 'first_name', 'last_name', 'email', 'password', 'created_at', 'updated_at', 'verified', 'phone', 'user_type', 'invite_type'], // Explicitly include password
       });
       await this.verifyPassword(password, user.password);
       user.password = undefined;
