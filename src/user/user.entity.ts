@@ -16,6 +16,7 @@ import { Investment } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import Kyc from '../kyc/kyc.entity';
 
 
 export enum InviteType {
@@ -72,6 +73,9 @@ class User {
 
     @Column({ nullable: true })
     public invite_type: string;
+
+    @OneToOne(() => Kyc, (kyc) => kyc.user, { nullable: true })
+    public kyc?: Kyc;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     public created_at: Date;

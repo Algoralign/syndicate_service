@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 import { countryData } from '../src/_data/countries';
 
-export class InitialSeeds1741868945523 implements MigrationInterface {
+export class Seeds1742031295579 implements MigrationInterface {
+
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`

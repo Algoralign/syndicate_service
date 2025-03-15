@@ -17,7 +17,8 @@ class Kyc {
     @PrimaryGeneratedColumn('uuid')
     public id: string;
 
-    @OneToOne(() => User, { nullable: false, eager: true })
+
+    @OneToOne(() => User, (user) => user.kyc, { nullable: false, eager: true, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     public user: User;
 

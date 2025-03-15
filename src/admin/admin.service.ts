@@ -92,7 +92,7 @@ export class AdminService {
                     message: "kyc already approved",
                 };
             }
-            if (detail.verified == "true") {
+            if (detail.verified === "true") {
 
                 kycExist.verified = true
                 kycExist.rejected = false

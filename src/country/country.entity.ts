@@ -1,5 +1,6 @@
 
 
+import Address from '../address/address.entity';
 import {
     Column,
     Entity,
@@ -24,6 +25,9 @@ class Country {
 
     @Column({ nullable: true })
     value: string;
+
+    @OneToMany(() => Address, (address) => address.country, { cascade: ['remove'] })
+    public addresses: Address[];
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     created_at: Date;

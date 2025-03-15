@@ -11,11 +11,9 @@ class Address {
     @JoinColumn({ name: 'user_id' })
     public user: User;
 
-
-    @ManyToOne(() => Country, { nullable: true, eager: true })
+    @ManyToOne(() => Country, (country) => country.addresses, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'country_id' })
     public country: Country;
-
 
     @Column({ nullable: true })
     public residential_address: string;
