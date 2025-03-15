@@ -5,10 +5,13 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToOne,
+    JoinColumn,
 } from 'typeorm';
 import User from '../user/user.entity';
 import { Deal } from '../deal/deal.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 
 export enum InvestmentStatus {
     PENDING = 'PENDING',
@@ -102,11 +105,15 @@ export class Investment {
     @ManyToOne(() => Syndicate, (syndicate) => syndicate.investments, { nullable: false, onDelete: 'CASCADE' })
     syndicate: Syndicate;
 
-    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    investment_amount: number;
+    @OneToOne(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.investment, { nullable: true, cascade: true })
+    @JoinColumn()
+    payment_receipt: PaymentReceipt;
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    proposed_amount: number;
+    investment_amount: number; // amount actually invested
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    proposed_amount: number; // amount specified in the invite to be invested by user
 
     @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
     actual_disbursed_amount: number; // Amount actually disbursed

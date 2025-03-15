@@ -319,6 +319,7 @@ export class AdminService {
                     investment_status: InvestmentStatus.APPROVED,
                     currency: inviteExist.currency,
                     is_active: true,
+                    payment_receipt: receiptExist
 
                 })
                 await transactionalEntityManager.save(Investment, createdInvest);
@@ -332,6 +333,7 @@ export class AdminService {
                 // update payment receipt
                 receiptExist.approved = true;
                 receiptExist.rejected = false;
+                receiptExist.investment = createdInvest;
                 await transactionalEntityManager.save(PaymentReceipt, receiptExist);
 
                 return {

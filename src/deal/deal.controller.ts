@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -176,6 +176,19 @@ export class DealController {
         const result = await this.dealService.getCreatedSyndicates(user, details);
         return response.status(result.status_code).json(result);
 
+    }
+
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('/get-deal/:id') // Change {id} to :id
+    async getSyndicateById(
+        @Req() request: RequestWithUser,
+        @Param('id') id: string, // Retrieve the id from the route
+        @Res() response: Response,
+    ) {
+        const result = await this.dealService.getDealById(id); // Pass id to the service
+        return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
     }
 
 }
