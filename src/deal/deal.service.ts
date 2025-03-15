@@ -740,6 +740,7 @@ export class DealService {
                 relations: ['user', 'investments', 'investments.user', 'investments.payment_receipt'],
             });
 
+
             return {
                 status_code: 200,
                 error: false,
