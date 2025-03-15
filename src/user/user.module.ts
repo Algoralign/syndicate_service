@@ -7,7 +7,6 @@ import Country from '../country/country.entity';
 import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
-import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import Address from '../address/address.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
