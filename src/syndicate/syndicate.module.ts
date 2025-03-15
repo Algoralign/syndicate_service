@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import User from '../user/user.entity';
 import { BlockAdminMiddleware } from '../middlewares/block-admin.middleware';
+import { UtilityService } from '../utility/utility.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Syndicate, InvestmentInstrument, User])],
   controllers: [SyndicateController],
-  providers: [SyndicateService]
+  providers: [SyndicateService, UtilityService]
 })
 // export class SyndicateModule { }
 

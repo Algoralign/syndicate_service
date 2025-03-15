@@ -14,7 +14,6 @@ import Address from '../address/address.entity';
 import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
-import { Utility } from '../utilities/utility';
 import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 import { Investment } from '../investments/investments.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
@@ -40,7 +39,7 @@ import { UtilityService } from '../utility/utility.service';
     PaymentReceipt
   ])],
   controllers: [DealController],
-  providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, Utility, UtilityService]
+  providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, UtilityService]
 })
 // export class DealModule { }
 
