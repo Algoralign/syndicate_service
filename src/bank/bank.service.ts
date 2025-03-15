@@ -16,7 +16,7 @@ export class BankService {
     try {
       return {
         status_code: 200,
-        status: true,
+        error: false,
         message: 'banks returned successfully',
         data: await this.bankRepository.find(),
       };

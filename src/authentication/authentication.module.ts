@@ -11,12 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
-import { Utility } from '../utilities/utility';
 import Kyc from '../kyc/kyc.entity';
-
-
-
-
 import Country from '../country/country.entity';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
@@ -28,6 +23,7 @@ import { Bank } from '../bank/bank.entity';
 import { BankService } from '../bank/bank.service';
 import { Deal } from '../deal/deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import { UtilityService } from '../utility/utility.service';
 @Global()
 @Module({
   imports: [
@@ -55,13 +51,13 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
       Bank,
       Kyc,
       Deal,
-      InvitationTracker
+      InvitationTracker,
     ])
   ],
   providers: [
     AuthenticationService,
     UserService,
-    Utility,
+    UtilityService,
     EmailVerificationTokenService,
     JwtStrategy,
     CloudinaryService,

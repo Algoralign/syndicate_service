@@ -18,7 +18,7 @@ export class CountryService {
 
       return {
         code: 200,
-        status: true,
+        error: false,
         message: 'countries retrieved succesfully',
         data: countries,
       };

@@ -133,7 +133,7 @@ export class AdminService {
             }
         } catch (error) {
             throw new InternalServerErrorException({
-                status: false,
+                error: true,
                 status_code: 500,
                 message: 'error approving kyc',
             });

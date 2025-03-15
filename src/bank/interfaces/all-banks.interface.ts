@@ -1,5 +1,5 @@
 export default interface AllBankInterface {
-  status: boolean;
+  error: boolean;
   status_code: number;
   message: string;
   data: {
