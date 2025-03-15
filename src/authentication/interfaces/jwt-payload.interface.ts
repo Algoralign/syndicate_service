@@ -18,7 +18,8 @@ export interface Role {
 export interface Data {
   user: User;
   kyc_detail: {}
-  invited_syndicates: {}
+  invitations: {}
+  all_syndicate: {}
 }
 
 export interface JsonResponse {

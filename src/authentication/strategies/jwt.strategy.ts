@@ -64,7 +64,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 
 
-    console.log("The user deal", userDeals)
+    // Step 3: Extract syndicates from both sources
+    const syndicatesFromUser = user?.syndicates || [];
+    const syndicatesFromDeals = userDeals.map(invite => invite.syndicate);
+
+    // Step 4: Merge & Remove Duplicates (based on ID)
+    const uniqueSyndicates = [
+      ...new Map(
+        [...syndicatesFromUser, ...syndicatesFromDeals].map(syndicate => [syndicate.id, syndicate])
+      ).values()
+    ];
+
+    // Step 5: Use uniqueSyndicates as needed
+    console.log(uniqueSyndicates);
+
     // Construct the response
     const response: JsonResponse = {
       error: false,
@@ -73,7 +86,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       data: {
         user,         // Include the original user object      // Include the extracted roles array
         kyc_detail: kyc || {},
-        invited_syndicates: userDeals,
+        invitations: userDeals,
+        all_syndicate: uniqueSyndicates,
       }
     };
 
