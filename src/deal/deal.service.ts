@@ -281,14 +281,14 @@ export class DealService {
             }
 
             const userExist = await this.userRepository.findOneBy({ id: user.id })
-            if (!user) {
+            if (!userExist) {
                 throw new BadRequestException('user unauthorized');
             }
 
 
             const systemBankExist = await this.systemReceivingAccountRepository.findOneBy({ id: details.system_receiving_account_id })
-            if (!user) {
-                throw new BadRequestException('user unauthorized');
+            if (!systemBankExist) {
+                throw new BadRequestException('bank selected do not exist');
             }
 
             // check syndicate exist
@@ -721,6 +721,31 @@ export class DealService {
             };
 
 
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
+
+    async getDealById(id: any) {
+        try {
+            // Using repository's findAndCount instead of query builder
+            const deal = await this.dealRepository.findOne({
+                where: { id: id },
+                relations: ['user', 'investments', 'investments.user', 'investments.payment_receipt'],
+            });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: deal
+            };
         } catch (error) {
             throw new InternalServerErrorException({
                 error: true,

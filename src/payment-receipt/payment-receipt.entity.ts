@@ -12,6 +12,7 @@ import User from '../user/user.entity';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import { Deal } from '../deal/deal.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import { Investment } from '../investments/investments.entity';
 
 
 @Entity({ name: 'payment_receipts' })
@@ -40,6 +41,9 @@ class PaymentReceipt {
     @ManyToOne(() => Syndicate, (syndicate) => syndicate.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     syndicate: Syndicate;
 
+
+    @OneToOne(() => Investment, (investment) => investment.payment_receipt, { nullable: false, onDelete: 'CASCADE' })
+    investment: Investment;
 
     @ManyToOne(() => SystemReceivingAccount, (systemReceivingAccount) => systemReceivingAccount.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     system_receiving_account: SystemReceivingAccount;
