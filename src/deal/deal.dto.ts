@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsNumber, IsArray, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsNumber, IsArray, IsUUID, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 class InvestorDto {
@@ -30,10 +30,11 @@ class CreateDealDto {
     @IsNotEmpty()
     syndicate_id: string;
 
-    @IsNotEmpty()
-    @Transform(({ value }) => Number(value)) // Converts the string to a number
+
+    @IsOptional() // Makes the field optional
+    @Transform(({ value }) => (value !== null && value !== undefined ? Number(value) : value)) // Converts only if present
     @IsNumber()
-    investing_amount: number;
+    investing_amount?: number;
 
     @IsNotEmpty()
     @IsString()
