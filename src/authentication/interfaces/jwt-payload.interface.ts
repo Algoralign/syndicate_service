@@ -20,6 +20,7 @@ export interface Data {
   kyc_detail: {}
   invitations: {}
   all_syndicate: {}
+  oldest_syndicate: {}
 }
 
 export interface JsonResponse {
