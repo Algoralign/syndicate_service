@@ -78,6 +78,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Step 5: Use uniqueSyndicates as needed
     console.log(uniqueSyndicates);
 
+    // Sort the syndicates by `created_at` in ascending order
+    const sortedSyndicates = uniqueSyndicates.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
+
+    // Get oldest and newest syndicates
+    const oldest_syndicate = sortedSyndicates.length > 0 ? sortedSyndicates[0] : null;
+    // const newest_syndicate = sortedSyndicates.length > 0 ? sortedSyndicates[sortedSyndicates.length - 1] : null;
+
     // Construct the response
     const response: JsonResponse = {
       error: false,
@@ -88,6 +95,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         kyc_detail: kyc || {},
         invitations: userDeals,
         all_syndicate: uniqueSyndicates,
+        oldest_syndicate,
       }
     };
 
