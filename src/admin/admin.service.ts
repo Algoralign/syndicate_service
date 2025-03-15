@@ -328,6 +328,7 @@ export class AdminService {
                 inviteExist.funding_amount = receiptExist.investment_amount
                 inviteExist.user_invested_in_deal = true
                 inviteExist.user_accepted_invite = true
+                inviteExist.logged_in = true
                 await transactionalEntityManager.save(InvitationTracker, inviteExist);
 
                 // update payment receipt
