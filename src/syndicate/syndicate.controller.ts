@@ -24,7 +24,7 @@ export class SyndicateController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('/retrieve-user-syndicates')
+    @Get('/get-all-syndicates')
     async getCreatedSyndicate(
         @Req() request: RequestWithUser,
         @Res() response: Response,
