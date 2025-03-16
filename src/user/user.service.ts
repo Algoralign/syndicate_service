@@ -175,74 +175,171 @@ export class UserService {
     }
   }
 
+  // public async completeInviteSignup(userData: CompleteInviteDto) {
+  //   try {
+  //     // Check if country exists
+  //     const country = await this.countryRepository.findOne({ where: { id: userData.country_id } });
+
+  //     if (!country) {
+  //       return {
+  //         error: true, // Fix: This should be `true` for an error
+  //         status_code: HttpStatus.BAD_REQUEST,
+  //         message: 'Country selected does not exist',
+  //       };
+  //     }
+
+  //     // update and save User first
+  //     const invitee = await this.invitationTrackerRepository.findOne({
+  //       where: { id: userData.invite_id }
+  //     });
+
+  //     if (!invitee) {
+  //       return {
+  //         error: true, // Fix: This should be `true` for an error
+  //         status_code: HttpStatus.BAD_REQUEST,
+  //         message: 'invalid invitation',
+  //       };
+  //     }
+
+  //     //check if user exist 
+  //     const userExist = await this.userRepository.findOne({
+  //       where: { email: invitee.email }
+  //     });
+
+  //     if (userExist) {
+  //       return {
+  //         error: true, // Fix: This should be `true` for an error
+  //         status_code: HttpStatus.BAD_REQUEST,
+  //         message: 'You  have an account already, please login to your account and check the invitation tab/link to view the deal details',
+  //       };
+  //     }
+
+  //     const entityManager = this.userRepository.manager;
+
+  //     return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+  //       // create user 
+  //       const newUser = this.userRepository.create({
+  //         first_name: invitee.first_name,
+  //         last_name: invitee.last_name,
+  //         email: invitee.email,
+  //         password: await this.createPasswordHash(userData.password),
+  //         verified: true,
+  //         invite_type: InviteType.REFFERRAL,
+  //       })
+
+  //       const user = await transactionalEntityManager.save(User, newUser);
+
+
+  //       // Create and save Address
+  //       const address = this.addressRepository.create({ user, country });
+  //       await transactionalEntityManager.save(Address, address);
+
+  //       //update the inivation tracker
+  //       invitee.user = user;
+  //       await transactionalEntityManager.save(InvitationTracker, invitee);
+
+  //       return {
+  //         error: false,
+  //         status_code: HttpStatus.OK,
+  //         message: 'User account created successfully',
+  //       };
+
+  //     })
+  //   } catch (error) {
+  //     console.log(error)
+  //     if (error?.code == PostgresErrorCode.UniqueViolation) {
+  //       throw new CustomHttpException(
+  //         'User email already exists',
+  //         HttpStatus.BAD_REQUEST,
+  //         { status_code: HttpStatus.BAD_REQUEST, error: true },
+  //       );
+  //     }
+  //     throw new CustomHttpException(
+  //       'Error creating user',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //       { status_code: HttpStatus.INTERNAL_SERVER_ERROR, error: true },
+  //     );
+  //   }
+  // }
   public async completeInviteSignup(userData: CompleteInviteDto) {
     try {
-      // Check if country exists
-      const country = await this.countryRepository.findOne({ where: { id: userData.country_id } });
+      return await this.userRepository.manager.transaction(async (transactionalEntityManager: EntityManager) => {
+        // Fetch invitation inside transaction
+        const invitee = await this.invitationTrackerRepository.findOne({
+          where: { id: userData.invite_id },
+        });
 
-      if (!country) {
-        return {
-          error: true, // Fix: This should be `true` for an error
-          status_code: HttpStatus.BAD_REQUEST,
-          message: 'Country selected does not exist',
-        };
-      }
+        if (!invitee) {
+          return {
+            error: true,
+            status_code: HttpStatus.BAD_REQUEST,
+            message: 'Invalid invitation',
+          };
+        }
 
-      // update and save User first
-      const invitee = await this.invitationTrackerRepository.findOne({
-        where: { id: userData.invite_id }
-      });
+        if (invitee.user) {
+          return {
+            error: true,
+            status_code: HttpStatus.BAD_REQUEST,
+            message: 'This invitation has already been used',
+          };
+        }
 
-      if (!invitee) {
-        return {
-          error: true, // Fix: This should be `true` for an error
-          status_code: HttpStatus.BAD_REQUEST,
-          message: 'invalid invitation',
-        };
-      }
+        // Fetch country inside transaction
+        const country = await this.countryRepository.findOne({
+          where: { id: userData.country_id },
+        });
 
-      //check if user exist 
-      const userExist = await this.userRepository.findOne({
-        where: { email: invitee.email }
-      });
+        if (!country) {
+          return {
+            error: true,
+            status_code: HttpStatus.BAD_REQUEST,
+            message: 'Country selected does not exist',
+          };
+        }
 
-      if (userExist) {
-        return {
-          error: true, // Fix: This should be `true` for an error
-          status_code: HttpStatus.BAD_REQUEST,
-          message: 'You  have an account already, please login to your account and check the invitation tab/link to view the deal details',
-        };
-      }
+        // Check if user already exists
+        const userExist = await this.userRepository.findOne({ where: { email: invitee.email } });
+        if (userExist) {
+          return {
+            error: true,
+            status_code: HttpStatus.BAD_REQUEST,
+            message: 'You already have an account. Please log in to check the invitation tab for deal details.',
+          };
+        }
 
-      const entityManager = this.userRepository.manager;
+        // Hash password outside transaction
+        const hashedPassword = await this.createPasswordHash(userData.password);
 
-      return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
-        // create user 
+        // Create and save User
         const newUser = this.userRepository.create({
           first_name: invitee.first_name,
           last_name: invitee.last_name,
           email: invitee.email,
-          password: await this.createPasswordHash(userData.password),
+          password: hashedPassword,
           verified: true,
           invite_type: InviteType.REFFERRAL,
-        })
+        });
 
         const user = await transactionalEntityManager.save(User, newUser);
-
 
         // Create and save Address
         const address = this.addressRepository.create({ user, country });
         await transactionalEntityManager.save(Address, address);
+
+        // Update InvitationTracker
+        invitee.user = user;
+        invitee.user_accepted_invite = true;
+        await transactionalEntityManager.save(InvitationTracker, invitee);
 
         return {
           error: false,
           status_code: HttpStatus.OK,
           message: 'User account created successfully',
         };
-
-      })
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error?.code == PostgresErrorCode.UniqueViolation) {
         throw new CustomHttpException(
           'User email already exists',
@@ -257,6 +354,7 @@ export class UserService {
       );
     }
   }
+
 
 
   public async createAdmin(userData: CreateAdminDto) {

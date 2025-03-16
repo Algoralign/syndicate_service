@@ -49,6 +49,9 @@ export class InvitationTracker {
     @JoinColumn({ name: 'payment_receipt_id' })
     public payment_receipt: PaymentReceipt;
 
+    @ManyToOne(() => User, (user) => user.invitations, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_id' })
+    user?: User;
 
     @Column({ type: 'boolean', default: false })
     email_sent: boolean;
