@@ -489,7 +489,7 @@ export class DealService {
 
 
             // Using repository's findAndCount instead of query builder
-            const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
+            const [deals, total] = await this.invitationTrackerRepository.findAndCount({
                 where: { email: user.email },
                 relations: ['deal', 'deal.startup_industry', 'syndicate', 'invited_by'],
                 select: [
@@ -528,7 +528,12 @@ export class DealService {
                 message: "data retrieved successfully",
                 data: {
                     pendingdeals,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
 
@@ -576,7 +581,7 @@ export class DealService {
 
 
             // Using repository's findAndCount instead of query builder
-            const [deals, totalCount] = await this.invitationTrackerRepository.findAndCount({
+            const [deals, total] = await this.invitationTrackerRepository.findAndCount({
                 where: { email: user.email, user_invested_in_deal: true },
                 relations: ['deal', 'deal.startup_industry', 'syndicate', 'invited_by'],
                 select: [
@@ -615,7 +620,12 @@ export class DealService {
                 message: "data retrieved successfully",
                 data: {
                     onboardeddeals,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
 
@@ -638,7 +648,7 @@ export class DealService {
 
 
             // Using repository's findAndCount instead of query builder
-            const [createddeals, totalCount] = await this.dealRepository.findAndCount({
+            const [createddeals, total] = await this.dealRepository.findAndCount({
                 where: { user: { id: user.id } },
                 relations: ['startup_industry', 'investments', 'invitations'],
                 select: [
@@ -680,7 +690,12 @@ export class DealService {
                 message: "data retrieved successfully",
                 data: {
                     createddeals,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
 
@@ -701,7 +716,7 @@ export class DealService {
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
-            const [createddeals, totalCount] = await this.invitationTrackerRepository
+            const [createddeals, total] = await this.invitationTrackerRepository
                 .createQueryBuilder('invitation')
                 .leftJoinAndSelect('invitation.user', 'user')
                 .leftJoin('user.kyc', 'kyc') // Join without selecting all fields
@@ -745,7 +760,12 @@ export class DealService {
                 message: 'Data retrieved successfully',
                 data: {
                     createddeals,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
 
@@ -771,7 +791,7 @@ export class DealService {
 
 
             // Using repository's findAndCount instead of query builder
-            const [createddeals, totalCount] = await this.syndicateRepository.findAndCount({
+            const [createddeals, total] = await this.syndicateRepository.findAndCount({
                 where: { user: { id: user.id } },
                 relations: ['deals', 'deals.user'],
                 select: [
@@ -793,7 +813,12 @@ export class DealService {
                 message: "data retrieved successfully",
                 data: {
                     createddeals,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
 
