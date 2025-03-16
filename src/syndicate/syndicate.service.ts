@@ -183,12 +183,12 @@ export class SyndicateService {
         }
     }
 
-    async getSyndicateById(id: any) {
+    async getSyndicateDeals(id: any) {
         try {
             // Using repository's findAndCount instead of query builder
             const syndicate = await this.syndicateRepository.findOne({
                 where: { id: id },
-                relations: ['user', 'deals', 'investment_instrument'],
+                relations: ['deals', 'investment_instrument'],
             });
 
             return {
