@@ -70,6 +70,9 @@ class User {
     @Column({ type: 'enum', enum: UserType, nullable: true })
     user_type?: UserType;
 
+    @OneToMany(() => InvitationTracker, (invitation) => invitation.user, { nullable: true })
+    invitations?: InvitationTracker[];
+
 
     @Column({ nullable: true })
     public invite_type: string;
