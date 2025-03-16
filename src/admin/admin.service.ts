@@ -33,7 +33,7 @@ export class AdminService {
             const pageSize = Number(page_size) || 100;
 
             // Using repository's findAndCount instead of query builder
-            const [kycs, totalCount] = await this.kycRepository.findAndCount({
+            const [kycs, total] = await this.kycRepository.findAndCount({
                 relations: ['user'],
                 select: [
                     'id',
@@ -65,7 +65,12 @@ export class AdminService {
                 message: "data retrieved successfully",
                 data: {
                     kycs,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
         } catch (error) {
@@ -151,7 +156,7 @@ export class AdminService {
             const pageSize = Number(page_size) || 100;
 
             // Using repository's findAndCount instead of query builder
-            const [kycs, totalCount] = await this.userRepository.findAndCount({
+            const [kycs, total] = await this.userRepository.findAndCount({
                 // relations: ['user'],
                 select: [
                     'id',
@@ -175,7 +180,12 @@ export class AdminService {
                 message: "data retrieved successfully",
                 data: {
                     kycs,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
         } catch (error) {
@@ -195,7 +205,7 @@ export class AdminService {
             const pageSize = Number(page_size) || 100;
 
             // Using repository's findAndCount instead of query builder
-            const [receipts, totalCount] = await this.paymentReceiptRepository.findAndCount({
+            const [receipts, total] = await this.paymentReceiptRepository.findAndCount({
                 relations: ['deal', 'syndicate', 'user', 'system_receiving_account'],
                 select: [
                     'id',
@@ -216,7 +226,12 @@ export class AdminService {
                 message: "data retrieved successfully",
                 data: {
                     receipts,
-                    totalCount,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
                 },
             };
         } catch (error) {

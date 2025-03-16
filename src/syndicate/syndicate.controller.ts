@@ -41,13 +41,13 @@ export class SyndicateController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('/get-syndicate-deals/:id') // Change {id} to :id
+    @Get('/get-syndicate-deals') // Change {id} to :id
     async getSyndicateDeals(
         @Req() request: RequestWithUser,
-        @Param('id') id: string, // Retrieve the id from the route
+        @Query() details: any,
         @Res() response: Response,
     ) {
-        const result = await this.syndicateService.getSyndicateDeals(id); // Pass id to the service
+        const result = await this.syndicateService.getSyndicateDeals(details); // Pass id to the service
         return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
     }
 
