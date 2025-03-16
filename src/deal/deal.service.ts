@@ -694,6 +694,24 @@ export class DealService {
         }
     }
 
+    async getInvestors(user: User, details: any) {
+        try {
+            let { page_size, page_number } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+            //   const = await this.invitationTrackerRepository.findOne
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
 
     async getCreatedSyndicates(user: User, details: any) {
         try {
@@ -743,20 +761,20 @@ export class DealService {
 
 
 
-    async getDealById(id: any) {
+    async getDealById(id: any, user: User) {
         try {
             // Using repository's findAndCount instead of query builder
             const deal = await this.dealRepository.findOne({
                 where: { id: id },
-                relations: ['user', 'investments', 'investments.user', 'startup_industry', 'syndicate', 'investments.payment_receipt'],
+                relations: ['startup_industry', 'syndicate'],
             });
 
-
+            const investment = await this.investmentRepository.findOne({ where: { deal: { id: deal.id }, user: { id: user.id } }, relations: ['deal', 'user'] })
             return {
                 status_code: 200,
                 error: false,
                 message: "data retrieved successfully",
-                data: deal
+                data: { deal: deal, user_invested: investment ? true : false }
             };
         } catch (error) {
             throw new InternalServerErrorException({
