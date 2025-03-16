@@ -809,11 +809,12 @@ export class DealService {
 
 
 
-    async getDealById(id: any, user: User) {
+    async getDealById(details: any, user: User) {
         try {
+            let { deal_id, syndicate_id } = details;
             // Using repository's findAndCount instead of query builder
             const deal = await this.dealRepository.findOne({
-                where: { id: id },
+                where: { id: deal_id, syndicate: { id: syndicate_id } },
                 relations: ['startup_industry', 'syndicate'],
             });
 
