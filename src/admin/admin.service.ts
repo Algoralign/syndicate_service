@@ -328,6 +328,7 @@ export class AdminService {
                 inviteExist.funding_amount = receiptExist.investment_amount
                 inviteExist.user_invested_in_deal = true
                 inviteExist.user_accepted_invite = true
+                actual_amount_invested = receiptExist.investment_amount;
                
                 await transactionalEntityManager.save(InvitationTracker, inviteExist);
 

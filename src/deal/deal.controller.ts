@@ -162,6 +162,23 @@ export class DealController {
 
     }
 
+
+    // @HttpCode(200)
+    // @UseGuards(JwtAuthenticationGuard)
+    // @Get('investors')
+    // async getInvestors(
+    //     @Req() request: RequestWithUser,
+    //     @Res() response: Response,
+    //     @Query() details: any,
+    // ) {
+
+    //     const user: User = request.user['data'].user
+
+    //     const result = await this.dealService.getInvestors(user, details);
+    //     return response.status(result.status_code).json(result);
+
+    // }
+
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
     @Get('user-created-syndicates')
@@ -187,7 +204,8 @@ export class DealController {
         @Param('id') id: string, // Retrieve the id from the route
         @Res() response: Response,
     ) {
-        const result = await this.dealService.getDealById(id); // Pass id to the service
+        const user: User = request.user['data'].user
+        const result = await this.dealService.getDealById(id, user); // Pass id to the service
         return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
     }
 

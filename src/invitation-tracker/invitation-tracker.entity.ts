@@ -25,7 +25,11 @@ export class InvitationTracker {
     proposed_amount: number;  // proposed investor amount that they will invest
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    actual_amount_invested: number; // amount the user finally invested
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     funding_amount: number; // proposed total amount to be raised for deal
+
 
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
