@@ -13,13 +13,15 @@ import Industry from '../industry/industry.entity';
 import { Deal } from './deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UserService } from '../user/user.service';
-import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
+import { Investment, InvestmentStatus } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import CreatePaymentDto from './payment.dto';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import { Currency } from '../_enums/currency.enum';
+import { Transaction } from '../transaction/transaction.entity';
 
 
 const unlinkAsync = promisify(fs.unlink);
@@ -60,6 +62,9 @@ export class DealService {
 
         @InjectRepository(PaymentReceipt)
         private paymentReceiptRepository: Repository<PaymentReceipt>,
+
+        @InjectRepository(Transaction)
+        private transactionRepository: Repository<Transaction>,
 
     ) { }
 
@@ -690,6 +695,67 @@ export class DealService {
                 message: "data retrieved successfully",
                 data: {
                     createddeals,
+                    pagination: {
+                        current_page: pageNumber,
+                        page_size: pageSize,
+                        totalCount: total,
+                        total_pages: Math.ceil(total / pageSize),
+                    },
+                },
+            };
+
+
+        } catch (error) {
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+    async getDealTransaction(user: User, details: any) {
+        try {
+            let { page_size, page_number, deal_id, syndicate_id } = details;
+
+            const pageNumber = Number(page_number) || 1;
+            const pageSize = Number(page_size) || 100;
+
+
+
+            // Using repository's findAndCount instead of query builder
+            const [transactions, total] = await this.transactionRepository.findAndCount({
+                where: { deal: { id: deal_id }, syndicate: { id: syndicate_id } },
+                select: [
+                    'id',
+                    'amount',
+                    'status',
+                    'receipt_url',
+                    'payment_gateway',
+                    'type',
+                    'currency',
+                    'created_at',
+                    'updated_at'
+                ],
+                order: { created_at: 'DESC' },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            // Manually remove the unwanted fields from deal
+            // const pendingdeals = deals.map(deal => {
+            //     if (deal.invited_by) {
+            //         delete deal.invited_by.password; // Replace with actual field you want to remove
+            //         delete deal.deal.investors;
+            //     }
+            //     return deal;
+            // });
+
+            return {
+                status_code: 200,
+                error: false,
+                message: "data retrieved successfully",
+                data: {
+                    transactions,
                     pagination: {
                         current_page: pageNumber,
                         page_size: pageSize,

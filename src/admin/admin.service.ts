@@ -10,6 +10,9 @@ import RejectPaymentDto from './reject-payment.dto';
 import ApprovePaymentDto from './approve-payment.dto';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { Investment, InvestmentStatus } from '../investments/investments.entity';
+import { Transaction, TransactionStatus, TransactionType } from '../transaction/transaction.entity';
+import { Deal } from '../deal/deal.entity';
+import Syndicate from '../syndicate/syndicate.entity';
 
 @Injectable()
 export class AdminService {
@@ -19,7 +22,10 @@ export class AdminService {
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(PaymentReceipt) private paymentReceiptRepository: Repository<PaymentReceipt>,
         @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
-        @InjectRepository(Investment) private InvestmentRepository: Repository<Investment>,
+        @InjectRepository(Investment) private investmentRepository: Repository<Investment>,
+        @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
+        @InjectRepository(Deal) private dealRepository: Repository<Deal>,
+        @InjectRepository(Syndicate) private syndicateRepository: Repository<Syndicate>,
         private mailService: MailService
 
     ) { }
@@ -321,12 +327,44 @@ export class AdminService {
                 },
             });
 
-            const entityManager = this.InvestmentRepository.manager;
+            // get the user
+            const userExist = await this.userRepository.findOne({ where: { email: receiptExist.user.email, } })
+            if (!receiptExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "user do not exist on system",
+                };
+            }
+
+
+            // get the deal
+            const dealExist = await this.dealRepository.findOne({ where: { id: receiptExist.deal.id } })
+            if (!dealExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "deal do not exist",
+                };
+            }
+
+            // get the deal
+            const syndicateExist = await this.syndicateRepository.findOne({ where: { id: receiptExist.syndicate.id } })
+            if (!syndicateExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: "syndicate do not exist",
+                };
+            }
+
+
+            const entityManager = this.investmentRepository.manager;
 
             return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
                 // create investment
-                const createdInvest = this.InvestmentRepository.create({
+                const createdInvest = this.investmentRepository.create({
                     user: { id: receiptExist.user.id },
                     deal: { id: receiptExist.deal.id },
                     syndicate: { id: receiptExist.syndicate.id },
@@ -353,6 +391,20 @@ export class AdminService {
                 receiptExist.rejected = false;
                 receiptExist.investment = createdInvest;
                 await transactionalEntityManager.save(PaymentReceipt, receiptExist);
+
+                // create transaction for the payment
+                const createdTransaction = this.transactionRepository.create({
+                    user: userExist,
+                    deal: dealExist,
+                    syndicate: syndicateExist,
+                    currency: inviteExist.currency,
+                    amount: receiptExist.investment_amount,
+                    status: TransactionStatus.COMPLETED,
+                    type: TransactionType.INVESTMENT,
+                    receipt_url: receiptExist.recipt_img,
+                    payment_gateway: "Bank Transfer/Deposit"
+                })
+                await transactionalEntityManager.save(Transaction, createdTransaction);
 
                 return {
                     status_code: 200,

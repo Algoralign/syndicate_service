@@ -15,6 +15,8 @@ import { Investment } from "./src/investments/investments.entity";
 import PaymentReceipt from "./src/payment-receipt/payment-receipt.entity";
 import SystemReceivingAccount from "./src/system-receiving-account/system-receiving-account.entity";
 import Syndicate from './src/syndicate/syndicate.entity';
+import { Transaction } from './src/transaction/transaction.entity';
+
 
 
 
@@ -35,5 +37,7 @@ export const entities = [
   SchedulePeriod,
   PaymentReceipt,
   SystemReceivingAccount,
-  Syndicate
+  Syndicate,
+  Transaction
+
 ];

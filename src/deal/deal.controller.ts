@@ -156,8 +156,23 @@ export class DealController {
     ) {
 
         const user: User = request.user['data'].user
-
         const result = await this.dealService.getCreatedDeals(user, details);
+        return response.status(result.status_code).json(result);
+
+    }
+
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('transactions')
+    async getDealTransaction(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: any,
+    ) {
+
+        const user: User = request.user['data'].user
+        const result = await this.dealService.getDealTransaction(user, details);
         return response.status(result.status_code).json(result);
 
     }
@@ -189,10 +204,8 @@ export class DealController {
     ) {
 
         const user: User = request.user['data'].user
-
         const result = await this.dealService.getCreatedSyndicates(user, details);
         return response.status(result.status_code).json(result);
-
     }
 
 
