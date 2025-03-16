@@ -722,24 +722,94 @@ export class DealService {
 
 
 
-            // Using repository's findAndCount instead of query builder
-            const [transactions, total] = await this.transactionRepository.findAndCount({
-                where: { deal: { id: deal_id }, syndicate: { id: syndicate_id } },
-                select: [
-                    'id',
-                    'amount',
-                    'status',
-                    'receipt_url',
-                    'payment_gateway',
-                    'type',
-                    'currency',
-                    'created_at',
-                    'updated_at'
-                ],
-                order: { created_at: 'DESC' },
-                skip: (pageNumber - 1) * pageSize,
-                take: pageSize,
+            // check the deal 
+            const inviteExist = await this.invitationTrackerRepository.findOne({
+                where: {
+                    deal: { id: deal_id },
+                    user: { id: user.id }
+                }
             });
+
+            if (!inviteExist) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'invite do not exist for user to fetch transactions for the deal',
+                };
+            }
+
+            if (inviteExist.user_type == UserType.SYNDICATE_INVESTOR) {
+
+                // Using repository's findAndCount instead of query builder
+                const [transactions, total] = await this.transactionRepository.findAndCount({
+                    where: { deal: { id: deal_id }, syndicate: { id: syndicate_id }, user: { id: user.id } },
+                    select: [
+                        'id',
+                        'amount',
+                        'status',
+                        'receipt_url',
+                        'payment_gateway',
+                        'type',
+                        'currency',
+                        'created_at',
+                        'updated_at'
+                    ],
+                    order: { created_at: 'DESC' },
+                    skip: (pageNumber - 1) * pageSize,
+                    take: pageSize,
+                });
+
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: "data retrieved successfully",
+                    data: {
+                        transactions,
+                        pagination: {
+                            current_page: pageNumber,
+                            page_size: pageSize,
+                            totalCount: total,
+                            total_pages: Math.ceil(total / pageSize),
+                        },
+                    },
+                };
+            } else {
+                // Using repository's findAndCount instead of query builder
+                const [transactions, total] = await this.transactionRepository.findAndCount({
+                    where: { deal: { id: deal_id }, syndicate: { id: syndicate_id } },
+                    select: [
+                        'id',
+                        'amount',
+                        'status',
+                        'receipt_url',
+                        'payment_gateway',
+                        'type',
+                        'currency',
+                        'created_at',
+                        'updated_at'
+                    ],
+                    order: { created_at: 'DESC' },
+                    skip: (pageNumber - 1) * pageSize,
+                    take: pageSize,
+                });
+
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: "data retrieved successfully",
+                    data: {
+                        transactions,
+                        pagination: {
+                            current_page: pageNumber,
+                            page_size: pageSize,
+                            totalCount: total,
+                            total_pages: Math.ceil(total / pageSize),
+                        },
+                    },
+                };
+            }
+
+
 
             // Manually remove the unwanted fields from deal
             // const pendingdeals = deals.map(deal => {
@@ -750,20 +820,7 @@ export class DealService {
             //     return deal;
             // });
 
-            return {
-                status_code: 200,
-                error: false,
-                message: "data retrieved successfully",
-                data: {
-                    transactions,
-                    pagination: {
-                        current_page: pageNumber,
-                        page_size: pageSize,
-                        totalCount: total,
-                        total_pages: Math.ceil(total / pageSize),
-                    },
-                },
-            };
+
 
 
         } catch (error) {
