@@ -818,11 +818,14 @@ export class DealService {
             });
 
             const investment = await this.investmentRepository.findOne({ where: { deal: { id: deal.id }, user: { id: user.id } }, relations: ['deal', 'user'] })
+
+            // get the user invitation 
+            const userInvitation = await this.invitationTrackerRepository.findOne({ where: { email: user.email } })
             return {
                 status_code: 200,
                 error: false,
                 message: "data retrieved successfully",
-                data: { deal: deal, user_invested: investment ? true : false }
+                data: { deal: deal, user_invested: investment ? true : false, invite_detail: userInvitation }
             };
         } catch (error) {
             throw new InternalServerErrorException({
