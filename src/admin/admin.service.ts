@@ -275,6 +275,7 @@ export class AdminService {
 
     async approvePayment(detail: ApprovePaymentDto) {
         try {
+
             const receiptExist = await this.paymentReceiptRepository.findOne({
                 where: { id: detail.receipt_id },
                 relations: ['deal', 'syndicate', 'user', 'system_receiving_account'],
@@ -328,8 +329,8 @@ export class AdminService {
                 inviteExist.funding_amount = receiptExist.investment_amount
                 inviteExist.user_invested_in_deal = true
                 inviteExist.user_accepted_invite = true
-                actual_amount_invested = receiptExist.investment_amount;
-               
+                inviteExist.actual_amount_invested = receiptExist.investment_amount;
+
                 await transactionalEntityManager.save(InvitationTracker, inviteExist);
 
                 // update payment receipt
