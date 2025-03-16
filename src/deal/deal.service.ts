@@ -809,20 +809,24 @@ export class DealService {
 
 
 
-    async getDealById(id: any, user: User) {
+    async getDealById(details: any, user: User) {
         try {
+            let { deal_id, syndicate_id } = details;
             // Using repository's findAndCount instead of query builder
             const deal = await this.dealRepository.findOne({
-                where: { id: id },
+                where: { id: deal_id, syndicate: { id: syndicate_id } },
                 relations: ['startup_industry', 'syndicate'],
             });
 
             const investment = await this.investmentRepository.findOne({ where: { deal: { id: deal.id }, user: { id: user.id } }, relations: ['deal', 'user'] })
+
+            // get the user invitation 
+            const userInvitation = await this.invitationTrackerRepository.findOne({ where: { email: user.email } })
             return {
                 status_code: 200,
                 error: false,
                 message: "data retrieved successfully",
-                data: { deal: deal, user_invested: investment ? true : false }
+                data: { deal: deal, user_invested: investment ? true : false, invite_detail: userInvitation }
             };
         } catch (error) {
             throw new InternalServerErrorException({

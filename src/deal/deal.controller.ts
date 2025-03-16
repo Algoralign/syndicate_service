@@ -198,14 +198,14 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('/get-deal/:id') // Change {id} to :id
+    @Get('get-deal') // Change {id} to :id
     async getSyndicateById(
         @Req() request: RequestWithUser,
-        @Param('id') id: string, // Retrieve the id from the route
+        @Query() details: any,
         @Res() response: Response,
     ) {
         const user: User = request.user['data'].user
-        const result = await this.dealService.getDealById(id, user); // Pass id to the service
+        const result = await this.dealService.getDealById(details, user); // Pass id to the service
         return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
     }
 
