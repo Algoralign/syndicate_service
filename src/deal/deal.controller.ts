@@ -163,21 +163,21 @@ export class DealController {
     }
 
 
-    // @HttpCode(200)
-    // @UseGuards(JwtAuthenticationGuard)
-    // @Get('investors')
-    // async getInvestors(
-    //     @Req() request: RequestWithUser,
-    //     @Res() response: Response,
-    //     @Query() details: any,
-    // ) {
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('invites')
+    async getDealInvites(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+        @Query() details: any,
+    ) {
 
-    //     const user: User = request.user['data'].user
+        const user: User = request.user['data'].user
 
-    //     const result = await this.dealService.getInvestors(user, details);
-    //     return response.status(result.status_code).json(result);
+        const result = await this.dealService.getDealInvites(user, details);
+        return response.status(result.status_code).json(result);
 
-    // }
+    }
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
