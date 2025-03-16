@@ -694,14 +694,62 @@ export class DealService {
         }
     }
 
-    async getInvestors(user: User, details: any) {
+    async getDealInvites(user: User, details: any) {
         try {
-            let { page_size, page_number } = details;
+            let { page_size, page_number, deal_id, syndicate_id } = details;
 
             const pageNumber = Number(page_number) || 1;
             const pageSize = Number(page_size) || 100;
 
-            //   const = await this.invitationTrackerRepository.findOne
+            const [createddeals, totalCount] = await this.invitationTrackerRepository
+                .createQueryBuilder('invitation')
+                .leftJoinAndSelect('invitation.user', 'user')
+                .leftJoin('user.kyc', 'kyc') // Join without selecting all fields
+                .select([
+                    'invitation.id',
+                    'invitation.first_name',
+                    'invitation.last_name',
+                    'invitation.email',
+                    'invitation.actual_amount_invested',
+                    'invitation.proposed_amount',
+                    'invitation.funding_amount',
+                    'invitation.user_type',
+                    'invitation.logged_in',
+                    'invitation.user_invested_in_deal',
+                    'invitation.user_accepted_invite',
+                    'invitation.invite_type',
+                    'invitation.receipt_uploaded',
+                    'invitation.created_at',
+                    'invitation.updated_at',
+                    'user.id',  // Ensure user relation is included
+                    'user.first_name',
+                    'user.last_name',
+                    'user.email',
+                    'user.verified',
+                    'kyc.id',
+                    'kyc.verified',
+                    'kyc.rejected',
+                    'kyc.uploaded',
+
+                ])
+                .where('invitation.deal = :dealId', { dealId: deal_id })
+                .andWhere('invitation.syndicate = :syndicateId', { syndicateId: syndicate_id })
+                .orderBy('invitation.created_at', 'DESC')
+                .skip((pageNumber - 1) * pageSize)
+                .take(pageSize)
+                .getManyAndCount();
+
+            return {
+                status_code: 200,
+                error: false,
+                message: 'Data retrieved successfully',
+                data: {
+                    createddeals,
+                    totalCount,
+                },
+            };
+
+
         } catch (error) {
             throw new InternalServerErrorException({
                 error: true,
