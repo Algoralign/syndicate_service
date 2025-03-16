@@ -21,6 +21,7 @@ import Syndicate from '../syndicate/syndicate.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import { BlockAdminMiddleware } from '../middlewares/block-admin.middleware';
 import { UtilityService } from '../utility/utility.service';
+import { Transaction } from '../transaction/transaction.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -36,7 +37,8 @@ import { UtilityService } from '../utility/utility.service';
     Investment,
     SystemReceivingAccount,
     Syndicate,
-    PaymentReceipt
+    PaymentReceipt,
+    Transaction
   ])],
   controllers: [DealController],
   providers: [DealService, CloudinaryService, UserService, EmailVerificationTokenService, ResetPasswordTokenService, UtilityService]
