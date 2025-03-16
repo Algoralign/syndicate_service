@@ -12,6 +12,9 @@ import { InvitationTracker } from '../invitation-tracker/invitation-tracker.enti
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import { AdminMiddleware } from '../middlewares/admin.middleware';
 import { UtilityService } from '../utility/utility.service';
+import { Transaction } from '../transaction/transaction.entity';
+import Syndicate from '../syndicate/syndicate.entity';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -22,6 +25,8 @@ import { UtilityService } from '../utility/utility.service';
     InvestmentInstrument,
     InvitationTracker,
     PaymentReceipt,
+    Transaction,
+    Syndicate
 
   ])],
   controllers: [AdminController],
