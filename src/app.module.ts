@@ -30,6 +30,8 @@ import { PaymentReceiptModule } from './payment-receipt/payment-receipt.module';
 import { SystemReceivingAccountModule } from './system-receiving-account/system-receiving-account.module';
 import { SyndicateModule } from './syndicate/syndicate.module';
 import { UtilityModule } from './utility/utility.module';
+import { TransactionModule } from './transaction/transaction.module';
+
 
 
 
@@ -89,6 +91,7 @@ import { UtilityModule } from './utility/utility.module';
     SystemReceivingAccountModule,
     SyndicateModule,
     UtilityModule,
+    TransactionModule,
 
   ],
   controllers: [AppController],

@@ -16,6 +16,8 @@ import InvestmentInstrument from '../investment-instrument/investment-instrument
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { Investment } from '../investments/investments.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import { Transaction } from '../transaction/transaction.entity';
+
 
 @Entity({ name: 'syndicates' })
 class Syndicate {
@@ -45,6 +47,9 @@ class Syndicate {
 
     @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.syndicates, { nullable: true, onDelete: 'CASCADE' })
     investment_instrument: InvestmentInstrument;
+
+    @OneToMany(() => Transaction, (transaction) => transaction.syndicate)
+    transactions: Transaction[];
 
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;

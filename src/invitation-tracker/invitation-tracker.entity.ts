@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index, JoinColumn, OneToOne } from 'typeorm';
 import User from '../user/user.entity';
 import { Deal } from '../deal/deal.entity';
-import { Currency } from '../investments/investments.entity';
+
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import { Currency } from '../_enums/currency.enum';
 
 
 @Entity('invitation_trackers')

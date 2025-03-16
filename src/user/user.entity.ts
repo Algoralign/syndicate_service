@@ -17,6 +17,8 @@ import { UserType } from '../_enums/user-type.enum';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import Kyc from '../kyc/kyc.entity';
+import { Transaction } from '../transaction/transaction.entity';
+
 
 
 export enum InviteType {
@@ -79,6 +81,9 @@ class User {
 
     @OneToOne(() => Kyc, (kyc) => kyc.user, { nullable: true })
     public kyc?: Kyc;
+
+    @OneToMany(() => Transaction, (transaction) => transaction.user)
+    transactions: Transaction[];
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     public created_at: Date;

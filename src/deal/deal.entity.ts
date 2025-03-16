@@ -13,9 +13,12 @@ import User from '../user/user.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 import Industry from '../industry/industry.entity';
-import { Currency, Investment } from '../investments/investments.entity';
+import { Investment } from '../investments/investments.entity';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import { Transaction } from '../transaction/transaction.entity';
+import { Currency } from '../_enums/currency.enum';
+
 
 // Enums for repayment schedule, disbursement schedule, and SPV code
 export enum RepaymentSchedule {
@@ -102,6 +105,9 @@ export class Deal {
 
     @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.deal)
     payment_receipts: PaymentReceipt[];
+
+    @OneToMany(() => Transaction, (transaction) => transaction.deal)
+    transactions: Transaction[];
 
     @CreateDateColumn()
     created_at: Date;

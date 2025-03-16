@@ -13,13 +13,14 @@ import Industry from '../industry/industry.entity';
 import { Deal } from './deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UserService } from '../user/user.service';
-import { Currency, Investment, InvestmentStatus } from '../investments/investments.entity';
+import {  Investment, InvestmentStatus } from '../investments/investments.entity';
 import { UserType } from '../_enums/user-type.enum';
 import CreateDealDto from './deal.dto';
 import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import CreatePaymentDto from './payment.dto';
 import PaymentReceipt from '../payment-receipt/payment-receipt.entity';
+import { Currency } from '../_enums/currency.enum';
 
 
 const unlinkAsync = promisify(fs.unlink);
