@@ -970,13 +970,34 @@ export class DealService {
 
             // get the user invitation 
             const userInvitation = await this.invitationTrackerRepository.findOne({ where: { email: user.email } })
+
+            // get total deposited
+            const totalDeposited = await this.investmentRepository
+                .createQueryBuilder("investment")
+                .select("COALESCE(SUM(investment.investment_amount), 0)", "total")
+                .where("investment.investment_status = :status", { status: InvestmentStatus.APPROVED })
+                .andWhere("investment.is_active = :isActive", { isActive: true })
+                .andWhere("investment.dealId = :dealId", { dealId: deal_id })  // Ensure `deal_id` is passed correctly
+                .andWhere("investment.syndicateId = :syndicateId", { syndicateId: syndicate_id }) // Ensure `syndicate_id` is passed correctly
+                .getRawOne();
+
+            console.log("Total Deposited:", totalDeposited.total);
+
+
             return {
                 status_code: 200,
                 error: false,
                 message: "data retrieved successfully",
-                data: { deal: deal, user_invested: investment ? true : false, invite_detail: userInvitation }
+                data: {
+                    deal: deal,
+                    user_invested: investment ? true : false,
+                    invite_detail: userInvitation,
+                    total_deposited: totalDeposited?.total,
+                    total_disbursed: 0.00
+                }
             };
         } catch (error) {
+            console.log(error)
             throw new InternalServerErrorException({
                 error: true,
                 status_code: 500,
