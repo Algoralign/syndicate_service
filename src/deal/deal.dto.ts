@@ -85,6 +85,10 @@ class CreateDealDto {
     @IsString()
     spv_name: string;
 
+    @IsNotEmpty()
+    @IsString()
+    investment_instrument_id: string;
+
     @IsArray()
     @IsNotEmpty()
     @Transform(({ value }) => (Array.isArray(value) ? value : JSON.parse(value))) // Ensures value is an array
