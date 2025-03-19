@@ -160,13 +160,10 @@ export class UserService {
           password: await this.createPasswordHash(userData.password),
           invite_type: InviteType.SELF
         });
-
-        // const user = await this.userRepository.save(newUser);
         const user = await transactionalEntityManager.save(User, newUser);
 
         // Create and save Address
         const address = this.addressRepository.create({ user, country });
-        // await this.addressRepository.save(address);
         await transactionalEntityManager.save(Address, address);
 
         // Generate email verification token
@@ -182,7 +179,6 @@ export class UserService {
           percentage_fee: userData.percentage_fee,
           syndicate_website: userData.syndicate_website,
         })
-        // await this.syndicateRepository.save(syndicate)
         await transactionalEntityManager.save(Syndicate, syndicate);
 
         // Prepare response data
