@@ -109,6 +109,9 @@ export class Deal {
     @OneToMany(() => Transaction, (transaction) => transaction.deal)
     transactions: Transaction[];
 
+    @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.deals, { nullable: true, onDelete: 'CASCADE' })
+    investment_instrument: InvestmentInstrument;
+
     @CreateDateColumn()
     created_at: Date;
 
