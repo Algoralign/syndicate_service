@@ -56,11 +56,15 @@ export class SyndicateService {
                 };
             }
 
-            const syndicate = this.syndicateRepository.create({
+
+            let syndicate = this.syndicateRepository.create({
                 user: userExist,
-                name: details.name,
+                name: details.syndicate_name,
                 ticket_size: details.ticket_size,
                 investment_instrument: investmentInstrument,
+                description: details.syndicate_description,
+                percentage_fee: details.percentage_fee,
+                syndicate_website: details.syndicate_website,
             })
 
 

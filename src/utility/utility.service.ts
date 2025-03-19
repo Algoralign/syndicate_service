@@ -65,8 +65,6 @@ export class UtilityService {
                 id: verified.userId,
             });
 
-
-            console.log(user, "testing if it works")
             return user;
         } catch (error) {
             console.log(error);
