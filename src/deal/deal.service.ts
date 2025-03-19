@@ -150,6 +150,22 @@ export class DealService {
             }
 
 
+            const investmentInstrument = await this.investmentInstrumentRepository
+                .createQueryBuilder('inv')
+                .where('inv.id = :id', { id: details.investment_instrument_id })
+                .getOne();
+
+
+
+            if (!investmentInstrument) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'investment instrument do not exist',
+                };
+            }
+
+
 
             // Upload files with error handling
             const uploadResults = await Promise.allSettled([
@@ -190,7 +206,8 @@ export class DealService {
                     spv_name: details.spv_name,
                     currency: details.currency,
                     waterfall_distribution_structure: waterfall_distribution_structure_url,
-                    angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url
+                    angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url,
+                    investment_instrument: investmentInstrument,
                 });
 
 

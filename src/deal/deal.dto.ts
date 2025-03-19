@@ -69,13 +69,15 @@ class CreateDealDto {
     @IsString()
     currency: string;
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
-    repayment_schedule_code: string;
+    repayment_schedule_code?: string;
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
-    disbursement_schedule_code: string;
+    disbursement_schedule_code?: string;
 
     @IsNotEmpty()
     @IsString()
@@ -84,6 +86,10 @@ class CreateDealDto {
     @IsNotEmpty()
     @IsString()
     spv_name: string;
+
+    @IsNotEmpty()
+    @IsString()
+    investment_instrument_id: string;
 
     @IsArray()
     @IsNotEmpty()
