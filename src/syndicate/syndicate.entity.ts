@@ -51,6 +51,15 @@ class Syndicate {
     @OneToMany(() => Transaction, (transaction) => transaction.syndicate)
     transactions: Transaction[];
 
+    @Column({ type: "text", nullable: true })
+    public description: string;
+
+    @Column({ nullable: true })
+    public percentage_fee: number;
+
+    @Column({ nullable: true })
+    public syndicate_website: string;
+
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;
 

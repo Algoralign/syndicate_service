@@ -24,6 +24,8 @@ import { BankService } from '../bank/bank.service';
 import { Deal } from '../deal/deal.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UtilityService } from '../utility/utility.service';
+import Syndicate from '../syndicate/syndicate.entity';
+import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 @Global()
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { UtilityService } from '../utility/utility.service';
       Kyc,
       Deal,
       InvitationTracker,
+      Syndicate,
+      InvestmentInstrument
     ])
   ],
   providers: [
@@ -63,7 +67,8 @@ import { UtilityService } from '../utility/utility.service';
     CloudinaryService,
     ResetPasswordTokenService,
     IdentityTypesService,
-    BankService
+    BankService,
+    
   ],
   controllers: [AuthenticationController],
   exports: [JwtStrategy, PassportModule],

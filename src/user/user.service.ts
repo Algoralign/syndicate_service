@@ -28,6 +28,8 @@ import { MailService } from '../mail/mail.service';
 import CreateAdminDto from '../_dtos/create-admin.dto';
 import CompleteInviteDto from '../_dtos/create-invite.dto';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
+import Syndicate from '../syndicate/syndicate.entity';
+import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 
 @Injectable()
 export class UserService {
@@ -45,6 +47,12 @@ export class UserService {
 
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
+
+    @InjectRepository(Syndicate)
+    private syndicateRepository: Repository<Syndicate>,
+
+    @InjectRepository(InvestmentInstrument)
+    private investmentInstrumentRepository: Repository<InvestmentInstrument>,
 
     private emailVerificationTokenService: EmailVerificationTokenService,
 
@@ -126,38 +134,75 @@ export class UserService {
         };
       }
 
-      // Create and save User first
-      const newUser = this.userRepository.create({
-        email: userData.email,
-        password: await this.createPasswordHash(userData.password),
-        invite_type: InviteType.SELF
-      });
 
-      const user = await this.userRepository.save(newUser);
+      // check if the instrument exists
 
-      // Create and save Address
-      const address = this.addressRepository.create({ user, country });
-      await this.addressRepository.save(address);
+      const investmentInstrument = await this.investmentInstrumentRepository
+        .createQueryBuilder('inv')
+        .where('inv.id = :id', { id: userData.investment_instrument_id })
+        .getOne();
 
-      // Generate email verification token
-      const token = await this.emailVerificationTokenService.createEmailverificationToken(userData.email);
 
-      // Prepare response data
-      const data = {
-        email: user.email,
-        email_verification_token: token.token,
-        verified: user.verified,
-        verification_link: `${process.env.ROOT_URL}/verify-email?token=${token.token}`,
-      };
+      if (!investmentInstrument) {
+        return {
+          status_code: 400,
+          error: true,
+          message: 'investment instrument do not exist',
+        };
+      }
 
-      // Send email verification mail (if needed)
-      await this.mailService.sendUserConfirmation(data);
+      const entityManager = this.userRepository.manager;
+      return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
-      return {
-        error: false,
-        status_code: HttpStatus.OK,
-        message: 'User account created',
-      };
+        // Create and save User first
+        const newUser = this.userRepository.create({
+          email: userData.email,
+          password: await this.createPasswordHash(userData.password),
+          invite_type: InviteType.SELF
+        });
+
+        // const user = await this.userRepository.save(newUser);
+        const user = await transactionalEntityManager.save(User, newUser);
+
+        // Create and save Address
+        const address = this.addressRepository.create({ user, country });
+        // await this.addressRepository.save(address);
+        await transactionalEntityManager.save(Address, address);
+
+        // Generate email verification token
+        const token = await this.emailVerificationTokenService.createEmailverificationToken(userData.email);
+
+        // create the syndicate 
+        let syndicate = this.syndicateRepository.create({
+          user: { id: user.id },
+          name: userData.syndicate_name,
+          ticket_size: userData.ticket_size,
+          investment_instrument: investmentInstrument,
+          description: userData.syndicate_description,
+          percentage_fee: userData.percentage_fee,
+          syndicate_website: userData.syndicate_website,
+        })
+        // await this.syndicateRepository.save(syndicate)
+        await transactionalEntityManager.save(Syndicate, syndicate);
+
+        // Prepare response data
+        const data = {
+          email: user.email,
+          email_verification_token: token.token,
+          verified: user.verified,
+          verification_link: `${process.env.ROOT_URL}/verify-email?token=${token.token}`,
+        };
+
+        // Send email verification mail (if needed)
+        await this.mailService.sendUserConfirmation(data);
+
+        return {
+          error: false,
+          status_code: HttpStatus.OK,
+          message: 'User account created',
+        };
+      })
+
     } catch (error) {
       console.log(error)
       if (error?.code == PostgresErrorCode.UniqueViolation) {

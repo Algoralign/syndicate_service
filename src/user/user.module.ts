@@ -11,6 +11,8 @@ import ResetPasswordToken from '../reset-password-token/reset-password-token.ent
 import Address from '../address/address.entity';
 import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 import { UtilityService } from '../utility/utility.service';
+import Syndicate from '../syndicate/syndicate.entity';
+import InvestmentInstrument from '../investment-instrument/investment-instrument.entity';
 
 // module
 @Module({
@@ -20,7 +22,9 @@ import { UtilityService } from '../utility/utility.service';
     EmailVerificationToken,
     ResetPasswordToken,
     Address,
-    InvitationTracker
+    InvitationTracker,
+    Syndicate,
+    InvestmentInstrument
 
   ])],
   controllers: [UserController],
