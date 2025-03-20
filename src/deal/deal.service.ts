@@ -73,8 +73,8 @@ export class DealService {
     async submitDeal(files: any, user: any, details: any): Promise<any> {
 
         try {
-            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure || !files.spv_custom_doc) {
-                throw new BadRequestException('All three files (spv, water fall structure, angel waterfall structure, spv_custom_doc) are required');
+            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure || !files.custom_repayment_schedule_doc || !files.custom_disbursement_schedule_doc) {
+                throw new BadRequestException('All files  are required');
             }
 
             // const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
@@ -180,17 +180,19 @@ export class DealService {
             const uploadResults = await Promise.allSettled([
                 this.uploadWithRetry(files.waterfall_distribution_structure[0], userExist.email),
                 this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email),
-                this.uploadWithRetry(files.spv_custom_doc[0], userExist.email)
+                this.uploadWithRetry(files.custom_repayment_schedule_doc[0], userExist.email),
+                this.uploadWithRetry(files.custom_disbursement_schedule_doc[0], userExist.email)
             ]);
 
             // Extract results  
 
             const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
             const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
-            const spv_custom_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+            const custom_repayment_schedule_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+            const custom_disbursement_schedule_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
 
             // Check if any upload failed
-            if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
+            if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url || !custom_repayment_schedule_doc || !custom_disbursement_schedule_doc) {
                 throw new Error('One or more document uploads failed. Please try again.');
             }  //
 
@@ -219,7 +221,8 @@ export class DealService {
                     waterfall_distribution_structure: waterfall_distribution_structure_url,
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url,
                     investment_instrument: investmentInstrument,
-                    spv_custom_doc: spv_custom_doc,
+                    custom_repayment_schedule_doc: custom_repayment_schedule_doc,
+                    custom_disbursement_schedule_doc: custom_disbursement_schedule_doc,
                     ticket_size: details.ticket_size && !isNaN(Number(details.ticket_size))
                         ? Number(details.ticket_size)
                         : 0.00,
