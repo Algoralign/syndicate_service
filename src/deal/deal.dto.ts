@@ -63,7 +63,7 @@ class CreateDealDto {
     @IsNotEmpty()
     @Transform(({ value }) => Number(value)) // Converts the string to a number
     @IsNumber()
-    funding_amount: number;
+    funding_amount: number; // alocation_size
 
     @IsNotEmpty()
     @IsString()

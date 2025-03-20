@@ -31,6 +31,9 @@ class PaymentReceipt {
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     investment_amount: number;
+    
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    investment_fee: number;  // percentage in monetary value based on the proposed amount & percentage_fee on syndicate percentage_fee
 
     @ManyToOne(() => User, (user) => user.payment_receipts, { nullable: true, onDelete: 'CASCADE' })
     user: User;

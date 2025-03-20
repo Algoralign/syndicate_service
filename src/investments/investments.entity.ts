@@ -43,6 +43,9 @@ export class Investment {
     payment_receipt: PaymentReceipt;
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    investment_fee: number;  // percentage in monetary value based on the proposed amount & percentage_fee on syndicate percentage_fee
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     investment_amount: number; // amount actually invested
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
