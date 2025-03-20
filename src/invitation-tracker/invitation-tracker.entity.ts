@@ -26,7 +26,7 @@ export class InvitationTracker {
     proposed_amount: number;  // proposed investor amount that they will invest
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    investment_fee: number;  // percentage in monetary value based on the proposed amount & percentage_fee on syndicate percentage_fee
+    investment_fee_on_proposed_amount: number;  // proposed investor amount that they will invest
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     proposed_amount_plus_investment_fee: number;  // proposed investor amount that they will invest
@@ -35,7 +35,10 @@ export class InvitationTracker {
     actual_amount_invested: number; // amount the user finally invested
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    funding_amount: number; // proposed total amount to be raised for deal or founder - allocation_size
+    investment_fee_on_actual_amount_invested: number;
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    allocation_size: number;  // amount to be raised for the deal for founder
 
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
