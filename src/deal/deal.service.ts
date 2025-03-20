@@ -250,8 +250,11 @@ export class DealService {
 
                 // Create invitation trackers
                 const invitedInv = typeof details.investors === "string" ? JSON.parse(details.investors) : details.investors;
-                const trackers = invitedInv.map((invitee) =>
-                    this.invitationTrackerRepository.create({
+                const trackers = invitedInv.map((invitee) => {
+                    // calculate the investment fee for proposed amount
+
+                    let fee = ((theSyndicate?.percentage_fee / 100) * (invitee?.amount ?? 0));
+                    return this.invitationTrackerRepository.create({
                         first_name: invitee.first_name,
                         last_name: invitee.last_name,
                         email: invitee.email,
@@ -262,13 +265,16 @@ export class DealService {
                         deal: { id: createdDeal.id },
                         syndicate: { id: theSyndicate.id },
                         user_type: UserType.SYNDICATE_INVESTOR,
-                        invite_type: InviteType.REFFERRAL
+                        invite_type: InviteType.REFFERRAL,
+                        investment_fee: fee
                     })
+                }
                 );
                 await transactionalEntityManager.save(InvitationTracker, trackers);
 
 
                 //invite self to deal
+                let fee = ((theSyndicate?.percentage_fee / 100) * (details?.investing_amount ?? 0));
                 const selfInvite = this.invitationTrackerRepository.create({
                     first_name: userExist.first_name,
                     last_name: userExist.last_name,
@@ -281,6 +287,7 @@ export class DealService {
                     syndicate: { id: theSyndicate.id },
                     user_type: UserType.SYNDICATE_LEAD,
                     invite_type: InviteType.SELF,
+                    investment_fee: fee,
                     email_sent: true,
                     logged_in: true,
                 })
