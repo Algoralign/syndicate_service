@@ -4,6 +4,7 @@ import { countryData } from '../src/_data/countries';
 export class InitialSchema1741369615005 implements MigrationInterface {
     name = 'InitialSchema1741369615005'
 
+
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             INSERT INTO "investment_instruments" ("id", "name", "code", "created_at", "updated_at") 

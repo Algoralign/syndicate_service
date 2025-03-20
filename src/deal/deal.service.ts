@@ -323,14 +323,6 @@ export class DealService {
             }
 
 
-            if (details.investment_amount && isNaN(Number(details.investment_amount))) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: 'investment amount must be a valid number',
-                };
-            }
-
             const userExist = await this.userRepository.findOneBy({ id: user.id })
             if (!userExist) {
                 throw new BadRequestException('user unauthorized');
@@ -417,7 +409,6 @@ export class DealService {
                     syndicate: syndicateExist,
                     system_receiving_account: systemBankExist,
                     invitation_tracker: inviteExist,
-                    // investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
                 });
 
 
