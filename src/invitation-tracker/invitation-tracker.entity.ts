@@ -29,6 +29,9 @@ export class InvitationTracker {
     investment_fee: number;  // percentage in monetary value based on the proposed amount & percentage_fee on syndicate percentage_fee
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+    proposed_amount_plus_investment_fee: number;  // proposed investor amount that they will invest
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
     actual_amount_invested: number; // amount the user finally invested
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
