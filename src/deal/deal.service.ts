@@ -73,8 +73,8 @@ export class DealService {
     async submitDeal(files: any, user: any, details: any): Promise<any> {
 
         try {
-            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure) {
-                throw new BadRequestException('All three files (spv, water fall structure, angel waterfall structure) are required');
+            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure || !files.spv_custom_doc) {
+                throw new BadRequestException('All three files (spv, water fall structure, angel waterfall structure, spv_custom_doc) are required');
             }
 
             // const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
@@ -101,7 +101,16 @@ export class DealService {
                 return {
                     status_code: 400,
                     error: true,
-                    message: 'funding amount must be a valid number',
+                    message: 'funding amount must be a valid amount',
+                };
+            }
+
+
+            if (details.ticket_size && isNaN(Number(details.ticket_size))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'ticket_size  must be a valid amount',
                 };
             }
 
@@ -170,13 +179,15 @@ export class DealService {
             // Upload files with error handling
             const uploadResults = await Promise.allSettled([
                 this.uploadWithRetry(files.waterfall_distribution_structure[0], userExist.email),
-                this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email)
+                this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email),
+                this.uploadWithRetry(files.spv_custom_doc[0], userExist.email)
             ]);
 
             // Extract results  
 
             const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
             const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+            const spv_custom_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
 
             // Check if any upload failed
             if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
@@ -208,6 +219,10 @@ export class DealService {
                     waterfall_distribution_structure: waterfall_distribution_structure_url,
                     angel_waterfall_distribution_structure: angel_waterfall_distribution_structure_url,
                     investment_instrument: investmentInstrument,
+                    spv_custom_doc: spv_custom_doc,
+                    ticket_size: details.ticket_size && !isNaN(Number(details.ticket_size))
+                        ? Number(details.ticket_size)
+                        : 0.00,
                 });
 
 
