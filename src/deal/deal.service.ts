@@ -270,7 +270,8 @@ export class DealService {
                         syndicate: { id: theSyndicate.id },
                         user_type: UserType.SYNDICATE_INVESTOR,
                         invite_type: InviteType.REFFERRAL,
-                        investment_fee: fee
+                        investment_fee: fee,
+                        proposed_amount_plus_investment_fee: (fee + invitee.amount),
                     })
                 }
                 );
@@ -292,8 +293,10 @@ export class DealService {
                     user_type: UserType.SYNDICATE_LEAD,
                     invite_type: InviteType.SELF,
                     investment_fee: fee,
+                    proposed_amount_plus_investment_fee: (fee + (details.investing_amount ? Number(details.funding_amount) : 0.0)),
                     email_sent: true,
                     logged_in: true,
+
                 })
 
                 await transactionalEntityManager.save(InvitationTracker, selfInvite);
