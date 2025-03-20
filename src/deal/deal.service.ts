@@ -256,7 +256,8 @@ export class DealService {
                 const trackers = invitedInv.map((invitee) => {
                     // calculate the investment fee for proposed amount
 
-                    let fee = ((theSyndicate?.percentage_fee / 100) * (invitee?.amount ?? 0));
+                    let fee = (((theSyndicate?.percentage_fee ?? 0) / 100) * (invitee?.amount ?? 0));
+
                     return this.invitationTrackerRepository.create({
                         first_name: invitee.first_name,
                         last_name: invitee.last_name,
@@ -277,7 +278,7 @@ export class DealService {
 
 
                 //invite self to deal
-                let fee = ((theSyndicate?.percentage_fee / 100) * (details?.investing_amount ?? 0));
+                let fee = (((theSyndicate?.percentage_fee ?? 0) / 100) * (details?.investing_amount ?? 0));
                 const selfInvite = this.invitationTrackerRepository.create({
                     first_name: userExist.first_name,
                     last_name: userExist.last_name,
