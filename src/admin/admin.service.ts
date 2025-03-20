@@ -13,6 +13,7 @@ import { Investment, InvestmentStatus } from '../investments/investments.entity'
 import { Transaction, TransactionStatus, TransactionType } from '../transaction/transaction.entity';
 import { Deal } from '../deal/deal.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import { DealService } from '../deal/deal.service';
 
 @Injectable()
 export class AdminService {
@@ -26,7 +27,8 @@ export class AdminService {
         @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
         @InjectRepository(Deal) private dealRepository: Repository<Deal>,
         @InjectRepository(Syndicate) private syndicateRepository: Repository<Syndicate>,
-        private mailService: MailService
+        private mailService: MailService,
+        private dealService: DealService
 
     ) { }
 
@@ -358,9 +360,21 @@ export class AdminService {
                 };
             }
 
+            if (detail.investment_amount && isNaN(Number(detail.investment_amount))) {
+                return {
+                    status_code: 400,
+                    error: true,
+                    message: 'investment amount must be a valid number',
+                };
+            }
+
+            //calculate the investment fee
+            // const fee = (((syndicateExist.percentage_fee ?? 0) / 100) * (detail.investment_amount ?? 0));
+
+            let fee = this.dealService.calculateFee((syndicateExist.percentage_fee ?? 0), (detail?.investment_amount ?? 0));
+
 
             const entityManager = this.investmentRepository.manager;
-
             return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
 
                 // create investment
@@ -368,21 +382,21 @@ export class AdminService {
                     user: { id: receiptExist.user.id },
                     deal: { id: receiptExist.deal.id },
                     syndicate: { id: receiptExist.syndicate.id },
-                    investment_amount: receiptExist.investment_amount,
+                    investment_amount: (detail.investment_amount - fee),
                     proposed_amount: inviteExist.proposed_amount,
                     investment_status: InvestmentStatus.APPROVED,
                     currency: inviteExist.currency,
                     is_active: true,
-                    payment_receipt: receiptExist
-
+                    payment_receipt: receiptExist,
+                    investment_fee: fee
                 })
                 await transactionalEntityManager.save(Investment, createdInvest);
 
                 // update invite
-                inviteExist.funding_amount = receiptExist.investment_amount
-                inviteExist.user_invested_in_deal = true
-                inviteExist.user_accepted_invite = true
-                inviteExist.actual_amount_invested = receiptExist.investment_amount;
+                inviteExist.user_invested_in_deal = true;
+                inviteExist.user_accepted_invite = true;
+                inviteExist.actual_amount_invested = (detail.investment_amount - fee);
+                inviteExist.investment_fee_on_actual_amount_invested = fee;
 
                 await transactionalEntityManager.save(InvitationTracker, inviteExist);
 
@@ -398,7 +412,7 @@ export class AdminService {
                     deal: dealExist,
                     syndicate: syndicateExist,
                     currency: inviteExist.currency,
-                    amount: receiptExist.investment_amount,
+                    amount: detail.investment_amount,
                     status: TransactionStatus.COMPLETED,
                     type: TransactionType.INVESTMENT,
                     receipt_url: receiptExist.recipt_img,

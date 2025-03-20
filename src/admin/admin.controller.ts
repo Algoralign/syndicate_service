@@ -93,6 +93,8 @@ export class AdminController {
         @Res() response: Response,
         @Body() details: ApprovePaymentDto,
     ) {
+
+        console.log(details)
         const result = await this.adminService.approvePayment(details);
         return response.status(result.status_code).json(result);
     }

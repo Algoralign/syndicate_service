@@ -14,6 +14,17 @@ import { AdminMiddleware } from '../middlewares/admin.middleware';
 import { UtilityService } from '../utility/utility.service';
 import { Transaction } from '../transaction/transaction.entity';
 import Syndicate from '../syndicate/syndicate.entity';
+import { DealService } from '../deal/deal.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { UserService } from '../user/user.service';
+import Industry from '../industry/industry.entity';
+import SystemReceivingAccount from '../system-receiving-account/system-receiving-account.entity';
+import Country from '../country/country.entity';
+import Address from '../address/address.entity';
+import { EmailVerificationTokenService } from '../email-verification-token/email-verification-token.service';
+import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
+import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
+import ResetPasswordToken from '../reset-password-token/reset-password-token.entity';
 
 
 @Module({
@@ -26,11 +37,28 @@ import Syndicate from '../syndicate/syndicate.entity';
     InvitationTracker,
     PaymentReceipt,
     Transaction,
-    Syndicate
+    Syndicate,
+    Industry,
+    SystemReceivingAccount,
+    Country,
+    Address,
+    EmailVerificationToken,
+    ResetPasswordToken
 
   ])],
   controllers: [AdminController],
-  providers: [AdminService, MailService, UtilityService]
+  providers: [
+    AdminService, 
+    MailService, 
+    UtilityService, 
+    DealService, 
+    CloudinaryService, 
+    UserService, 
+    EmailVerificationTokenService,
+    ResetPasswordTokenService,
+    
+
+  ]
 })
 // export class AdminModule { }
 

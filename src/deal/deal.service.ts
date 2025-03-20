@@ -97,7 +97,7 @@ export class DealService {
                 throw new BadRequestException('user unauthorized');
             }
 
-            if (details.funding_amount && isNaN(Number(details.funding_amount))) {
+            if (details.allocation_size && isNaN(Number(details.allocation_size))) {
                 return {
                     status_code: 400,
                     error: true,
@@ -210,8 +210,8 @@ export class DealService {
                     founder_lastname: details.founder_lastname,
                     founder_email: details.founder_email,
                     startup_website: details.startup_website,
-                    funding_amount: details.funding_amount && !isNaN(Number(details.funding_amount))
-                        ? Number(details.funding_amount)
+                    allocation_size: details.allocation_size && !isNaN(Number(details.allocation_size))
+                        ? Number(details.allocation_size)
                         : 0.00,
                     repayment_schedule_code: details.repayment_schedule_code,
                     disbursement_schedule_code: details.disbursement_schedule_code,
@@ -242,7 +242,7 @@ export class DealService {
                     last_name: details.founder_lastname,
                     email: details.founder_email,
                     currency: details.currency,
-                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                    allocation_size: details.allocation_size ? Number(details.allocation_size) : 0,
                     invited_by: { id: userExist.id },
                     deal: { id: createdDeal.id },
                     syndicate: { id: theSyndicate.id },
@@ -256,7 +256,7 @@ export class DealService {
                 const trackers = invitedInv.map((invitee) => {
                     // calculate the investment fee for proposed amount
 
-                    let fee = (((theSyndicate?.percentage_fee ?? 0) / 100) * (invitee?.amount ?? 0));
+                    let fee = this.calculateFee((theSyndicate?.percentage_fee ?? 0), (invitee?.amount ?? 0));
 
                     return this.invitationTrackerRepository.create({
                         first_name: invitee.first_name,
@@ -264,13 +264,13 @@ export class DealService {
                         email: invitee.email,
                         currency: invitee.currency,
                         proposed_amount: invitee.amount,
-                        funding_amount: details.funding_amount ? Number(details.funding_amount) : 0,
+                        allocation_size: details.allocation_size ? Number(details.allocation_size) : 0,
                         invited_by: { id: userExist.id },
                         deal: { id: createdDeal.id },
                         syndicate: { id: theSyndicate.id },
                         user_type: UserType.SYNDICATE_INVESTOR,
                         invite_type: InviteType.REFFERRAL,
-                        investment_fee: fee,
+                        investment_fee_on_proposed_amount: fee,
                         proposed_amount_plus_investment_fee: (fee + invitee.amount),
                     })
                 }
@@ -279,21 +279,21 @@ export class DealService {
 
 
                 //invite self to deal
-                let fee = (((theSyndicate?.percentage_fee ?? 0) / 100) * (details?.investing_amount ?? 0));
+                let fee = this.calculateFee((theSyndicate?.percentage_fee ?? 0), (details?.investing_amount ?? 0));
                 const selfInvite = this.invitationTrackerRepository.create({
                     first_name: userExist.first_name,
                     last_name: userExist.last_name,
                     email: userExist.email,
                     currency: details.currency,
-                    proposed_amount: details.investing_amount ? Number(details.funding_amount) : 0.00,
-                    funding_amount: details.funding_amount ? Number(details.funding_amount) : 0.00,
+                    proposed_amount: details.investing_amount ? Number(details.allocation_size) : 0.00,
+                    allocation_size: details.allocation_size ? Number(details.allocation_size) : 0.00,
                     invited_by: { id: userExist.id },
                     deal: { id: createdDeal.id },
                     syndicate: { id: theSyndicate.id },
                     user_type: UserType.SYNDICATE_LEAD,
                     invite_type: InviteType.SELF,
-                    investment_fee: fee,
-                    proposed_amount_plus_investment_fee: (fee + (details.investing_amount ? Number(details.funding_amount) : 0.0)),
+                    investment_fee_on_proposed_amount: fee,
+                    proposed_amount_plus_investment_fee: (fee + (details.investing_amount ? Number(details.allocation_size) : 0.0)),
                     email_sent: true,
                     logged_in: true,
 
@@ -417,7 +417,7 @@ export class DealService {
                     syndicate: syndicateExist,
                     system_receiving_account: systemBankExist,
                     invitation_tracker: inviteExist,
-                    investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
+                    // investment_amount: details.investment_amount ? Number(details.investment_amount) : 0.00,
                 });
 
 
@@ -549,7 +549,7 @@ export class DealService {
                     'last_name',
                     'email',
                     'proposed_amount',
-                    'funding_amount',
+                    'allocation_size',
                     'currency',
                     'email_sent',
                     'user_type',
@@ -641,7 +641,7 @@ export class DealService {
                     'last_name',
                     'email',
                     'proposed_amount',
-                    'funding_amount',
+                    'allocation_size',
                     'currency',
                     'email_sent',
                     'user_type',
@@ -709,7 +709,7 @@ export class DealService {
                     'founder_lastname',
                     'founder_email',
                     'startup_website',
-                    'funding_amount',
+                    'allocation_size',
                     'repayment_schedule_code',
                     'disbursement_schedule_code',
                     'spv_code',
@@ -896,7 +896,7 @@ export class DealService {
                     'invitation.email',
                     'invitation.actual_amount_invested',
                     'invitation.proposed_amount',
-                    'invitation.funding_amount',
+                    'invitation.allocation_size',
                     'invitation.user_type',
                     'invitation.logged_in',
                     'invitation.user_invested_in_deal',
@@ -1052,5 +1052,8 @@ export class DealService {
         }
     }
 
+    calculateFee(percentage: number, amount: number) {
+        return ((percentage / 100) * amount);
+    }
 
 }

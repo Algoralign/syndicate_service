@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsArray, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsArray, IsUUID, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 class CreatePaymentDto {
@@ -18,7 +18,7 @@ class CreatePaymentDto {
     @IsNotEmpty()
     invite_id: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @Transform(({ value }) => (value === '' ? undefined : Number(value))) // Reject empty string
     @IsNumber()
     investment_amount: number;

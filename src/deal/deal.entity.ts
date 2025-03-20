@@ -72,8 +72,9 @@ export class Deal {
     @Column({ type: 'varchar', length: 255, nullable: true })
     startup_website: string;
 
+
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    funding_amount: number;  // proposed total amount to be raised for deal or founder - allocation_size
+    allocation_size: number;  // amount to be raised for the deal for founder
 
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
