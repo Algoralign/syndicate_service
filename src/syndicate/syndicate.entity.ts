@@ -28,7 +28,7 @@ class Syndicate {
     public name: string;
 
     @Column({ nullable: true })
-    public ticket_size: number;
+    public ticket_size: number; // minimum amount a user can deposit 
 
     @ManyToOne(() => User, (user) => user.syndicates, { nullable: false, onDelete: 'CASCADE' })
     public user: User;

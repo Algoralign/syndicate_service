@@ -32,8 +32,7 @@ export class InvitationTracker {
     actual_amount_invested: number; // amount the user finally invested
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    funding_amount: number; // proposed total amount to be raised for deal
-    
+    funding_amount: number; // proposed total amount to be raised for deal or founder - allocation_size
 
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
@@ -47,7 +46,6 @@ export class InvitationTracker {
 
     @ManyToOne(() => Syndicate, (syndicate) => syndicate.invitations, { nullable: true, onDelete: 'CASCADE' })
     syndicate: Syndicate;
-
 
     @OneToOne(() => PaymentReceipt, (PaymentReceipt) => PaymentReceipt.invitation_tracker, { nullable: true })
     @JoinColumn({ name: 'payment_receipt_id' })

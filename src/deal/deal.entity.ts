@@ -73,7 +73,7 @@ export class Deal {
     startup_website: string;
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
-    funding_amount: number;
+    funding_amount: number;  // proposed total amount to be raised for deal or founder - allocation_size
 
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
@@ -96,8 +96,14 @@ export class Deal {
     @Column({ type: 'text', nullable: true })
     angel_waterfall_distribution_structure: string;
 
+    @Column({ type: 'text', nullable: true })
+    spv_custom_doc: string;
+
     @Column({ default: false })
     public verified: boolean;
+
+    @Column({ nullable: true })
+    public ticket_size: number; // minimum amount a user can deposit 
 
     @ManyToOne(() => Syndicate, (syndicate) => syndicate.deals, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'syndicate_id' }) // Foreign key column

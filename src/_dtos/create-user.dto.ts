@@ -31,10 +31,10 @@ class CreateUserDto {
     @IsString()
     syndicate_website: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @Transform(({ value }) => Number(value)) // Converts the string to a number
     @IsNumber()
-    ticket_size: number;
+    ticket_size?: number;  // minimum amount a user can deposit
 
     @IsOptional() // Makes the field optional
     @Transform(({ value }) => (value !== null && value !== undefined ? Number(value) : value)) // Converts only if present
