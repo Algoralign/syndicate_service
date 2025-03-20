@@ -17,11 +17,6 @@ class CreatePaymentDto {
     @IsUUID()
     @IsNotEmpty()
     invite_id: string;
-
-    @IsOptional()
-    @Transform(({ value }) => (value === '' ? undefined : Number(value))) // Reject empty string
-    @IsNumber()
-    investment_amount: number;
 }
 
 export default CreatePaymentDto;
