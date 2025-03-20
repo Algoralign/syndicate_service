@@ -10,7 +10,6 @@ export class InvestmentInstrumentController {
     constructor(private investmentInstrumentService: InvestmentInstrumentService) { }
 
     @HttpCode(200)
-    @UseGuards(JwtAuthenticationGuard)
     @Get('retrieve-instrument')
     async getInstruments(
         @Req() request: RequestWithUser,
@@ -18,7 +17,5 @@ export class InvestmentInstrumentController {
     ) {
         const result = await this.investmentInstrumentService.getInstruments();
         return response.status(HttpStatus.ACCEPTED).json(result);
-
     }
-
 }
