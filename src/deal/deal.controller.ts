@@ -45,7 +45,8 @@ export class DealController {
             [
                 { name: 'waterfall_distribution_structure', maxCount: 1 },
                 { name: 'angel_waterfall_distribution_structure', maxCount: 1 },
-                { name: 'spv_custom_doc', maxCount: 1 },
+                { name: 'custom_repayment_schedule_doc', maxCount: 1 },
+                { name: 'custom_disbursement_schedule_doc', maxCount: 1 },
             ],
             storage,
         ),
@@ -59,7 +60,8 @@ export class DealController {
         files: {
             waterfall_distribution_structure?: Express.Multer.File[];
             angel_waterfall_distribution_structure?: Express.Multer.File[];
-            spv_custom_doc?: Express.Multer.File[];
+            custom_repayment_schedule_doc?: Express.Multer.File[];
+            custom_disbursement_schedule_doc?: Express.Multer.File[];
         },
     ): Promise<any> {
         return await this.dealService.submitDeal(files, request.user, details);

@@ -99,6 +99,12 @@ export class Deal {
     @Column({ type: 'text', nullable: true })
     spv_custom_doc: string;
 
+    @Column({ type: 'text', nullable: true })
+    custom_repayment_schedule_doc: string;
+
+    @Column({ type: 'text', nullable: true })
+    custom_disbursement_schedule_doc: string;
+
     @Column({ default: false })
     public verified: boolean;
 
