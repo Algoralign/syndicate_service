@@ -75,12 +75,10 @@ class CreateDealDto {
     currency: string;
 
     @IsOptional()
-    @IsNotEmpty()
     @IsString()
     repayment_schedule_code?: string;
 
     @IsOptional()
-    @IsNotEmpty()
     @IsString()
     disbursement_schedule_code?: string;
 
