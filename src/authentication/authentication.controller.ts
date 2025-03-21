@@ -311,4 +311,18 @@ export class AuthenticationController {
 
   }
 
+
+  @HttpCode(200)
+  @Get('retrive-invitations')
+  async getInvitations(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+    @Query() details: any,
+  ) {
+
+    const result = await this.authenticationService.getInvitations(details);
+    return response.status(result.status_code).json(result);
+  }
+
+
 }
