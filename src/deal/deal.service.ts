@@ -77,14 +77,14 @@ export class DealService {
                 throw new BadRequestException('All files  are required');
             }
 
-            if (details.disbursement_schedule_code == "custom") {
-                if (!files || !files.custom_disbursement_schedule_doc) {
+            if (details?.disbursement_schedule_code == "custom") {
+                if (!files.custom_disbursement_schedule_doc) {
                     throw new BadRequestException('custom disbursement schedule doc is required');
                 }
             }
 
-            if (details.repayment_schedule_code == "custom") {
-                if (!files || !files.custom_repayment_schedule_doc) {
+            if (details?.repayment_schedule_code == "custom") {
+                if (!files.custom_repayment_schedule_doc) {
                     throw new BadRequestException('custom repayment schedule doc is required');
                 }
             }
@@ -192,21 +192,55 @@ export class DealService {
             const uploadResults = await Promise.allSettled([
                 this.uploadWithRetry(files.waterfall_distribution_structure[0], userExist.email),
                 this.uploadWithRetry(files.angel_waterfall_distribution_structure[0], userExist.email),
-                this.uploadWithRetry(files.custom_repayment_schedule_doc[0], userExist.email),
-                this.uploadWithRetry(files.custom_disbursement_schedule_doc[0], userExist.email)
+
+                (details.disbursement_schedule_code === "custom")
+                    ? this.uploadWithRetry(files.custom_disbursement_schedule_doc[0], userExist.email)
+                    : Promise.resolve(null),  // Ensure it's a valid promise
+
+                (details.repayment_schedule_code === "custom")
+                    ? this.uploadWithRetry(files.custom_repayment_schedule_doc[0], userExist.email) // ✅ Corrected file reference
+                    : Promise.resolve(null) // Ensure it's a valid promise
             ]);
 
             // Extract results  
+            const waterfall_distribution_structure_url =
+                uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
 
-            const waterfall_distribution_structure_url = uploadResults[0].status === 'fulfilled' ? uploadResults[0].value : null;
-            const angel_waterfall_distribution_structure_url = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
-            const custom_repayment_schedule_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
-            const custom_disbursement_schedule_doc = uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+            const angel_waterfall_distribution_structure_url =
+                uploadResults[1].status === 'fulfilled' ? uploadResults[1].value : null;
+
+            // Corrected order and fixed ternary nesting
+            const custom_disbursement_schedule_doc =
+                (details.disbursement_schedule_code === "custom" && uploadResults[2].status === 'fulfilled')
+                    ? uploadResults[2].value
+                    : null;
+
+            const custom_repayment_schedule_doc =
+                (details.repayment_schedule_code === "custom" && uploadResults[3].status === 'fulfilled')
+                    ? uploadResults[3].value
+                    : null;
 
             // Check if any upload failed
-            if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url || !custom_repayment_schedule_doc || !custom_disbursement_schedule_doc) {
+            // if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url || !custom_repayment_schedule_doc || !custom_disbursement_schedule_doc) {
+            //     throw new Error('One or more document uploads failed. Please try again.');
+            // }  //
+
+            if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
                 throw new Error('One or more document uploads failed. Please try again.');
             }  //
+
+            if (details?.disbursement_schedule_code == "custom") {
+                console.log("TESTSTSTTSTSTSTST", custom_repayment_schedule_doc)
+                if (!custom_disbursement_schedule_doc) {
+                    throw new Error('One or more document uploads failed. Please try again - custom_disbursement_schedule_doc.');
+                }
+            }
+
+            if (details?.repayment_schedule_code == "custom") {
+                if (!custom_repayment_schedule_doc) {
+                    throw new BadRequestException('custom repayment schedule doc is required - custom_repayment_schedule_doc');
+                }
+            }
 
             const entityManager = this.dealRepository.manager;
 
