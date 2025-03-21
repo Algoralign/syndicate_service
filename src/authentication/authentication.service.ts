@@ -30,6 +30,7 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import * as path from 'path';
 import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
+import { InvitationTracker } from '../invitation-tracker/invitation-tracker.entity';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -48,6 +49,10 @@ export class AuthenticationService {
 
     @InjectRepository(EmailVerificationToken)
     private emailVerificationTokenRepository: Repository<EmailVerificationToken>,
+
+
+    @InjectRepository(InvitationTracker)
+    private invitationTrackerRepository: Repository<InvitationTracker>,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -305,6 +310,57 @@ export class AuthenticationService {
           'email',
           'token',
           'expired',
+          'created_at',
+          'updated_at'
+        ],
+        order: { created_at: 'DESC' },
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+      });
+
+      return {
+        status_code: 200,
+        error: false,
+        message: "data retrieved successfully",
+        data: {
+          tokens,
+          pagination: {
+            current_page: pageNumber,
+            page_size: pageSize,
+            totalCount: total,
+            total_pages: Math.ceil(total / pageSize),
+          },
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException({
+        error: true,
+        status_code: 500,
+        message: error.message,
+      });
+    }
+  }
+
+  async getInvitations(details: any) {
+    try {
+      let { page_size, page_number } = details;
+
+      const pageNumber = Number(page_number) || 1;
+      const pageSize = Number(page_size) || 100;
+
+      // Using repository's findAndCount instead of query builder
+      const [tokens, total] = await this.invitationTrackerRepository.findAndCount({
+        select: [
+          'id',
+          'email',
+          'first_name',
+          'last_name',
+          'proposed_amount',
+          'allocation_size',
+          'allocation_size',
+          'currency',
+          'investment_fee_on_actual_amount_invested',
+          'investment_fee_on_proposed_amount',
           'created_at',
           'updated_at'
         ],
