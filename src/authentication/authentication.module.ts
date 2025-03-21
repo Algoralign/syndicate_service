@@ -55,7 +55,8 @@ import InvestmentInstrument from '../investment-instrument/investment-instrument
       Deal,
       InvitationTracker,
       Syndicate,
-      InvestmentInstrument
+      InvestmentInstrument,
+      EmailVerificationToken
     ])
   ],
   providers: [

@@ -298,4 +298,17 @@ export class AuthenticationController {
   }
 
 
+  @HttpCode(200)
+  @Get('retrive-email-token')
+  async getEmailToken(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+    @Query() details: any,
+  ) {
+
+    const result = await this.authenticationService.getEmailToken(details);
+    return response.status(result.status_code).json(result);
+
+  }
+
 }

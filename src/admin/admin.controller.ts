@@ -71,6 +71,9 @@ export class AdminController {
 
     }
 
+
+
+
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
     @Post('reject-payment-receipts')

@@ -14,12 +14,14 @@ import { Transaction, TransactionStatus, TransactionType } from '../transaction/
 import { Deal } from '../deal/deal.entity';
 import Syndicate from '../syndicate/syndicate.entity';
 import { DealService } from '../deal/deal.service';
+import EmailVerificationToken from '../email-verification-token/email-verification-token.entity';
 
 @Injectable()
 export class AdminService {
 
     constructor(
         @InjectRepository(Kyc) private kycRepository: Repository<Kyc>,
+        @InjectRepository(EmailVerificationToken) private emailVerificationTokenRepository: Repository<EmailVerificationToken>,
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(PaymentReceipt) private paymentReceiptRepository: Repository<PaymentReceipt>,
         @InjectRepository(InvitationTracker) private invitationTrackerRepository: Repository<InvitationTracker>,
@@ -204,6 +206,7 @@ export class AdminService {
             });
         }
     }
+
 
     async getPayments(details: any) {
         try {
