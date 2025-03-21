@@ -73,8 +73,20 @@ export class DealService {
     async submitDeal(files: any, user: any, details: any): Promise<any> {
 
         try {
-            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure || !files.custom_repayment_schedule_doc || !files.custom_disbursement_schedule_doc) {
+            if (!files || !files.waterfall_distribution_structure || !files.angel_waterfall_distribution_structure) {
                 throw new BadRequestException('All files  are required');
+            }
+
+            if (details.disbursement_schedule_code == "custom") {
+                if (!files || !files.custom_disbursement_schedule_doc) {
+                    throw new BadRequestException('custom disbursement schedule doc is required');
+                }
+            }
+
+            if (details.repayment_schedule_code == "custom") {
+                if (!files || !files.custom_repayment_schedule_doc) {
+                    throw new BadRequestException('custom repayment schedule doc is required');
+                }
             }
 
             // const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
