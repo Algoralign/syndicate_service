@@ -34,7 +34,7 @@ export class CronService {
             })
 
 
-            console.log(invitations)
+            
             for (const invite of invitations) {
 
                 const deal_creator = invite.deal.user;
