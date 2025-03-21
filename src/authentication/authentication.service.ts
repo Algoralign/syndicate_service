@@ -361,6 +361,7 @@ export class AuthenticationService {
           'currency',
           'investment_fee_on_actual_amount_invested',
           'investment_fee_on_proposed_amount',
+          'invite_url',
           'created_at',
           'updated_at'
         ],
