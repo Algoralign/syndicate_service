@@ -82,6 +82,9 @@ export class InvitationTracker {
     @Column({ type: 'varchar', nullable: true })
     invite_type: string;
 
+    @Column({ type: 'varchar', nullable: true })
+    invite_url: string;
+
     @CreateDateColumn()
     created_at: Date;
 

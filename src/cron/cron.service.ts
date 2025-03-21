@@ -24,7 +24,7 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('*/5 * * * *')
+    @Cron('*/3 * * * *')
     async sendInviteEmailToInvestor() {
         try {
 
@@ -54,7 +54,10 @@ export class CronService {
                 }
 
 
-                console.log(data)
+                // update the invitation tracker
+                const trackerExist = await this.invitationTrackerRepository.findOne({ where: { id: invite.id } })
+                trackerExist.invite_url = `${process.env.ROOT_URL}/signup/invite?token=${invite.id}&startup=${deal.startup_name}&inviteefn=${invite.first_name}&inviteeln=${invite.last_name}&leadfn=${deal_creator.first_name}&leadln=${deal_creator.last_name}`;
+                await this.invitationTrackerRepository.save(trackerExist)
 
                 await this.mailService.sendInvestorInviteEmail(data);
             }
@@ -67,7 +70,7 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('*/5 * * * *')
+    @Cron('*/3 * * * *')
     async sendInviteEmailToFounder() {
         try {
 
@@ -92,6 +95,12 @@ export class CronService {
                     accept_invitation_link: `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invite.id}`,
                     tracker_id: invite.id,
                 }
+
+
+                // update the invitation tracker
+                const trackerExist = await this.invitationTrackerRepository.findOne({ where: { id: invite.id } })
+                trackerExist.invite_url = `${process.env.ROOT_URL}` + '/signup/invite?token=' + `${invite.id}`;
+                await this.invitationTrackerRepository.save(trackerExist)
 
                 await this.mailService.sendFounderInviteEmail(data);
             }
