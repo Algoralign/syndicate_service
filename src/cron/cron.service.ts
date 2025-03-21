@@ -24,7 +24,7 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('*/5 * * * *')
+    @Cron('*/3 * * * *')
     async sendInviteEmailToInvestor() {
         try {
 
@@ -70,7 +70,7 @@ export class CronService {
 
 
     //1. get proposal check 
-    @Cron('*/5 * * * *')
+    @Cron('*/3 * * * *')
     async sendInviteEmailToFounder() {
         try {
 
