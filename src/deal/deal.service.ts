@@ -220,17 +220,13 @@ export class DealService {
                     ? uploadResults[3].value
                     : null;
 
-            // Check if any upload failed
-            // if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url || !custom_repayment_schedule_doc || !custom_disbursement_schedule_doc) {
-            //     throw new Error('One or more document uploads failed. Please try again.');
-            // }  //
+
 
             if (!waterfall_distribution_structure_url || !angel_waterfall_distribution_structure_url) {
                 throw new Error('One or more document uploads failed. Please try again.');
             }  //
 
             if (details?.disbursement_schedule_code == "custom") {
-                console.log("TESTSTSTTSTSTSTST", custom_repayment_schedule_doc)
                 if (!custom_disbursement_schedule_doc) {
                     throw new Error('One or more document uploads failed. Please try again - custom_disbursement_schedule_doc.');
                 }
@@ -277,9 +273,7 @@ export class DealService {
 
                 const createdDeal = await transactionalEntityManager.save(Deal, deal);
 
-                // // update syndicate
-                // theSyndicate.deal = createdDeal
-                // await transactionalEntityManager.save(Syndicate, theSyndicate);
+
 
 
                 // add founder to tracker
@@ -321,7 +315,12 @@ export class DealService {
                     })
                 }
                 );
+
+
                 await transactionalEntityManager.save(InvitationTracker, trackers);
+                // update invite signup
+
+
 
 
                 //invite self to deal
@@ -346,6 +345,9 @@ export class DealService {
                 })
 
                 await transactionalEntityManager.save(InvitationTracker, selfInvite);
+
+                // update invite
+
 
                 return {
                     status_code: 201,
