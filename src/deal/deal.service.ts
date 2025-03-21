@@ -1054,7 +1054,7 @@ export class DealService {
             const investment = await this.investmentRepository.findOne({ where: { deal: { id: deal.id }, user: { id: user.id } }, relations: ['deal', 'user'] })
 
             // get the user invitation 
-            const userInvitation = await this.invitationTrackerRepository.findOne({ where: { email: user.email } })
+            const userInvitation = await this.invitationTrackerRepository.findOne({ where: { email: user.email, deal: { id: deal_id } } })
 
             // get total deposited
             const totalDeposited = await this.investmentRepository
