@@ -79,10 +79,10 @@ export class Deal {
     @Column({ type: 'enum', enum: Currency, default: Currency.USD })
     currency: Currency;
 
-    @Column({ type: 'enum', enum: RepaymentSchedule })
+    @Column({ type: 'enum', enum: RepaymentSchedule, nullable: true })
     repayment_schedule_code: RepaymentSchedule;
 
-    @Column({ type: 'enum', enum: DisbursementSchedule })
+    @Column({ type: 'enum', enum: DisbursementSchedule, nullable: true })
     disbursement_schedule_code: DisbursementSchedule;
 
     @Column({ type: 'enum', enum: SPVType })
