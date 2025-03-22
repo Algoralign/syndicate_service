@@ -215,7 +215,7 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('get-deal') 
+    @Get('get-deal')
     async getSyndicateById(
         @Req() request: RequestWithUser,
         @Query() details: any,
@@ -228,14 +228,17 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('dashboard-data') 
+    @Get('dashboard-data/:syndicate_id')
     async getDashboard(
+        @Param('syndicate_id') syndicate_id: string,  // Extracts the 'id' from the URL
         @Req() request: RequestWithUser,
         @Res() response: Response,
     ) {
-        const user: User = request.user['data'].user
-        const result = await this.dealService.getDashboard(user);
+        console.log('Received ID:', syndicate_id);
+        const user: User = request.user['data'].user;
+        const result = await this.dealService.getDashboard(user, syndicate_id);
         return response.status(result.status_code).json(result);
     }
+
 
 }
