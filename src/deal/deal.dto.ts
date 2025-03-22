@@ -56,7 +56,7 @@ class CreateDealDto {
     @IsNotEmpty()
     founder_email: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     startup_website: string;
 

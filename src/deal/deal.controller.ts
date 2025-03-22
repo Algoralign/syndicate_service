@@ -215,7 +215,7 @@ export class DealController {
 
     @HttpCode(200)
     @UseGuards(JwtAuthenticationGuard)
-    @Get('get-deal') // Change {id} to :id
+    @Get('get-deal') 
     async getSyndicateById(
         @Req() request: RequestWithUser,
         @Query() details: any,
@@ -224,6 +224,18 @@ export class DealController {
         const user: User = request.user['data'].user
         const result = await this.dealService.getDealById(details, user); // Pass id to the service
         return response.status(result.status_code).json(result); // Explicitly set status and return JSON response
+    }
+
+    @HttpCode(200)
+    @UseGuards(JwtAuthenticationGuard)
+    @Get('dashboard-data') 
+    async getDashboard(
+        @Req() request: RequestWithUser,
+        @Res() response: Response,
+    ) {
+        const user: User = request.user['data'].user
+        const result = await this.dealService.getDashboard(user);
+        return response.status(result.status_code).json(result);
     }
 
 }

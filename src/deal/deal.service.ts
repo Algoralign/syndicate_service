@@ -1091,6 +1091,43 @@ export class DealService {
         }
     }
 
+
+    async getDashboard(user: User) {
+        try {
+
+            // get the recent deals 
+            const recentDeals = await this.dealRepository.find({
+                where: { user: { id: user.id } },
+                order: { created_at: 'DESC' }, // Assuming you have a 'createdAt' field
+                take: 5
+            });
+            // get the transaction
+            const recentTrans = await this.transactionRepository.find({
+                where: { user: { id: user.id } },
+                order: { created_at: 'DESC' }, // Assuming you have a 'createdAt' field
+                take: 5
+            });
+
+
+            return {
+                status_code: 200,
+                error: false,
+                data: {
+                    recentTrans,
+                    recentDeals,
+                }
+            }
+
+        } catch (error) {
+            console.log(error)
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
     calculateFee(percentage: number, amount: number) {
         return ((percentage / 100) * amount);
     }
