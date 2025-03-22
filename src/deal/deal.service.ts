@@ -807,13 +807,17 @@ export class DealService {
 
 
 
+
             // check the deal 
             const inviteExist = await this.invitationTrackerRepository.findOne({
                 where: {
                     deal: { id: deal_id },
-                    user: { id: user.id }
+                    syndicate: { id: syndicate_id },
+                    email: user.email
                 }
             });
+
+            console.log(inviteExist, "invite exist")
 
             if (!inviteExist) {
                 return {
