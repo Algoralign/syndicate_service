@@ -1096,27 +1096,49 @@ export class DealService {
     }
 
 
-    async getDashboard(user: User) {
+    async getDashboard(user: User, syndicate_id: string) {
         try {
 
             // get the recent deals 
             const recentDeals = await this.dealRepository.find({
-                where: { user: { id: user.id } },
+                where: { syndicate: { id: syndicate_id } },
                 order: { created_at: 'DESC' }, // Assuming you have a 'createdAt' field
                 take: 5
             });
             // get the transaction
             const recentTrans = await this.transactionRepository.find({
-                where: { user: { id: user.id } },
+                where: { syndicate: { id: syndicate_id } },
                 order: { created_at: 'DESC' }, // Assuming you have a 'createdAt' field
                 take: 5
             });
+
+            // Using repository's findAndCount instead of query builder
+            const { totalInvestors } = await this.investmentRepository
+                .createQueryBuilder('investment')
+                .leftJoin('investment.user', 'user')
+                .where('investment.syndicateId = :syndicate_id', { syndicate_id })
+                .select('COUNT(DISTINCT user.id)', 'totalInvestors')
+                .getRawOne();
+
+
+
+            // get total deposited
+            const totalDeposited = await this.investmentRepository
+                .createQueryBuilder("investment")
+                .select("COALESCE(SUM(investment.investment_amount), 0)", "total")
+                .where("investment.investment_status = :status", { status: InvestmentStatus.APPROVED })
+                .andWhere("investment.is_active = :isActive", { isActive: true })
+                .andWhere("investment.syndicateId = :syndicateId", { syndicateId: syndicate_id }) // Ensure `syndicate_id` is passed correctly
+                .getRawOne();
+
 
 
             return {
                 status_code: 200,
                 error: false,
                 data: {
+                    totalInvestors,
+                    totalDeposit: totalDeposited.total,
                     recentTrans,
                     recentDeals,
                 }
