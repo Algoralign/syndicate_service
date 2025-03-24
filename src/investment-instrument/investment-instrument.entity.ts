@@ -23,9 +23,6 @@ class InvestmentInstrument {
     @Column({ nullable: true })
     code: string;
 
-    @OneToMany(() => Syndicate, (syndicate) => syndicate.investment_instrument)
-    syndicates: Syndicate[];
-
     @OneToMany(() => Deal, (deal) => deal.investment_instrument)
     deals: Deal[];
 

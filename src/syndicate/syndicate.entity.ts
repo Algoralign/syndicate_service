@@ -27,9 +27,6 @@ class Syndicate {
     @Column({ nullable: true })
     public name: string;
 
-    @Column({ nullable: true })
-    public ticket_size: number; // minimum amount a user can deposit 
-
     @ManyToOne(() => User, (user) => user.syndicates, { nullable: false, onDelete: 'CASCADE' })
     public user: User;
 
@@ -45,17 +42,12 @@ class Syndicate {
     @OneToMany(() => PaymentReceipt, (paymentReceipt) => paymentReceipt.syndicate)
     payment_receipts: PaymentReceipt[];
 
-    @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.syndicates, { nullable: true, onDelete: 'CASCADE' })
-    investment_instrument: InvestmentInstrument;
-
     @OneToMany(() => Transaction, (transaction) => transaction.syndicate)
     transactions: Transaction[];
 
     @Column({ type: "text", nullable: true })
     public description: string;
 
-    @Column({ nullable: true })
-    public percentage_fee: number;
 
     @Column({ nullable: true })
     public syndicate_website: string;

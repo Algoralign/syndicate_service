@@ -374,7 +374,7 @@ export class AdminService {
             //calculate the investment fee
             // const fee = (((syndicateExist.percentage_fee ?? 0) / 100) * (detail.investment_amount ?? 0));
 
-            let fee = this.dealService.calculateFee((syndicateExist.percentage_fee ?? 0), (detail?.investment_amount ?? 0));
+            let fee = this.dealService.calculateFee((dealExist.percentage_fee ?? 0), (detail?.investment_amount ?? 0));
 
 
             const entityManager = this.investmentRepository.manager;

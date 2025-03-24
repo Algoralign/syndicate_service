@@ -173,10 +173,7 @@ export class UserService {
         let syndicate = this.syndicateRepository.create({
           user: { id: user.id },
           name: userData.syndicate_name,
-          ticket_size: userData.ticket_size,
-          investment_instrument: investmentInstrument,
           description: userData.syndicate_description,
-          percentage_fee: userData.percentage_fee,
           syndicate_website: userData.syndicate_website,
         })
         await transactionalEntityManager.save(Syndicate, syndicate);
