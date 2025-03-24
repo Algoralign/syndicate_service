@@ -43,7 +43,6 @@ export class SyndicateService {
 
             const cSyndiacte = await this.syndicateRepository.save(syndicate)
 
-            cSyndiacte.user = null
 
             return {
                 status_code: 200,
@@ -106,6 +105,72 @@ export class SyndicateService {
     //     }
     // }
 
+    // async getUserSyndicates(user: User, details: any) {
+    //     try {
+    //         let { page_size, page_number } = details;
+
+    //         const pageNumber = Number(page_number) || 1;
+    //         const pageSize = Number(page_size) || 100;
+
+    //         // Fetch syndicates directly associated with the user
+    //         const [syndicatesFromUser, totalUserSyndicates] = await this.syndicateRepository.findAndCount({
+    //             where: { user: { email: user.email } },
+    //             relations: ['user', 'deals'],
+    //             select: ['id', 'name', 'created_at', 'updated_at'],
+    //             order: { created_at: 'DESC' },
+    //         });
+
+    //         console.log(syndicatesFromUser, "FROM USER")
+
+    //         // Fetch syndicates from deals where the user was invited
+    //         const userDeals = await this.invitationTrackerRepository
+    //             .createQueryBuilder('invitation')
+    //             .leftJoinAndSelect('invitation.deal', 'deal')
+    //             .leftJoinAndSelect('invitation.syndicate', 'syndicate')
+    //             .where('invitation.email = :email', { email: user.email })
+    //             .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
+    //             .getMany();
+
+    //         // Extract syndicates from invitations
+    //         const syndicatesFromDeals = userDeals.map(invite => invite.syndicate);
+
+    //         console.log(syndicatesFromDeals, "THE DEALS")
+    //         // Merge both sources and remove duplicates based on `id`
+    //         const uniqueSyndicates = [
+    //             ...new Map(
+    //                 [...syndicatesFromUser, ...syndicatesFromDeals].map(syndicate => [syndicate.id, syndicate])
+    //             ).values()
+    //         ];
+
+    //         console.log(syndicatesFromDeals, "UNIQUE SYNDICATE")
+
+    //         // Implement pagination on the merged syndicates
+    //         const total = uniqueSyndicates.length;
+    //         const paginatedSyndicates = uniqueSyndicates.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+
+    //         return {
+    //             status_code: 200,
+    //             error: false,
+    //             message: "Data retrieved successfully",
+    //             data: {
+    //                 syndicates: paginatedSyndicates,
+    //                 pagination: {
+    //                     current_page: pageNumber,
+    //                     page_size: pageSize,
+    //                     totalCount: total,
+    //                     total_pages: Math.ceil(total / pageSize),
+    //                 },
+    //             },
+    //         };
+    //     } catch (error) {
+    //         throw new InternalServerErrorException({
+    //             error: true,
+    //             status_code: 500,
+    //             message: error.message,
+    //         });
+    //     }
+    // }
+
     async getUserSyndicates(user: User, details: any) {
         try {
             let { page_size, page_number } = details;
@@ -116,16 +181,18 @@ export class SyndicateService {
             // Fetch syndicates directly associated with the user
             const [syndicatesFromUser, totalUserSyndicates] = await this.syndicateRepository.findAndCount({
                 where: { user: { email: user.email } },
-                relations: ['user', 'deals', 'investment_instrument'],
-                select: ['id', 'name', 'created_at', 'updated_at'],
+                relations: ['user', 'deals'],
                 order: { created_at: 'DESC' },
             });
+
+
 
             // Fetch syndicates from deals where the user was invited
             const userDeals = await this.invitationTrackerRepository
                 .createQueryBuilder('invitation')
                 .leftJoinAndSelect('invitation.deal', 'deal')
                 .leftJoinAndSelect('invitation.syndicate', 'syndicate')
+                .leftJoinAndSelect('syndicate.user', 'syndicate_creator') // Include creator details
                 .where('invitation.email = :email', { email: user.email })
                 .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
                 .getMany();
@@ -133,12 +200,16 @@ export class SyndicateService {
             // Extract syndicates from invitations
             const syndicatesFromDeals = userDeals.map(invite => invite.syndicate);
 
+
+
             // Merge both sources and remove duplicates based on `id`
             const uniqueSyndicates = [
                 ...new Map(
                     [...syndicatesFromUser, ...syndicatesFromDeals].map(syndicate => [syndicate.id, syndicate])
                 ).values()
             ];
+
+
 
             // Implement pagination on the merged syndicates
             const total = uniqueSyndicates.length;
@@ -166,6 +237,7 @@ export class SyndicateService {
             });
         }
     }
+
 
     // async getSyndicateDeals(id: any) {
     //     try {
