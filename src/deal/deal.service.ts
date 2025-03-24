@@ -268,6 +268,11 @@ export class DealService {
                     ticket_size: details.ticket_size && !isNaN(Number(details.ticket_size))
                         ? Number(details.ticket_size)
                         : 0.00,
+
+                    percentage_fee: details.percentage_fee && !isNaN(Number(details.percentage_fee))
+                        ? Number(details.percentage_fee)
+                        : 0.00,
+
                 });
 
 
@@ -296,7 +301,7 @@ export class DealService {
                 const trackers = invitedInv.map((invitee) => {
                     // calculate the investment fee for proposed amount
 
-                    let fee = this.calculateFee((theSyndicate?.percentage_fee ?? 0), (invitee?.amount ?? 0));
+                    let fee = this.calculateFee((createdDeal?.percentage_fee ?? 0), (invitee?.amount ?? 0));
 
                     return this.invitationTrackerRepository.create({
                         first_name: invitee.first_name,
@@ -324,7 +329,7 @@ export class DealService {
 
 
                 //invite self to deal
-                let fee = this.calculateFee((theSyndicate?.percentage_fee ?? 0), (details?.investing_amount ?? 0));
+                let fee = this.calculateFee((createdDeal?.percentage_fee ?? 0), (details?.investing_amount ?? 0));
                 const selfInvite = this.invitationTrackerRepository.create({
                     first_name: userExist.first_name,
                     last_name: userExist.last_name,
@@ -1009,7 +1014,6 @@ export class DealService {
                 select: [
                     'id',
                     'name',
-                    'ticket_size',
                     'created_at',
                     'updated_at'
                 ],

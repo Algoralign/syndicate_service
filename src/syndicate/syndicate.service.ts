@@ -22,7 +22,7 @@ export class SyndicateService {
     ) { }
 
 
-    async submitDeal(user: any, details: CreateSyndicateDto) {
+    async submitSyndicate(user: any, details: CreateSyndicateDto) {
         try {
 
             const userExist = await this.userRepository.findOneBy({ id: user.data.user.id })
@@ -32,38 +32,11 @@ export class SyndicateService {
             }
 
 
-            const investmentInstrument = await this.investmentInstrumentRepository
-                .createQueryBuilder('inv')
-                .where('inv.id = :id', { id: details.investment_instrument_id })
-                .getOne();
-
-
-            if (!investmentInstrument) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: 'investment instrument do not exist',
-                };
-            }
-
-
-
-            if (details.ticket_size && isNaN(Number(details.ticket_size))) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: 'ticket size must be a valid number',
-                };
-            }
-
 
             let syndicate = this.syndicateRepository.create({
                 user: userExist,
                 name: details.syndicate_name,
-                ticket_size: details.ticket_size,
-                investment_instrument: investmentInstrument,
                 description: details.syndicate_description,
-                percentage_fee: details.percentage_fee,
                 syndicate_website: details.syndicate_website,
             })
 

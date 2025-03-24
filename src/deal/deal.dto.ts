@@ -98,6 +98,12 @@ class CreateDealDto {
     @IsNotEmpty()
     @Transform(({ value }) => (Array.isArray(value) ? value : JSON.parse(value))) // Ensures value is an array
     investors: InvestorDto[];
+
+
+    @IsOptional() // Makes the field optional
+    @Transform(({ value }) => (value !== null && value !== undefined ? Number(value) : value)) // Converts only if present
+    @IsNumber()
+    percentage_fee?: number;
 }
 
 export default CreateDealDto;

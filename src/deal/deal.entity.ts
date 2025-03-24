@@ -112,6 +112,9 @@ export class Deal {
     @Column({ nullable: true })
     public ticket_size: number; // minimum amount a user can deposit 
 
+    @Column({ nullable: true })
+    public percentage_fee: number;
+
     @ManyToOne(() => Syndicate, (syndicate) => syndicate.deals, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'syndicate_id' }) // Foreign key column
     public syndicate: Syndicate;
@@ -124,6 +127,7 @@ export class Deal {
 
     @ManyToOne(() => InvestmentInstrument, (instrument) => instrument.deals, { nullable: true, onDelete: 'CASCADE' })
     investment_instrument: InvestmentInstrument;
+
 
     @CreateDateColumn()
     created_at: Date;

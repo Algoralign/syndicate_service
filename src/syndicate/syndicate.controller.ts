@@ -17,7 +17,7 @@ export class SyndicateController {
         @Body() details: CreateSyndicateDto,
         @Req() request: RequestWithUser,
     ): Promise<any> {
-        return await this.syndicateService.submitDeal(request.user, details);
+        return await this.syndicateService.submitSyndicate(request.user, details);
     }
 
 
