@@ -54,23 +54,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     user.password = undefined;
 
 
-    // const userDeals = await this.invitationTrackerRepository
-    //   .createQueryBuilder('invitation')
-    //   .leftJoinAndSelect('invitation.deal', 'deal')
-    //   .leftJoinAndSelect('invitation.syndicate', 'syndicate')
-    //   .where('invitation.email = :email', { email: user.email })
-    //   .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
-    //   .getMany();
 
-
-      const userDeals = await this.invitationTrackerRepository
-        .createQueryBuilder('invitation')
-        .leftJoinAndSelect('invitation.deal', 'deal')
-        .leftJoinAndSelect('invitation.syndicate', 'syndicate')
-        .leftJoinAndSelect('syndicate.user', 'syndicate_creator') // Include creator details
-        .where('invitation.email = :email', { email: user.email })
-        .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
-        .getMany();
+    const userDeals = await this.invitationTrackerRepository
+      .createQueryBuilder('invitation')
+      .leftJoinAndSelect('invitation.deal', 'deal')
+      .leftJoinAndSelect('invitation.syndicate', 'syndicate')
+      .leftJoinAndSelect('syndicate.user', 'syndicate_creator') // Include creator details
+      .where('invitation.email = :email', { email: user.email })
+      .distinctOn(['invitation.deal', 'invitation.syndicate']) // PostgreSQL only
+      .getMany();
 
 
     // Step 3: Extract syndicates from both sources

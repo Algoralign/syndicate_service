@@ -272,7 +272,6 @@ export class SyndicateService {
             // Fetch syndicate with basic details
             const syndicate = await this.syndicateRepository.findOne({
                 where: { id: syndicate_id },
-                relations: ['investment_instrument'],
             });
 
             if (!syndicate) {
