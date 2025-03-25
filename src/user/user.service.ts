@@ -135,21 +135,7 @@ export class UserService {
       }
 
 
-      // check if the instrument exists
 
-      const investmentInstrument = await this.investmentInstrumentRepository
-        .createQueryBuilder('inv')
-        .where('inv.id = :id', { id: userData.investment_instrument_id })
-        .getOne();
-
-
-      if (!investmentInstrument) {
-        return {
-          status_code: 400,
-          error: true,
-          message: 'investment instrument do not exist',
-        };
-      }
 
       const entityManager = this.userRepository.manager;
       return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
