@@ -158,6 +158,9 @@ export class AdminService {
 
 
 
+
+
+
     async getUsers(details: any) {
         try {
             let { page_size, page_number } = details;
@@ -255,48 +258,6 @@ export class AdminService {
     }
 
 
-    async rejectPayment(detail: RejectPaymentDto) {
-        try {
-            const receiptExist = await this.paymentReceiptRepository.findOne({
-                where: { id: detail.receipt_id }
-            })
-
-            if (!receiptExist) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: "payment with id do not exist",
-
-                };
-            }
-
-            if (receiptExist.approved) {
-                return {
-                    status_code: 400,
-                    error: true,
-                    message: "payment receipt already approved",
-                };
-            }
-
-            receiptExist.reject_reason = detail.reason
-            receiptExist.rejected = true
-
-            await this.paymentReceiptRepository.save(receiptExist)
-
-            return {
-                status_code: 200,
-                error: false,
-                message: "reject message updated succesfully",
-
-            };
-        } catch (error) {
-            throw new InternalServerErrorException({
-                error: true,
-                status_code: 500,
-                message: error.message,
-            });
-        }
-    }
 
 
     async approvePayment(detail: ApprovePaymentDto) {
@@ -372,8 +333,6 @@ export class AdminService {
             }
 
             //calculate the investment fee
-            // const fee = (((syndicateExist.percentage_fee ?? 0) / 100) * (detail.investment_amount ?? 0));
-
             let fee = this.dealService.calculateFee((dealExist.percentage_fee ?? 0), (detail?.investment_amount ?? 0));
 
 
@@ -433,6 +392,105 @@ export class AdminService {
             // create investment
         } catch (error) {
             console.log(error)
+            throw new InternalServerErrorException({
+                error: true,
+                status_code: 500,
+                message: error.message,
+            });
+        }
+    }
+
+
+    async rejectPayment(detail: RejectPaymentDto) {
+        try {
+
+
+            const entityManager = this.paymentReceiptRepository.manager;
+
+            return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+                const receiptExist = await this.paymentReceiptRepository.findOne({
+                    where: { id: detail.receipt_id }
+                })
+
+                if (!receiptExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "payment with id do not exist",
+
+                    };
+                }
+
+                if (receiptExist.approved) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "payment receipt already approved",
+                    };
+                }
+
+                receiptExist.reject_reason = detail.reason
+                receiptExist.rejected = true
+
+                // await this.paymentReceiptRepository.save(receiptExist)
+                await transactionalEntityManager.save(PaymentReceipt, receiptExist);
+
+                // get the invitation tracker
+                const inviteExist = await this.invitationTrackerRepository.findOne({
+                    where: {
+                        email: receiptExist.user.email,
+                        syndicate: { id: receiptExist.syndicate.id },
+                        deal: { id: receiptExist.deal.id },
+                    },
+                });
+
+                if (!inviteExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "invitation do not exist on system",
+                    };
+                }
+
+                // get the user
+                const userExist = await this.userRepository.findOne({ where: { email: receiptExist.user.email, } })
+                if (!receiptExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "user do not exist on system",
+                    };
+                }
+
+                // get the deal
+                const dealExist = await this.dealRepository.findOne({ where: { id: receiptExist.deal.id } })
+                if (!dealExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "deal do not exist",
+                    };
+                }
+
+                // get the deal
+                const syndicateExist = await this.syndicateRepository.findOne({ where: { id: receiptExist.syndicate.id } })
+                if (!syndicateExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "syndicate do not exist",
+                    };
+                }
+
+
+                return {
+                    status_code: 200,
+                    error: false,
+                    message: "reject message updated succesfully",
+
+                };
+            })
+        } catch (error) {
             throw new InternalServerErrorException({
                 error: true,
                 status_code: 500,

@@ -1056,7 +1056,7 @@ export class DealService {
             // Using repository's findAndCount instead of query builder
             const deal = await this.dealRepository.findOne({
                 where: { id: deal_id, syndicate: { id: syndicate_id } },
-                relations: ['startup_industry', 'syndicate'],
+                relations: ['startup_industry', 'syndicate', 'investment_instrument'],
             });
 
             const investment = await this.investmentRepository.findOne({ where: { deal: { id: deal.id }, user: { id: user.id } }, relations: ['deal', 'user'] })
