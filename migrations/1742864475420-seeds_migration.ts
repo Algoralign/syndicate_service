@@ -1,15 +1,14 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 import { countryData } from '../src/_data/countries';
 
-export class SeedsSql1742492173627 implements MigrationInterface {
+export class SeedsMigration1742864475420 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             INSERT INTO "investment_instruments" ("id", "name", "code", "created_at", "updated_at") 
             VALUES 
                 (uuid_generate_v4(), 'S.A.F.E', 'SE', NOW(), NOW()),
-                (uuid_generate_v4(), 'OnAfrica PACT', 'OP', NOW(), NOW()),
-                (uuid_generate_v4(), 'Others', 'OT', NOW(), NOW());
+                (uuid_generate_v4(), 'OnAfrica PACT', 'OP', NOW(), NOW());
         `);
 
 
@@ -377,6 +376,5 @@ export class SeedsSql1742492173627 implements MigrationInterface {
         `);
 
     }
-
 
 }
