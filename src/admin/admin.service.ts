@@ -61,6 +61,7 @@ export class AdminService {
                     'uploaded',
                     'verified',
                     'phone',
+                    'failure_reason',
                     'created_at',
                     'updated_at'
                 ],
