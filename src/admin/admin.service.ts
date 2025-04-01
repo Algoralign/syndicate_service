@@ -111,6 +111,7 @@ export class AdminService {
 
                 kycExist.verified = true
                 kycExist.rejected = false
+
                 await this.kycRepository.save(kycExist)
 
                 // send email 
@@ -137,6 +138,7 @@ export class AdminService {
                 }
 
                 kycExist.rejected = true
+                kycExist.failure_reason = detail.failed_reason
                 await this.kycRepository.save(kycExist)
 
                 await this.mailService.sendKycFailEmail(data);

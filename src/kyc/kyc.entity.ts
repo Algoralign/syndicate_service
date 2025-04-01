@@ -74,6 +74,9 @@ class Kyc {
     @Column({ nullable: true })
     public phone: string;
 
+    @Column({ type: 'text', nullable: true })
+    public failure_reason: string;
+
     @CreateDateColumn({ type: 'timestamp' })
     public created_at: Date;
 
