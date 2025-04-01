@@ -24,12 +24,9 @@ class CreateUserDto {
     @IsString()
     syndicate_name: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     syndicate_website: string;
-
-
-
 }
 
 

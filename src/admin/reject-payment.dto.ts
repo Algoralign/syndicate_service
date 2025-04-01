@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 class RejectPaymentDto {
     @IsNotEmpty()
@@ -9,6 +10,11 @@ class RejectPaymentDto {
     @IsNotEmpty()
     @IsString()
     reason: string;
+
+    @IsOptional()
+    @Transform(({ value }) => (value === '' ? undefined : Number(value))) // Reject empty string
+    @IsNumber()
+    investment_amount: number;
 }
 
 

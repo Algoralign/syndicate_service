@@ -406,8 +406,8 @@ export class AdminService {
 
 
             const entityManager = this.paymentReceiptRepository.manager;
-
             return await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+
                 const receiptExist = await this.paymentReceiptRepository.findOne({
                     where: { id: detail.receipt_id }
                 })
@@ -429,28 +429,6 @@ export class AdminService {
                     };
                 }
 
-                receiptExist.reject_reason = detail.reason
-                receiptExist.rejected = true
-
-                // await this.paymentReceiptRepository.save(receiptExist)
-                await transactionalEntityManager.save(PaymentReceipt, receiptExist);
-
-                // get the invitation tracker
-                const inviteExist = await this.invitationTrackerRepository.findOne({
-                    where: {
-                        email: receiptExist.user.email,
-                        syndicate: { id: receiptExist.syndicate.id },
-                        deal: { id: receiptExist.deal.id },
-                    },
-                });
-
-                if (!inviteExist) {
-                    return {
-                        status_code: 400,
-                        error: true,
-                        message: "invitation do not exist on system",
-                    };
-                }
 
                 // get the user
                 const userExist = await this.userRepository.findOne({ where: { email: receiptExist.user.email, } })
@@ -482,12 +460,47 @@ export class AdminService {
                     };
                 }
 
+                receiptExist.reject_reason = detail.reason
+                receiptExist.rejected = true
+                await transactionalEntityManager.save(PaymentReceipt, receiptExist);
+
+                // get the invitation tracker
+                const inviteExist = await this.invitationTrackerRepository.findOne({
+                    where: {
+                        email: receiptExist.user.email,
+                        syndicate: { id: receiptExist.syndicate.id },
+                        deal: { id: receiptExist.deal.id },
+                    },
+                });
+
+                if (!inviteExist) {
+                    return {
+                        status_code: 400,
+                        error: true,
+                        message: "invitation do not exist on system",
+                    };
+                }
+
+                // create transaction for the payment
+                const createdTransaction = this.transactionRepository.create({
+                    user: userExist,
+                    deal: dealExist,
+                    syndicate: syndicateExist,
+                    currency: inviteExist.currency,
+                    amount: detail.investment_amount,
+                    status: TransactionStatus.FAILED,
+                    type: TransactionType.INVESTMENT,
+                    receipt_url: receiptExist.recipt_img,
+                    payment_gateway: "Bank Transfer/Deposit",
+                    notes: detail.reason
+                })
+                await transactionalEntityManager.save(Transaction, createdTransaction);
+
 
                 return {
                     status_code: 200,
                     error: false,
                     message: "reject message updated succesfully",
-
                 };
             })
         } catch (error) {
