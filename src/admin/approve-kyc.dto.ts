@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 class ApproveKYCDto {
     @IsNotEmpty()
@@ -10,7 +10,7 @@ class ApproveKYCDto {
     @IsString()
     verified: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     failed_reason: string;
 }
